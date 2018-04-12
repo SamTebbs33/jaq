@@ -3,6 +3,7 @@
 //
 
 #include "print.h"
+#include "framebuffer.h"
 
 char fg = FB_WHITE, bg = FB_BLACK;
 unsigned int row = 0, column = 0;
@@ -34,4 +35,9 @@ void print_at(unsigned int r, unsigned int c) {
     row = r;
     column = c;
     fb_cursor(r, c);
+}
+
+void print_clear() {
+    fb_clear(fg, bg);
+    fb_cursor(0, 0);
 }
