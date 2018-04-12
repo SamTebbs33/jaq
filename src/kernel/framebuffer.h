@@ -5,6 +5,8 @@
 #ifndef PROJECT_FRAMEBUFFER_H
 #define PROJECT_FRAMEBUFFER_H
 
+#include "stdint.h"
+
 #define FB_BLACK 0
 #define FB_BLUE 1
 #define FB_GREEN 2
@@ -28,5 +30,6 @@
 
 void fb_putc(unsigned char ch, unsigned char fg, unsigned char bg);
 void fb_cursor(unsigned int row, unsigned int column);
+void fb_clear(uint8_t fg, uint8_t bg);
 
 #endif //PROJECT_FRAMEBUFFER_H
