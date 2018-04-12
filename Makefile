@@ -1,7 +1,7 @@
 BUILD_DIR = build
 OBJ_DIR = $(BUILD_DIR)/obj
 
-OBJECT_NAMES = boot kmain framebuffer print util gdt
+OBJECT_NAMES = boot kmain framebuffer print util gdt idt idt_asm keyboard timer
 OBJECTS = $(patsubst %,$(OBJ_DIR)/%.o,$(OBJECT_NAMES))
 
 C_FLAGS = -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector \
