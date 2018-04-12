@@ -55,6 +55,12 @@ gdt_flush:
    mov fs, ax
    mov gs, ax
    mov ss, ax
+
+   ; Enter protected mode
+   mov eax, cr0
+   or al, 1
+   mov cr0, eax
+
    jmp 0x08:.flush   ; 0x08 is the offset to our code segment: Far jump!
 .flush:
    ret
@@ -64,4 +70,5 @@ gdt_flush:
 idt_flush:
    mov eax, [esp+4]  ; Get the pointer to the IDT, passed as a parameter.
    lidt [eax]        ; Load the IDT pointer.
+   sti
    ret
