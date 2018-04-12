@@ -5,14 +5,13 @@
 #include "print.h"
 #include "gdt.h"
 #include "idt.h"
+#include "keyboard.h"
 
 void kmain() {
     gdt_init();
     idt_init();
 
+    keyboard_init();
     print_clear();
     PRINT("Hello, world!");
-
-    asm volatile ("int $0x3");
-    asm volatile ("int $0x4");
 }
