@@ -3,8 +3,10 @@
 //
 
 #include "print.h"
+#include "gdt.h"
 
 void kmain() {
+    gdt_init();
     print_clear();
-    PRINT("hi");
+    PRINT("Hello, world!");
 }
