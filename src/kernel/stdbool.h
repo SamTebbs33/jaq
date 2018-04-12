@@ -5,9 +5,11 @@
 #ifndef SAMIX_BOOL_H
 #define SAMIX_BOOL_H
 
-#define TRUE 0xFF
-#define FALSE 0
+#include "stdint.h"
 
-typedef char bool;
+#define TRUE 0xFF
+#define FALSE 0x00
+
+typedef uint8_t bool;
 
 #endif //SAMIX_BOOL_H
