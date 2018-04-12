@@ -5,5 +5,6 @@
 #include "print.h"
 
 void kmain() {
+    print_clear();
     PRINT("hi");
 }
