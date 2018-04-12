@@ -30,3 +30,15 @@
 
 # Debug files
 *.dSYM/
+
+\.idea/
+
+cmake-build-debug/
+
+\.DS_Store
+
+CMakeLists\.txt
+
+build/iso/boot/grub/stage2_eltorito
+
+build/os\.iso
