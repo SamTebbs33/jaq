@@ -160,7 +160,10 @@ bool handle(interrupt_registers_t registers) {
 }
 
 void isr_handler(interrupt_registers_t registers) {
-    handle(registers);
+    if(!handle(registers)) {
+        PRINT("Unhandled exception: ");
+        print_u32(registers.int_no);
+    }
 }
 
 void irq_handler(interrupt_registers_t registers) {
