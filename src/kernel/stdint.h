@@ -12,7 +12,7 @@ typedef unsigned short uint16_t;
 typedef unsigned int uint32_t;
 typedef unsigned long long uint64_t;
 
-#define UINT_MAX(bits) (uint32_t) (1 << bits) - 1
+#define UINT_MAX(bits) (uint32_t) (0x00000001 << bits) - 1
 #define UINT8_MAX UINT_MAX(8)
 #define UINT16_MAX UINT_MAX(16)
 #define UINT32_MAX UINT_MAX(32)
