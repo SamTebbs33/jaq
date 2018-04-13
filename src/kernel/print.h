@@ -8,7 +8,8 @@
 #include "stdint.h"
 
 void print_ch(char ch);
-void print(char* buff, unsigned int len);
+void print(char* buff);
+void print_len(char *buff, unsigned int len);
 void print_u8(uint8_t u8);
 void print_u16(uint16_t u16);
 void print_u32(uint32_t u32);
@@ -17,6 +18,6 @@ void print_fg(char fg);
 void print_at(unsigned int r, unsigned int c);
 void print_clear();
 
-#define PRINT(s) print(s, sizeof(s))
+#define PRINT(s) print_len(s, sizeof(s))
 
 #endif //SAMIX_PRINT_H
