@@ -5,8 +5,8 @@
 #include "print.h"
 #include "gdt.h"
 #include "idt.h"
-#include "keyboard.h"
-#include "timer.h"
+#include "../drivers/keyboard.h"
+#include "../drivers/timer.h"
 
 void kmain() {
     gdt_init();
