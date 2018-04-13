@@ -4,6 +4,7 @@
 
 #include "print.h"
 #include "framebuffer.h"
+#include "stdbool.h"
 
 char fg = FB_WHITE, bg = FB_BLACK;
 unsigned int row = 0, column = 0;
@@ -13,14 +14,8 @@ void print(char *buff, unsigned int len) {
     for (unsigned int i = 0; i < len && (ch = buff[i]); ++i) {
         // Return if we're at the end of the screen
         if(row >= FB_ROWS) return;
-        fb_putc(ch, fg, bg);
-        column++;
-        if(column >= FB_COLUMNS) {
-            column = 0;
-            row++;
-        }
+        print_ch(ch);
     }
-    fb_cursor(row, column);
 }
 
 void print_bg(char arg) {
@@ -40,4 +35,33 @@ void print_at(unsigned int r, unsigned int c) {
 void print_clear() {
     fb_clear(fg, bg);
     fb_cursor(0, 0);
+}
+
+void print_u8(uint8_t u8) {
+    print_u32(u8);
+}
+
+void print_u16(uint16_t u16) {
+    print_u32(u16);
+}
+
+void print_u32_rec(uint32_t u32, bool first) {
+    if(u32 > 0) print_u32_rec(u32 / 10, FALSE);
+    else if(!first) return;
+    uint8_t digit = (uint8_t) (u32 % 10);
+    print_ch((char) (digit + '0'));
+}
+
+void print_u32(uint32_t u32) {
+    print_u32_rec(u32, TRUE);
+}
+
+void print_ch(char ch) {
+    fb_putc(ch, fg, bg);
+    column++;
+    if(column >= FB_COLUMNS) {
+        column = 0;
+        row++;
+    }
+    fb_cursor(row, column);
 }
