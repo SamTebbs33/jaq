@@ -41,7 +41,7 @@ int32_t get_frame(uint32_t frame_addr) {
 }
 
 uint32_t first_free_frame() {
-    for (int i = 0; i < FRAME_OFFSET(n_frames); ++i) {
+    for (uint32_t i = 0; i < FRAME_OFFSET(n_frames); ++i) {
         uint32_t frame = frames[i];
         // If at least one bit in the frame is free
         if(frame != FULL_FRAME) {
@@ -81,7 +81,7 @@ void paging_init(uint32_t mem_size) {
     kernel_directory = (page_directory_t *) kmalloc_a(sizeof(page_directory_t));
     memset(kernel_directory, sizeof(page_directory_t), 0);
 
-    for (int i = 0; i < placement_address; i += 0x1000) {
+    for (uint32_t i = 0; i < placement_address; i += 0x1000) {
         // Allocate a frame for kernel that is non-writable from user space
         alloc_frame(paging_get_page(i, kernel_directory, TRUE), FALSE, FALSE);
     }
