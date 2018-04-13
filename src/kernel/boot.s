@@ -16,7 +16,7 @@ MBOOT_CHECKSUM      equ -(MBOOT_HEADER_MAGIC + MBOOT_HEADER_FLAGS)
 [GLOBAL mboot]                  ; Make 'mboot' accessible from C.
 [EXTERN code]                   ; Start of the '.text' section.
 [EXTERN bss]                    ; Start of the .bss section.
-[EXTERN end]                    ; End of the last loadable section.
+[EXTERN kernel_end]             ; End of the last loadable section.
 
 mboot:
   dd  MBOOT_HEADER_MAGIC        ; GRUB will search for this value on each
@@ -27,7 +27,7 @@ mboot:
   dd  mboot                     ; Location of this descriptor
   dd  code                      ; Start of kernel '.text' (code) section.
   dd  bss                       ; End of kernel '.data' section.
-  dd  end                       ; End of kernel.
+  dd  kernel_end                ; End of kernel.
   dd  start                     ; Kernel entry point (initial EIP).
 
 [GLOBAL start]                  ; Kernel entry point.
