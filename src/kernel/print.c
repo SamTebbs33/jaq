@@ -9,7 +9,24 @@
 char fg = FB_WHITE, bg = FB_BLACK;
 unsigned int row = 0, column = 0;
 
-void print(char *buff, unsigned int len) {
+void print_panic(char* str, char* filename, uint32_t line) {
+    print("PANIC: ");
+    print(str);
+    print(" @ ");
+    print(filename);
+    print(":");
+    print_u32(line);
+}
+
+void print(char* str) {
+    char ch;
+    while((ch = *str++)) {
+        if(row >= FB_ROWS) return;
+        print_ch(ch);
+    }
+}
+
+void print_len(char *buff, unsigned int len) {
     char ch;
     for (unsigned int i = 0; i < len && (ch = buff[i]); ++i) {
         // Return if we're at the end of the screen
