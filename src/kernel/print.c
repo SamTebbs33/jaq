@@ -9,15 +9,6 @@
 char fg = FB_WHITE, bg = FB_BLACK;
 unsigned int row = 0, column = 0;
 
-void print_panic(char* str, char* filename, uint32_t line) {
-    print("PANIC: ");
-    print(str);
-    print(" @ ");
-    print(filename);
-    print(":");
-    print_u32(line);
-}
-
 void print(char* str) {
     char ch;
     while((ch = *str++)) {
