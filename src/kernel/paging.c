@@ -86,7 +86,7 @@ void paging_init(uint32_t mem_size) {
         alloc_frame(paging_get_page(i, kernel_directory, TRUE), FALSE, FALSE);
     }
 
-    interrupts_register_handler(IRQ_14, page_fault);
+    interrupts_register_handler(ISR_14, page_fault);
     paging_set_directory(kernel_directory);
 }
 
