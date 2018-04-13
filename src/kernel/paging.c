@@ -15,11 +15,12 @@ extern void* kernel_end;
 uint32_t placement_address = (uint32_t) &kernel_end;
 
 #define BITS_PER_FRAME 32
+#define BYTES_PER_FRAME 0x1000
 #define FULL_FRAME 0xFFFFFFFF
 #define FRAME_OFFSET(n) (n / (BITS_PER_FRAME))
 #define BIT_OFFSET(n) (n % BITS_PER_FRAME)
-#define FRAME_FROM_ADDR(a) a / 0x1000
-#define ADDR_FROM_FRAME(a) a * 0x1000
+#define FRAME_FROM_ADDR(a) a / BYTES_PER_FRAME
+#define ADDR_FROM_FRAME(a) a * BYTES_PER_FRAME
 
 page_directory_t* kernel_directory;
 
@@ -81,7 +82,7 @@ void paging_init(uint32_t mem_size) {
     kernel_directory = (page_directory_t *) kmalloc_a(sizeof(page_directory_t));
     memset(kernel_directory, sizeof(page_directory_t), 0);
 
-    for (uint32_t i = 0; i < placement_address; i += 0x1000) {
+    for (uint32_t i = 0; i < placement_address; i += BYTES_PER_FRAME) {
         // Allocate a frame for kernel that is non-writable from user space
         alloc_frame(paging_get_page(i, kernel_directory, TRUE), FALSE, FALSE);
     }
@@ -106,7 +107,7 @@ page_t *paging_get_page(uint32_t addr, page_directory_t *page_dir, bool create) 
     else if(create) {
         uint32_t tmp;
         page_table_t* table = (page_table_t *) kmalloc_ap(sizeof(page_table_t), &tmp);
-        memset(table, 0x1000, 0);
+        memset(table, BYTES_PER_FRAME, 0);
         page_dir->tables_physical[table_idx] = tmp | 0x7; //Present, writable and user level
         page_dir->tables[table_idx] = table;
         return &table->pages[page_idx];
