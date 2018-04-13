@@ -18,6 +18,6 @@ void print_fg(char fg);
 void print_at(unsigned int r, unsigned int c);
 void print_clear();
 
-#define PRINT(s) print(s, sizeof(s))
+#define PRINT(s) print_len(s, sizeof(s))
 
 #endif //SAMIX_PRINT_H
