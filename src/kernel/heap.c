@@ -30,20 +30,23 @@ heap_index_t* heap_index_create(size_t max_size) {
 }
 
 heap_t *heap_create(uint32_t start_addr, uint32_t end_addr, bool is_kernel, bool is_writable, uint32_t index_size) {
-    if(start_addr < end_addr && is_page_aligned(start_addr) && is_page_aligned(end_addr)) {
-        heap_t *heap = (heap_t *) kmalloc(sizeof(heap_t));
-        if(heap) {
-            heap->start_addr = start_addr;
-            heap->end_addr = end_addr;
-            heap->is_kernel = is_kernel;
-            heap->is_writable = is_writable;
-            heap->capacity = end_addr - start_addr;
-            heap->occupied = 0;
-            heap->hole_index = heap_index_create(index_size);
-        }
-        return heap;
+    heap_t *heap = (heap_t *) kmalloc(sizeof(heap_t));
+    if(heap) {
+        heap->start_addr = start_addr;
+        heap->end_addr = end_addr;
+        heap->is_kernel = is_kernel;
+        heap->is_writable = is_writable;
+        heap->capacity = end_addr - start_addr;
+        heap->occupied = 0;
+        heap->hole_index = heap_index_create(index_size);
+
+        heap_header_t* initial_hole = (heap_header_t *) start_addr;
+        initial_hole->magic = HEAP_MAGIC;
+        initial_hole->is_hole = TRUE;
+        initial_hole->size = end_addr - start_addr - sizeof(heap_header_t) - sizeof(heap_footer_t);
+        add_hole(initial_hole, heap->hole_index);
     }
-    return NULL;
+    return heap;
 }
 
 heap_header_t* find_hole(size_t size, heap_t* heap) {
