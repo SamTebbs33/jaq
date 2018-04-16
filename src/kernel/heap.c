@@ -80,6 +80,8 @@ void *heap_alloc(size_t size, heap_t *heap) {
             }
             hole->is_hole = FALSE;
             uint32_t data_addr = (uint32_t) hole + sizeof(heap_header_t);
+            // The memory taken up by the block is now occupied
+            heap->occupied += hole->size + sizeof(heap_header_t) + sizeof(heap_footer_t);
             return (void *) data_addr;
         }
     }
@@ -95,6 +97,8 @@ void heap_free(void *ptr, heap_t *heap) {
             join_right(header, heap);
             // If this hole wasn't incorporated into the left one, then add it to the hole index
             if(!join_left(header, heap)) add_hole(header, heap->hole_index);
+            // The memory taken up by the block is released
+            heap->occupied -= header->size + sizeof(heap_header_t) + sizeof(heap_footer_t);
             return;
         }
     }
