@@ -50,7 +50,7 @@ heap_header_t* find_hole(size_t size, heap_t* heap) {
     heap_index_t* index = heap->hole_index;
     size_t best_size = SIZE_MAX;
     heap_header_t* best_header = NULL;
-    for (int i = 0; i < index->size; ++i) {
+    for (uint32_t i = 0; i < index->size; ++i) {
         heap_header_t* header = index->entries[i];
         if(header->is_hole && header->size >= size) {
             if(header->size == size) {
@@ -167,7 +167,10 @@ void remove_hole(heap_header_t *hole, heap_index_t *index) {
     while(i < index->size && index->entries[i++] != hole);
     if(i > 0) {
         // Shift subsequent entries left, the last one isn't replace but that's fine
-        while (i > 0 && i < index->size) index->entries[i - 1] = index->entries[i++];
+        while (i > 0 && i < index->size) {
+            index->entries[i - 1] = index->entries[i];
+            i++;
+        }
         index->size--;
     }
 }
@@ -202,5 +205,5 @@ void split_right(heap_header_t *hole, size_t size, heap_t *heap) {
 }
 
 bool is_page_aligned(uint32_t addr) {
-    return (bool) ((addr & BYTES_PER_PAGE > 0) ? TRUE : FALSE);
+    return ((addr & BYTES_PER_PAGE) > 0) ? TRUE : FALSE;
 }
