@@ -5,6 +5,7 @@
 #include "paging.h"
 #include "util.h"
 #include "mem.h"
+#include "heap.h"
 #include "interrupts.h"
 
 // Bitmap for frames
@@ -13,6 +14,8 @@ uint32_t n_frames;
 
 extern void* kernel_end;
 uint32_t placement_address = (uint32_t) &kernel_end;
+page_directory_t* kernel_directory;
+heap_t* kernel_heap;
 
 #define BITS_PER_FRAME 32
 #define FULL_FRAME 0xFFFFFFFF
@@ -20,6 +23,11 @@ uint32_t placement_address = (uint32_t) &kernel_end;
 #define BIT_OFFSET(n) (n % BITS_PER_FRAME)
 #define FRAME_FROM_ADDR(a) a / BYTES_PER_PAGE
 #define ADDR_FROM_FRAME(a) a * BYTES_PER_PAGE
+
+#define KHEAP_START         0xC0000000
+#define KHEAP_INITIAL_SIZE  0x100000
+#define HEAP_INDEX_SIZE   0x20000
+#define HEAP_MIN_SIZE     0x70000
 
 void page_fault(interrupt_registers_t registers) ;
 
@@ -79,13 +87,16 @@ void paging_init(uint32_t mem_size) {
     kernel_directory = (page_directory_t *) kmalloc_a(sizeof(page_directory_t));
     memset(kernel_directory, sizeof(page_directory_t), 0);
 
-    for (uint32_t i = 0; i < placement_address; i += BYTES_PER_PAGE) {
-        // Allocate a frame for kernel that is non-writable from user space
-        alloc_frame(paging_get_page(i, kernel_directory, TRUE), FALSE, FALSE);
-    }
+    for (uint32_t i = KHEAP_START; i < KHEAP_START+KHEAP_INITIAL_SIZE; i += BYTES_PER_PAGE)
+        paging_get_page(i, kernel_directory, TRUE);
+
+    for (uint32_t i = KHEAP_START; i < KHEAP_START+KHEAP_INITIAL_SIZE; i += BYTES_PER_PAGE)
+        alloc_frame( paging_get_page(i, kernel_directory, TRUE), FALSE, FALSE);
 
     interrupts_register_handler(ISR_14, page_fault);
     paging_set_directory(kernel_directory);
+
+    kernel_heap = heap_create(KHEAP_START, KHEAP_START + KHEAP_INITIAL_SIZE, FALSE, FALSE, HEAP_INDEX_SIZE);
 }
 
 void paging_set_directory(page_directory_t *new) {

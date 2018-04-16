@@ -32,8 +32,6 @@ typedef struct {
     uint32_t physical_addr;
 } page_directory_t;
 
-page_directory_t* kernel_directory;
-
 void paging_init(uint32_t mem_size);
 void paging_set_directory(page_directory_t* new);
 page_t* paging_get_page(uint32_t addr, page_directory_t* page_dir, bool create);
