@@ -15,7 +15,7 @@ uint32_t n_frames;
 extern void* kernel_end;
 uint32_t placement_address = (uint32_t) &kernel_end;
 page_directory_t* kernel_directory;
-heap_t* kernel_heap;
+heap_t* kernel_heap = NULL;
 
 #define BITS_PER_FRAME 32
 #define FULL_FRAME 0xFFFFFFFF
