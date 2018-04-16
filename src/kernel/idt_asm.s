@@ -32,7 +32,7 @@ ISR_ERR 13
 ISR_ERR 14
 ISR_NO_ERR 15
 ISR_NO_ERR 16
-ISR_NO_ERR 17
+ISR_ERR 17
 ISR_NO_ERR 18
 ISR_NO_ERR 19
 ISR_NO_ERR 20
@@ -45,7 +45,7 @@ ISR_NO_ERR 26
 ISR_NO_ERR 27
 ISR_NO_ERR 28
 ISR_NO_ERR 29
-ISR_NO_ERR 30
+ISR_ERR 30
 ISR_NO_ERR 31
 
 [EXTERN isr_handler]
@@ -75,7 +75,6 @@ isr_common:
 
    popa                     ; Pops edi,esi,ebp...
    add esp, 8     ; Cleans up the pushed error code and pushed ISR number
-   sti
    iret           ; pops 5 things at once: CS, EIP, EFLAGS, SS, and ESP
 
 %macro IRQ 2
