@@ -8,9 +8,9 @@ bits 32
 
 section .multiboot
 align 4
-  dd  MAGIC
-  dd  FLAGS
-  dd  CHECKSUM
+    dd  MAGIC
+    dd  FLAGS
+    dd  CHECKSUM
 
 section .bss
 align 16
@@ -24,12 +24,10 @@ extern kmain
 
 start:
     mov esp, kernel_stack_end
-    push ebx
-    call kmain
+    push    ebx
     cli
-    .loop
-        hlt
-        jmp .loop
+    call kmain
+    jmp $
 
 global gdt_flush
 

@@ -86,14 +86,16 @@ void paging_init(uint32_t mem_size) {
 
     interrupts_register_handler(ISR_14, page_fault);
     paging_set_directory(kernel_directory);
+
+    // Enable paging
+    uint32_t cr0;
+    asm ("mov %%cr0, %0": "=r"(cr0));
+    cr0 |= 0x80000000;
+    asm ("mov %0, %%cr0":: "r"(cr0));
 }
 
 void paging_set_directory(page_directory_t *new) {
-    asm volatile("mov %0, %%cr3":: "r"(&new->tables_physical));
-    uint32_t cr0;
-    asm volatile("mov %%cr0, %0": "=r"(cr0));
-    cr0 |= 0x80000000; // Enable paging and put new value back into cr0
-    asm volatile("mov %0, %%cr0":: "r"(cr0));
+    asm ("mov %0, %%cr3":: "r"(&new->tables_physical));
 }
 
 page_t *paging_get_page(uint32_t addr, page_directory_t *page_dir, bool create) {
