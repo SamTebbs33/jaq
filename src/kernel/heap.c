@@ -101,8 +101,8 @@ void heap_free(void *ptr, heap_t *heap) {
     PANIC("Freeing unallocated memory");
 }
 
-    // TODO
 void add_hole(heap_header_t *hole, heap_index_t *index) {
+    if(index->size < index->max_size) index->entries[index->size++] = hole;
 }
 
 bool join_left(heap_header_t *header, heap_t *heap) {
@@ -114,7 +114,14 @@ bool join_right(heap_header_t *header, heap_t *heap) {
 }
 
 void remove_hole(heap_header_t *hole, heap_index_t *index) {
-    // TODO
+    uint32_t i = 0;
+    // Find hole after this one
+    while(i < index->size && index->entries[i++] != hole);
+    if(i > 0) {
+        // Shift subsequent entries left, the last one isn't replace but that's fine
+        while (i > 0 && i < index->size) index->entries[i - 1] = index->entries[i++];
+        index->size--;
+    }
 }
 
 void split_right(heap_header_t *hole, heap_t *heap) {
