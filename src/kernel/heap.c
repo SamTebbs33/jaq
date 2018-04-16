@@ -9,7 +9,7 @@
 
 bool is_page_aligned(uint32_t addr);
 
-void split_right(heap_header_t *hole, heap_t *heap);
+void split_right(heap_header_t *hole, size_t size, heap_t *heap);
 
 void remove_hole(heap_header_t *hole, heap_index_t *index);
 
@@ -76,7 +76,7 @@ void *heap_alloc(size_t size, heap_t *heap) {
             remove_hole(hole, heap->hole_index);
             if(overhead < surplus) {
                 // If the overhead of adding another footer and header is worth the extra hole gained, then split the hole in two
-                split_right(hole, heap);
+                split_right(hole, surplus - overhead, heap);
             }
             hole->is_hole = FALSE;
             uint32_t data_addr = (uint32_t) hole + sizeof(heap_header_t);
@@ -128,8 +128,7 @@ void remove_hole(heap_header_t *hole, heap_index_t *index) {
     }
 }
 
-void split_right(heap_header_t *hole, heap_t *heap) {
-    // TODO
+void split_right(heap_header_t *hole, size_t size, heap_t *heap) {
 }
 
 bool is_page_aligned(uint32_t addr) {
