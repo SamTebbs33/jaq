@@ -12,7 +12,7 @@
 void kmain() {
     gdt_init();
     idt_init();
-    paging_init(0x1000000); // Assume the RAM is 16MB big for now
+    paging_init(0xF0000000); // Assume the RAM is 4GB big for now
 
     keyboard_init();
     timer_init(50);
