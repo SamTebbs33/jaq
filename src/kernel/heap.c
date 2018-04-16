@@ -94,7 +94,7 @@ void heap_free(void *ptr, heap_t *heap) {
             header->is_hole = TRUE;
             join_right(header, heap);
             // If this hole wasn't incorporated into the left one, then add it to the hole index
-            if(!join_left(header, heap)) add_hole(header, heap);
+            if(!join_left(header, heap)) add_hole(header, heap->hole_index);
             return;
         }
     }
