@@ -9,15 +9,15 @@
 
 bool is_page_aligned(uint32_t addr);
 
-void split_right(heap_header_t *hole);
+void split_right(heap_header_t *hole, heap_t *heap);
 
 void remove_hole(heap_header_t *hole, heap_index_t *index);
 
-bool join_right(heap_header_t *header);
+bool join_right(heap_header_t *header, heap_t *heap);
 
-bool join_left(heap_header_t *header);
+bool join_left(heap_header_t *header, heap_t *heap);
 
-void add_hole(heap_header_t *hole);
+void add_hole(heap_header_t *hole, heap_index_t *index);
 
 heap_index_t* heap_index_create(size_t max_size) {
     heap_index_t* index = (heap_index_t *) kmalloc(sizeof(heap_index_t));
@@ -76,7 +76,7 @@ void *heap_alloc(size_t size, heap_t *heap) {
             remove_hole(hole, heap->hole_index);
             if(overhead < surplus) {
                 // If the overhead of adding another footer and header is worth the extra hole gained, then split the hole in two
-                split_right(hole);
+                split_right(hole, heap);
             }
             hole->is_hole = FALSE;
             uint32_t data_addr = (uint32_t) hole + sizeof(heap_header_t);
@@ -92,24 +92,24 @@ void heap_free(void *ptr, heap_t *heap) {
         heap_header_t* header = (heap_header_t *) (ptr_addr - sizeof(heap_header_t));
         if(header && header->magic == HEAP_MAGIC) {
             header->is_hole = TRUE;
-            join_right(header);
+            join_right(header, heap);
             // If this hole wasn't incorporated into the left one, then add it to the hole index
-            if(!join_left(header)) add_hole(header);
+            if(!join_left(header, heap)) add_hole(header, heap);
             return;
         }
     }
     PANIC("Freeing unallocated memory");
 }
 
-void add_hole(heap_header_t *hole) {
+    // TODO
+void add_hole(heap_header_t *hole, heap_index_t *index) {
+}
+
+bool join_left(heap_header_t *header, heap_t *heap) {
     // TODO
 }
 
-bool join_left(heap_header_t *header) {
-    // TODO
-}
-
-bool join_right(heap_header_t *header) {
+bool join_right(heap_header_t *header, heap_t *heap) {
     // TODO
 }
 
@@ -117,7 +117,7 @@ void remove_hole(heap_header_t *hole, heap_index_t *index) {
     // TODO
 }
 
-void split_right(heap_header_t *hole) {
+void split_right(heap_header_t *hole, heap_t *heap) {
     // TODO
 }
 
