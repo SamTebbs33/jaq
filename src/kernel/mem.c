@@ -36,3 +36,7 @@ uint32_t kmalloc_p(size_t size, uint32_t *phys) {
 uint32_t kmalloc_ap(size_t size, uint32_t *phys) {
     return _kmalloc(size, TRUE, phys);
 }
+
+void kfree(void *ptr) {
+    heap_free(ptr, kernel_heap);
+}
