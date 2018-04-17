@@ -15,7 +15,7 @@ void kmain(multiboot_info_t* mb_info) {
 
     gdt_init();
     idt_init();
-    paging_init(total_mem);
+    paging_init(total_mem, UINT32_MAX);
     keyboard_init();
     timer_init(50);
 

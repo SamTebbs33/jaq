@@ -79,7 +79,8 @@ void free_frame(page_t* page) {
     page->frame = 0;
 }
 
-void paging_init(uint32_t mem_kilobytes) {
+void paging_init(uint32_t mem_kilobytes, uint32_t addr) {
+    if(addr < UINT32_MAX) placement_address = addr;
     n_frames = FRAME_FROM_ADDR(mem_kilobytes * 1024);
     frames = (uint32_t *) kmalloc(FRAME_OFFSET(n_frames));
     memset(frames, FRAME_OFFSET(n_frames), 0);
