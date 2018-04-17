@@ -3,7 +3,8 @@ OBJ_DIR = $(BUILD_DIR)/obj
 
 KERNEL_OBJECT_NAMES = boot kmain framebuffer print util gdt idt idt_asm paging mem heap
 DRIVER_OBJECT_NAMES = keyboard timer
-OBJECT_NAMES = $(patsubst %,kernel/%,$(KERNEL_OBJECT_NAMES)) $(patsubst %,drivers/%,$(DRIVER_OBJECT_NAMES))
+FS_OBJECT_NAMES = initrd
+OBJECT_NAMES = $(patsubst %,kernel/%,$(KERNEL_OBJECT_NAMES)) $(patsubst %,driver/%,$(DRIVER_OBJECT_NAMES)) $(patsubst %,fs/%,$(FS_OBJECT_NAMES))
 OBJECTS = $(patsubst %,$(OBJ_DIR)/%.o,$(OBJECT_NAMES))
 
 C_FLAGS = -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector \
@@ -28,8 +29,7 @@ $(ISO_OUTPUT): kernel.elf
 	genisoimage -R -b boot/grub/stage2_eltorito -no-emul-boot -boot-load-size 4 -A os -input-charset utf8 -quiet -boot-info-table -o $(ISO_OUTPUT) build/iso
 
 clean:
-	rm -rf $(OBJ_DIR)/kernel
-	rm -rf $(OBJ_DIR)/drivers
+	rm -rf $(OBJ_DIR)/*
 	rm $(KERNEL_OUTPUT)
 	rm $(ISO_OUTPUT)
 
