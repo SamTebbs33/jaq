@@ -5,8 +5,8 @@
 #include "print.h"
 #include "gdt.h"
 #include "idt.h"
-#include "../drivers/keyboard.h"
-#include "../drivers/timer.h"
+#include "../driver/keyboard.h"
+#include "../driver/timer.h"
 #include "paging.h"
 #include "multiboot.h"
 
