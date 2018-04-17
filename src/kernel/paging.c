@@ -95,7 +95,7 @@ void paging_init(uint32_t mem_kilobytes, uint32_t addr) {
     // placement_address between identity mapping and enabling the heap!
     uint32_t i = 0;
     for (i = KHEAP_START; i < KHEAP_START + KHEAP_INITIAL_SIZE; i += BYTES_PER_PAGE)
-        paging_get_page(i, kernel_directory, TRUE);
+        paging_get_page(i, kernel_directory, true);
 
     // We need to identity map (phys addr = virt addr) from
     // 0x0 to the end of used memory, so we can access this
@@ -106,13 +106,13 @@ void paging_init(uint32_t mem_kilobytes, uint32_t addr) {
     while (i < placement_address + BYTES_PER_PAGE)
     {
         // Kernel code is readable but not writeable from userspace.
-        alloc_frame( paging_get_page(i, kernel_directory, TRUE), FALSE, FALSE);
+        alloc_frame( paging_get_page(i, kernel_directory, true), false, false);
         i += BYTES_PER_PAGE;
     }
 
     // Now allocate those pages we mapped earlier.
     for (i = KHEAP_START; i < KHEAP_START+KHEAP_INITIAL_SIZE; i += BYTES_PER_PAGE)
-        alloc_frame( paging_get_page(i, kernel_directory, TRUE), FALSE, FALSE);
+        alloc_frame( paging_get_page(i, kernel_directory, true), false, false);
 
     interrupts_register_handler(ISR_14, page_fault);
     paging_set_directory(kernel_directory);
@@ -123,7 +123,7 @@ void paging_init(uint32_t mem_kilobytes, uint32_t addr) {
     cr0 |= 0x80000000;
     asm ("mov %0, %%cr0":: "r"(cr0));
 
-    kernel_heap = heap_create(KHEAP_START, KHEAP_START + KHEAP_INITIAL_SIZE, FALSE, FALSE, HEAP_INDEX_SIZE);
+    kernel_heap = heap_create(KHEAP_START, KHEAP_START + KHEAP_INITIAL_SIZE, false, false, HEAP_INDEX_SIZE);
 }
 
 void paging_set_directory(page_directory_t *new) {

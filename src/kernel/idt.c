@@ -154,9 +154,9 @@ bool handle(interrupt_registers_t registers) {
     uint8_t interrupt = registers.int_no;
     if(handlers[interrupt]) {
         handlers[interrupt](registers);
-        return TRUE;
+        return true;
     }
-    return FALSE;
+    return false;
 }
 
 void isr_handler(interrupt_registers_t registers) {
@@ -174,7 +174,7 @@ void irq_handler(interrupt_registers_t registers) {
 }
 
 bool interrupts_register_handler(uint8_t interrupt, interrupt_handler_t handler) {
-    if(handlers[interrupt]) return TRUE;
+    if(handlers[interrupt]) return true;
     handlers[interrupt] = handler;
-    return FALSE;
+    return false;
 }

@@ -5,7 +5,7 @@
 #ifndef JAQ_GDT_H
 #define JAQ_GDT_H
 
-#include "stdint.h"
+#include <stdinc.h>
 
 #define GDT_NUM_ENTRIES 5
 

@@ -5,8 +5,7 @@
 #ifndef JAQ_HEAP_H
 #define JAQ_HEAP_H
 
-#include "stdint.h"
-#include "stdbool.h"
+#include <stdinc.h>
 
 #define HEAP_MAGIC 0x3BADDAD3
 

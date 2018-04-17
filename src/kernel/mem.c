@@ -14,7 +14,7 @@ uint32_t _kmalloc(size_t size, bool align, uint32_t *phys) {
     if(kernel_heap != NULL) {
         void* addr = heap_alloc(size, kernel_heap);
         if(phys) {
-            page_t* page = paging_get_page((uint32_t) addr, kernel_directory, FALSE);
+            page_t* page = paging_get_page((uint32_t) addr, kernel_directory, false);
             *phys = page->frame * BYTES_PER_PAGE + ((uint32_t) addr & 0xFFF);
         }
         return (uint32_t) addr;
@@ -35,19 +35,19 @@ uint32_t _kmalloc(size_t size, bool align, uint32_t *phys) {
 }
 
 uint32_t kmalloc(size_t size) {
-    return _kmalloc(size, FALSE, NULL);
+    return _kmalloc(size, false, NULL);
 }
 
 uint32_t kmalloc_a(size_t size) {
-    return _kmalloc(size, TRUE, NULL);
+    return _kmalloc(size, true, NULL);
 }
 
 uint32_t kmalloc_p(size_t size, uint32_t *phys) {
-    return _kmalloc(size, FALSE, phys);
+    return _kmalloc(size, false, phys);
 }
 
 uint32_t kmalloc_ap(size_t size, uint32_t *phys) {
-    return _kmalloc(size, TRUE, phys);
+    return _kmalloc(size, true, phys);
 }
 
 void kfree(void *ptr) {

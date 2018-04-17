@@ -5,8 +5,10 @@
 #ifndef JAQ_MEM_H
 #define JAQ_MEM_H
 
-#include "stdint.h"
-#include "stdbool.h"
+#include <stdinc.h>
+
+#define KMALLOC_N(type, n) (type*) kmalloc(sizeof(type) * n)
+#define KMALLOC(type) KMALLOC_N(type, 1)
 
 #define KMALLOC_N(type, n) (type*) kmalloc(sizeof(type) * n)
 #define KMALLOC(type) KMALLOC_N(type, 1)

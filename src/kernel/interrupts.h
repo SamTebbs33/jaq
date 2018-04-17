@@ -5,8 +5,7 @@
 #ifndef JAQ_INTERRUPTS_H
 #define JAQ_INTERRUPTS_H
 
-#include "stdbool.h"
-#include "stdint.h"
+#include <stdinc.h>
 
 #define IRQ_0 32
 #define IRQ_1 33

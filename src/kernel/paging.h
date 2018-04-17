@@ -5,8 +5,7 @@
 #ifndef JAQ_PAGING_H
 #define JAQ_PAGING_H
 
-#include "stdint.h"
-#include "stdbool.h"
+#include <stdinc.h>
 
 #define BYTES_PER_PAGE 0x1000
 #define PAGES_PER_TABLE 1024
