@@ -5,7 +5,7 @@
 #ifndef JAQ_TIMER_H
 #define JAQ_TIMER_H
 
-#include "../kernel/stdint.h"
+#include <stdinc.h>
 
 void timer_init(uint32_t frequency);
 

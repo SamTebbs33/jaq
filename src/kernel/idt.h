@@ -5,7 +5,7 @@
 #ifndef JAQ_IDT_H
 #define JAQ_IDT_H
 
-#include "stdint.h"
+#include <stdinc.h>
 
 #define IDT_NUM_ENTRIES 256
 

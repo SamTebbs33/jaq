@@ -5,7 +5,7 @@
 #ifndef SAMIX_PRINT_H
 #define SAMIX_PRINT_H
 
-#include "stdint.h"
+#include <stdinc.h>
 
 void print_ch(char ch);
 void print(char* buff);

@@ -42,7 +42,7 @@ heap_t *heap_create(uint32_t start_addr, uint32_t end_addr, bool is_kernel, bool
 
         heap_header_t* initial_hole = (heap_header_t *) start_addr;
         initial_hole->magic = HEAP_MAGIC;
-        initial_hole->is_hole = TRUE;
+        initial_hole->is_hole = true;
         initial_hole->size = end_addr - start_addr - sizeof(heap_header_t) - sizeof(heap_footer_t);
         add_hole(initial_hole, heap->hole_index);
     }
@@ -81,7 +81,7 @@ void *heap_alloc(size_t size, heap_t *heap) {
                 // If the overhead of adding another footer and header is worth the extra hole gained, then split the hole in two
                 split_right(hole, surplus - overhead, heap);
             }
-            hole->is_hole = FALSE;
+            hole->is_hole = false;
             uint32_t data_addr = (uint32_t) hole + sizeof(heap_header_t);
             // The memory taken up by the block is now occupied
             heap->occupied += hole->size + sizeof(heap_header_t) + sizeof(heap_footer_t);
@@ -96,7 +96,7 @@ void heap_free(void *ptr, heap_t *heap) {
     if(ptr && ptr_addr < heap->end_addr && ptr_addr > heap->start_addr) {
         heap_header_t* header = (heap_header_t *) (ptr_addr - sizeof(heap_header_t));
         if(header && header->magic == HEAP_MAGIC) {
-            header->is_hole = TRUE;
+            header->is_hole = true;
             join_right(header, heap);
             // If this hole wasn't incorporated into the left one, then add it to the hole index
             if(!join_left(header, heap)) add_hole(header, heap->hole_index);
@@ -129,11 +129,11 @@ bool join_left(heap_header_t *header, heap_t *heap) {
 
                 remove_hole(header, heap->hole_index);
                 join_left(left_header, heap); // Recurse until we find a non-hole or memory outside of the heapspace
-                return TRUE;
+                return true;
             }
         }
     }
-    return FALSE;
+    return false;
 }
 
 bool join_right(heap_header_t *header, heap_t *heap) {
@@ -157,11 +157,11 @@ bool join_right(heap_header_t *header, heap_t *heap) {
 
                 remove_hole(right_header, heap->hole_index);
                 join_right(header, heap); // Recurse until we find a non-hole or memory outside of the heapspace
-                return TRUE;
+                return true;
             }
         }
     }
-    return FALSE;
+    return false;
 }
 
 void remove_hole(heap_header_t *hole, heap_index_t *index) {
@@ -198,7 +198,7 @@ void split_right(heap_header_t *hole, size_t size, heap_t *heap) {
 
         right_header->magic = HEAP_MAGIC;
         right_header->size = right_hole_size;
-        right_header->is_hole = TRUE;
+        right_header->is_hole = true;
 
         right_footer->magic = HEAP_MAGIC;
         right_footer->header = right_header;
@@ -208,5 +208,5 @@ void split_right(heap_header_t *hole, size_t size, heap_t *heap) {
 }
 
 bool is_page_aligned(uint32_t addr) {
-    return ((addr & BYTES_PER_PAGE) > 0) ? TRUE : FALSE;
+    return ((addr & BYTES_PER_PAGE) > 0) ? true : false;
 }

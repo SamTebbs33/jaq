@@ -5,7 +5,7 @@
 #ifndef PROJECT_FRAMEBUFFER_H
 #define PROJECT_FRAMEBUFFER_H
 
-#include "stdint.h"
+#include <stdinc.h>
 
 #define FB_BLACK 0
 #define FB_BLUE 1

@@ -4,7 +4,6 @@
 
 #include "print.h"
 #include "framebuffer.h"
-#include "stdbool.h"
 
 char fg = FB_WHITE, bg = FB_BLACK;
 unsigned int row = 0, column = 0;
@@ -54,14 +53,14 @@ void print_u16(uint16_t u16) {
 }
 
 void print_u32_rec(uint32_t u32, bool first) {
-    if(u32 > 0) print_u32_rec(u32 / 10, FALSE);
+    if(u32 > 0) print_u32_rec(u32 / 10, false);
     else if(!first) return;
     uint8_t digit = (uint8_t) (u32 % 10);
     print_ch((char) (digit + '0'));
 }
 
 void print_u32(uint32_t u32) {
-    print_u32_rec(u32, TRUE);
+    print_u32_rec(u32, true);
 }
 
 void print_ch(char ch) {
