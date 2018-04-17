@@ -8,6 +8,9 @@
 #include "stdint.h"
 #include "stdbool.h"
 
+#define KMALLOC_N(type, n) (type*) kmalloc(sizeof(type) * n)
+#define KMALLOC(type) KMALLOC_N(type, 1)
+
 uint32_t kmalloc(size_t size); // Normal
 uint32_t kmalloc_a(size_t size); // Page-aligned
 uint32_t kmalloc_p(size_t size, uint32_t* phys); // Returns physical address
