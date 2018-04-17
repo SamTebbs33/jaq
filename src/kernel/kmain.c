@@ -11,7 +11,7 @@
 #include "multiboot.h"
 
 void kmain(multiboot_info_t* mb_info) {
-    uint32_t total_mem = mb_info->mem_lower + mb_info->mem_lower;
+    uint32_t total_mem = mb_info->mem_upper + mb_info->mem_lower;
 
     gdt_init();
     idt_init();
