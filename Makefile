@@ -3,7 +3,7 @@ OBJ_DIR = $(BUILD_DIR)/obj
 
 KERNEL_OBJECT_NAMES = boot kmain framebuffer print util gdt idt idt_asm paging mem heap
 DRIVER_OBJECT_NAMES = keyboard timer
-OBJECT_NAMES = $(patsubst %,kernel/%,$(KERNEL_OBJECT_NAMES)) $(patsubst %,drivers/%,$(DRIVER_OBJECT_NAMES))
+OBJECT_NAMES = $(patsubst %,kernel/%,$(KERNEL_OBJECT_NAMES)) $(patsubst %,driver/%,$(DRIVER_OBJECT_NAMES))
 OBJECTS = $(patsubst %,$(OBJ_DIR)/%.o,$(OBJECT_NAMES))
 
 C_FLAGS = -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector \
@@ -15,10 +15,14 @@ ISO_OUTPUT = $(BUILD_DIR)/os.iso
 
 all: $(ISO_OUTPUT)
 
-$(OBJ_DIR)/%.o: src/%.c
+obj_dirs:
+	mkdir -p $(OBJ_DIR)/kernel
+	mkdir -p $(OBJ_DIR)/driver
+
+$(OBJ_DIR)/%.o: src/%.c obj_dirs
 	gcc $(C_FLAGS)  $< -o $@
 
-$(OBJ_DIR)/%.o: src/%.s
+$(OBJ_DIR)/%.o: src/%.s obj_dirs
 	nasm $(AS_FLAGS) $< -o $@
 
 kernel.elf: $(OBJECTS)
@@ -29,7 +33,7 @@ $(ISO_OUTPUT): kernel.elf
 
 clean:
 	rm -rf $(OBJ_DIR)/kernel
-	rm -rf $(OBJ_DIR)/drivers
+	rm -rf $(OBJ_DIR)/driver
 	rm $(KERNEL_OUTPUT)
 	rm $(ISO_OUTPUT)
 
