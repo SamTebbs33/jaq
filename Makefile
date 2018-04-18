@@ -12,10 +12,11 @@ AS_FLAGS = -f elf
 
 KERNEL_OUTPUT = $(BUILD_DIR)/iso/boot/kernel.elf
 ISO_OUTPUT = $(BUILD_DIR)/os.iso
+MODULES_OUTPUT = $(BUILD_DIR)/iso/modules
 
 MKRD_SRC = src/tools/mkrd.c
 INITRD_FILES = initrd/test1.txt initrd/test2.txt
-INITRD_OUTPUT = $(BUILD_DIR)/iso/modules/initrd.rd
+INITRD_OUTPUT = $(MODULES_OUTPUT)/initrd.rd
 
 all: $(ISO_OUTPUT)
 
@@ -41,11 +42,11 @@ kernel.elf: $(OBJECTS)
 
 initrd: $(INITRD_FILES)
 	$(info -> Building initrd)
+	mkdir -p $(MODULES_OUTPUT)
 	./mkrd $(INITRD_OUTPUT) $(INITRD_FILES)
 
 $(ISO_OUTPUT): kernel.elf initrd
 	$(info -> Building .iso)
-	./mkrd $(INITRD_OUTPUT) $(INITRD_FILES)
 	genisoimage -R -b boot/grub/stage2_eltorito -no-emul-boot -boot-load-size 4 -A os -input-charset utf8 -quiet -boot-info-table -o $(ISO_OUTPUT) build/iso
 
 clean:
@@ -55,8 +56,8 @@ clean:
 	rm $(INITRD_OUTPUT)
 
 run:
-	VBoxManage startvm Samix
-	#VBoxManage debugvm "Samix" log
+	VBoxManage startvm Jaq
+	VBoxManage debugvm Jaq log
 
 mkrd: $(MKRD_SRC)
 	gcc -std=gnu99 -Isrc/inc $(MKRD_SRC) -o mkrd
