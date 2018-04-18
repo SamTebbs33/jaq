@@ -37,6 +37,9 @@ driver_ifc_t driver_ifc = {
                 .fb_cursor = fb_cursor,
                 .fb_clear = fb_clear,
                 .fb_putc = fb_putc
+        },
+        .int_ifc = {
+                .interrupts_register_handler = interrupts_register_handler
         }
 };
 

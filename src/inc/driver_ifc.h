@@ -7,6 +7,7 @@
 
 #include <stdinc.h>
 #include "../fs/fs.h"
+#include "interrupts.h"
 
 typedef struct {
     uint32_t (*kmalloc)(size_t size);
@@ -34,9 +35,14 @@ typedef struct {
 } fb_ifc_t;
 
 typedef struct {
+    bool (*interrupts_register_handler)(uint8_t interrupt, interrupt_handler_t handler);
+} int_ifc_t;
+
+typedef struct {
     mem_ifc_t mem_ifc;
     fs_ifc_t fs_ifc;
     fb_ifc_t fb_ifc;
+    int_ifc_t int_ifc;
 } driver_ifc_t;
 
 #endif //JAQ_DRIVER_IFC_H
