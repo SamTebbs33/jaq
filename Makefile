@@ -1,9 +1,9 @@
 BUILD_DIR = build
 OBJ_DIR = $(BUILD_DIR)/obj
 
-KERNEL_OBJECT_NAMES = boot kmain framebuffer print util gdt idt idt_asm paging mem heap
+KERNEL_OBJECT_NAMES = boot kmain framebuffer print util gdt idt idt_asm paging mem heap string maths
 DRIVER_OBJECT_NAMES = keyboard timer
-FS_OBJECT_NAMES = initrd
+FS_OBJECT_NAMES = initrd fs
 OBJECT_NAMES = $(patsubst %,kernel/%,$(KERNEL_OBJECT_NAMES)) $(patsubst %,driver/%,$(DRIVER_OBJECT_NAMES)) $(patsubst %,fs/%,$(FS_OBJECT_NAMES))
 OBJECTS = $(patsubst %,$(OBJ_DIR)/%.o,$(OBJECT_NAMES))
 
