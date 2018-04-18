@@ -11,6 +11,13 @@ unsigned int row = 0, column = 0;
 void print(char* str) {
     char ch;
     while((ch = *str++)) {
+        if(ch == PRINT_NEWLINE) {
+            print_at(row + 1, 0);
+            continue;
+        } else if(ch == PRINT_TAB) {
+            print_at(row, column + PRINT_TAB_SIZE);
+            continue;
+        }
         if(row >= FB_ROWS) return;
         print_ch(ch);
     }
