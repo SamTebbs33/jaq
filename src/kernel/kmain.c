@@ -12,8 +12,36 @@
 #include "multiboot.h"
 #include "util/maths.h"
 #include "mem/mem.h"
+#include "screen/framebuffer.h"
+#include <driver_ifc.h>
 
 fs_node_t *fs_root;
+
+driver_ifc_t driver_ifc = {
+        .mem_ifc = {
+                .kmalloc = kmalloc,
+                .kmalloc_a = kmalloc_a,
+                .kmalloc_p = kmalloc_p,
+                .kmalloc_ap = kmalloc_ap
+        },
+        .fs_ifc = {
+                .fs_readdir = fs_readdir,
+                .fs_read = fs_read,
+                .fs_finddir = fs_finddir,
+                .fs_make_node = fs_make_node,
+                .fs_close = fs_close,
+                .fs_open = fs_open,
+                .fs_write = fs_write
+        },
+        .fb_ifc = {
+                .fb_cursor = fb_cursor,
+                .fb_clear = fb_clear,
+                .fb_putc = fb_putc
+        },
+        .int_ifc = {
+                .interrupts_register_handler = interrupts_register_handler
+        }
+};
 
 void kmain(multiboot_info_t* mb_info) {
     uint32_t total_mem = mb_info->mem_upper + mb_info->mem_lower;
