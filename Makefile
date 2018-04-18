@@ -1,7 +1,7 @@
 BUILD_DIR = build
 OBJ_DIR = $(BUILD_DIR)/obj
 
-KERNEL_OBJECT_NAMES = boot kmain framebuffer print util gdt idt idt_asm paging mem heap string maths
+KERNEL_OBJECT_NAMES = boot kmain screen/framebuffer screen/print util/util gdt/gdt idt/idt idt/idt_asm mem/paging mem/mem mem/heap util/string util/maths
 DRIVER_OBJECT_NAMES = keyboard timer
 FS_OBJECT_NAMES = initrd fs
 OBJECT_NAMES = $(patsubst %,kernel/%,$(KERNEL_OBJECT_NAMES)) $(patsubst %,driver/%,$(DRIVER_OBJECT_NAMES)) $(patsubst %,fs/%,$(FS_OBJECT_NAMES))
@@ -20,7 +20,11 @@ INITRD_OUTPUT = $(BUILD_DIR)/iso/modules/initrd.rd
 all: $(ISO_OUTPUT)
 
 obj_dirs:
-	mkdir -p $(OBJ_DIR)/kernel
+	mkdir -p $(OBJ_DIR)/kernel/mem
+	mkdir -p $(OBJ_DIR)/kernel/screen
+	mkdir -p $(OBJ_DIR)/kernel/util
+	mkdir -p $(OBJ_DIR)/kernel/gdt
+	mkdir -p $(OBJ_DIR)/kernel/idt
 	mkdir -p $(OBJ_DIR)/driver
 	mkdir -p $(OBJ_DIR)/fs
 

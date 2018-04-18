@@ -1,5 +1,5 @@
 #include "framebuffer.h"
-#include "util.h"
+#include "../util/util.h"
 
 #define CURSOR_CMD_PORT 0x3D4
 #define CURSOR_DATA_PORT 0x3D5

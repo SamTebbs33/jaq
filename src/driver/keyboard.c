@@ -3,9 +3,9 @@
 //
 
 #include "keyboard.h"
-#include "../kernel/interrupts.h"
-#include "../kernel/print.h"
-#include "../kernel/util.h"
+#include "interrupts.h"
+#include "../kernel/screen/print.h"
+#include "../kernel/util/util.h"
 
 #define KEYBOARD_PORT 0x60
 

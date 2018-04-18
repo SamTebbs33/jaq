@@ -3,9 +3,9 @@
 //
 
 #include "timer.h"
-#include "../kernel/interrupts.h"
-#include "../kernel/util.h"
-#include "../kernel/print.h"
+#include "interrupts.h"
+#include "../kernel/util/util.h"
+#include "../kernel/screen/print.h"
 
 void on_tick(interrupt_registers_t registers) {
 }

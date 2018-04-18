@@ -3,8 +3,8 @@
 //
 
 #include "fs.h"
-#include "../kernel/mem.h"
-#include "../kernel/string.h"
+#include "../kernel/mem/mem.h"
+#include "../kernel/util/string.h"
 
 fs_node_t * fs_make_node(char *name, fs_node_perms_t perms, fs_node_flags_t flags, fs_node_user_t user, fs_node_group_t group,
                          fs_node_read_t read, fs_node_write_t write, fs_node_open_t open, fs_node_close_t close,

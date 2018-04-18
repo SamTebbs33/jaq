@@ -4,7 +4,7 @@
 
 #include "print.h"
 #include "framebuffer.h"
-#include "maths.h"
+#include "../util/maths.h"
 
 char fg = FB_WHITE, bg = FB_BLACK;
 unsigned int row = 0, column = 0;

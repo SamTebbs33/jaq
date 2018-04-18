@@ -3,8 +3,8 @@
 //
 
 #include "paging.h"
-#include "util.h"
-#include "string.h"
+#include "../util/util.h"
+#include "../util/string.h"
 #include "mem.h"
 #include "heap.h"
 #include "interrupts.h"

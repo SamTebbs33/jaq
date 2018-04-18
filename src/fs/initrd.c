@@ -3,8 +3,8 @@
 //
 
 #include "initrd.h"
-#include "../kernel/mem.h"
-#include "../kernel/string.h"
+#include "../kernel/mem/mem.h"
+#include "../kernel/util/string.h"
 #include "fs.h"
 
 initrd_t* initrd;

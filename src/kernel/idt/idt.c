@@ -3,10 +3,10 @@
 //
 
 #include "idt.h"
-#include "string.h"
-#include "util.h"
+#include "../util/string.h"
+#include "../util/util.h"
 #include "interrupts.h"
-#include "print.h"
+#include "../screen/print.h"
 
 extern void isr0();
 extern void isr1();

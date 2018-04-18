@@ -5,7 +5,7 @@
 #include "heap.h"
 #include "mem.h"
 #include "paging.h"
-#include "util.h"
+#include "../util/util.h"
 
 bool is_page_aligned(uint32_t addr);
 
