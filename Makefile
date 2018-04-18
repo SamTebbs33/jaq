@@ -7,7 +7,7 @@ FS_OBJECT_NAMES = initrd fs
 OBJECT_NAMES = $(patsubst %,kernel/%,$(KERNEL_OBJECT_NAMES)) $(patsubst %,driver/%,$(DRIVER_OBJECT_NAMES)) $(patsubst %,fs/%,$(FS_OBJECT_NAMES))
 OBJECTS = $(patsubst %,$(OBJ_DIR)/%.o,$(OBJECT_NAMES))
 
-C_FLAGS = -m32 -Isrc/inc -nostdlib -ffreestanding -lgcc -Wall -Wextra -Werror -Wno-unused-parameter -Wno-unused-variable -c
+C_FLAGS = -std=c99 -m32 -Isrc/inc -nostdlib -ffreestanding -lgcc -Wall -Wextra -Werror -Wno-unused-parameter -Wno-unused-variable -c
 AS_FLAGS = -f elf
 
 KERNEL_OUTPUT = $(BUILD_DIR)/iso/boot/kernel.elf
