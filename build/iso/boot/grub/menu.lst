@@ -3,3 +3,4 @@ timeout=0
 
 title jaq
 kernel /boot/kernel.elf
+module /modules/initrd.rd
