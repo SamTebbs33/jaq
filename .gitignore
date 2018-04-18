@@ -39,8 +39,6 @@ cmake-build-debug/
 
 CMakeLists\.txt
 
-build/iso/boot/grub/stage2_eltorito
-
 build/os\.iso
 
 mkrd
