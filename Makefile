@@ -56,8 +56,9 @@ clean:
 	rm $(INITRD_OUTPUT)
 
 run:
-	VBoxManage startvm Jaq
-	VBoxManage debugvm Jaq log
+	echo "" > qemu.log
+	qemu-system-x86_64 -cdrom build/os.iso -m 32 -boot d -serial file:qemu.log &
+	tail -f qemu.log
 
 mkrd: $(MKRD_SRC)
 	gcc -std=gnu99 -Isrc/inc $(MKRD_SRC) -o mkrd
