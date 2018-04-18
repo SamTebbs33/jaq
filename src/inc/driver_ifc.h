@@ -45,4 +45,7 @@ typedef struct {
     int_ifc_t int_ifc;
 } driver_ifc_t;
 
+typedef void (*driver_init_t)(driver_ifc_t* ifc);
+#define INIT(ifc) void driver_init(driver_ifc_t* ifc)
+
 #endif //JAQ_DRIVER_IFC_H
