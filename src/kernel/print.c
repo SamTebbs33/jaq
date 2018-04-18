@@ -4,6 +4,7 @@
 
 #include "print.h"
 #include "framebuffer.h"
+#include "maths.h"
 
 char fg = FB_WHITE, bg = FB_BLACK;
 unsigned int row = 0, column = 0;
@@ -41,8 +42,11 @@ void print_fg(char arg) {
 }
 
 void print_at(unsigned int r, unsigned int c) {
-    row = r;
-    column = c;
+    row = min_u32(r, FB_ROWS);
+    if(c > FB_COLUMNS) {
+        column = 0;
+        row = min_u32(row + 1, FB_ROWS);
+    } else column = c;
     fb_cursor(r, c);
 }
 
