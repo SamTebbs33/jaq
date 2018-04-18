@@ -49,6 +49,10 @@ $(ISO_OUTPUT): kernel.elf initrd
 	$(info -> Building .iso)
 	genisoimage -R -b boot/grub/stage2_eltorito -no-emul-boot -boot-load-size 4 -A os -input-charset utf8 -quiet -boot-info-table -o $(ISO_OUTPUT) build/iso
 
+deps:
+	$(info -> Getting dependencies)
+	sudo apt-get install nasm genisoimage
+
 clean:
 	rm -rf $(OBJ_DIR)/*
 	rm $(KERNEL_OUTPUT)

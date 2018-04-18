@@ -1,5 +1,5 @@
 language: c
 compiler: gcc
-script: sudo apt-get install nasm && make mkrd && make
+script: make deps && make mkrd && make
 notifications:
   email: false
