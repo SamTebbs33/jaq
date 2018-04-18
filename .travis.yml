@@ -1,3 +1,5 @@
 language: c
-script: sudo apt-get install nasm && make
 compiler: gcc
+script: sudo apt-get install nasm && make
+notifications:
+  email: false
