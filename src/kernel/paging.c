@@ -4,6 +4,7 @@
 
 #include "paging.h"
 #include "util.h"
+#include "string.h"
 #include "mem.h"
 #include "heap.h"
 #include "interrupts.h"
@@ -83,10 +84,10 @@ void paging_init(uint32_t mem_kilobytes, uint32_t addr) {
     if(addr < UINT32_MAX) placement_address = addr;
     n_frames = FRAME_FROM_ADDR(mem_kilobytes * 1024);
     frames = (uint32_t *) kmalloc(FRAME_OFFSET(n_frames));
-    memset(frames, FRAME_OFFSET(n_frames), 0);
+    memset(frames, 0, FRAME_OFFSET(n_frames));
 
     kernel_directory = (page_directory_t *) kmalloc_a(sizeof(page_directory_t));
-    memset(kernel_directory, sizeof(page_directory_t), 0);
+    memset(kernel_directory, 0, sizeof(page_directory_t));
 
     // Map some pages in the kernel heap area.
     // Here we call get_page but not alloc_frame. This causes page_table_t's
@@ -138,7 +139,7 @@ page_t *paging_get_page(uint32_t addr, page_directory_t *page_dir, bool create) 
     else if(create) {
         uint32_t tmp;
         page_table_t* table = (page_table_t *) kmalloc_ap(sizeof(page_table_t), &tmp);
-        memset(table, BYTES_PER_PAGE, 0);
+        memset(table, 0, BYTES_PER_PAGE);
         page_dir->tables_physical[table_idx] = tmp | 0x7; //Present, writable and user level
         page_dir->tables[table_idx] = table;
         return &table->pages[page_idx];

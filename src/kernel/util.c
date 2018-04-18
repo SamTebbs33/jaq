@@ -14,7 +14,3 @@ uint8_t inb(uint16_t port) {
     return ret;
 }
 
-void memset(void* buff, size_t len, char value) {
-    char* buff2 = buff;
-    for (size_t i = 0; i < len; i++) buff2[i] = value;
-}

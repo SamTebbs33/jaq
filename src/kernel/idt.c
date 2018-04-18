@@ -3,6 +3,7 @@
 //
 
 #include "idt.h"
+#include "string.h"
 #include "util.h"
 #include "interrupts.h"
 #include "print.h"
@@ -70,7 +71,7 @@ void idt_init() {
     idt_ptr.limit = sizeof(idt_entry_t) * IDT_NUM_ENTRIES - 1;
     idt_ptr.base  = (uint32_t) &idt;
 
-    memset(idt, sizeof(idt_entry_t) * IDT_NUM_ENTRIES, 0);
+    memset(idt, 0, sizeof(idt_entry_t) * IDT_NUM_ENTRIES);
 
     // Remap the PIC
     outb(0x20, 0x11);
