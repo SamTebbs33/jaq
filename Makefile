@@ -1,7 +1,7 @@
 BUILD_DIR = build
 OBJ_DIR = $(BUILD_DIR)/obj
 
-KERNEL_OBJECT_NAMES = boot kmain screen/framebuffer screen/print util/util gdt/gdt idt/idt idt/idt_asm mem/paging mem/mem mem/heap util/string util/maths
+KERNEL_OBJECT_NAMES = boot idt/idt_asm kmain screen/framebuffer screen/print util/util gdt/gdt idt/idt mem/paging mem/mem mem/heap util/string util/maths
 DRIVER_OBJECT_NAMES = keyboard timer
 FS_OBJECT_NAMES = initrd fs
 OBJECT_NAMES = $(patsubst %,kernel/%,$(KERNEL_OBJECT_NAMES)) $(patsubst %,driver/%,$(DRIVER_OBJECT_NAMES)) $(patsubst %,fs/%,$(FS_OBJECT_NAMES))
@@ -19,36 +19,47 @@ INITRD_OUTPUT = $(BUILD_DIR)/iso/modules/initrd.rd
 
 all: $(ISO_OUTPUT)
 
-obj_dirs:
-	mkdir -p $(OBJ_DIR)/kernel/mem
-	mkdir -p $(OBJ_DIR)/kernel/screen
-	mkdir -p $(OBJ_DIR)/kernel/util
-	mkdir -p $(OBJ_DIR)/kernel/gdt
-	mkdir -p $(OBJ_DIR)/kernel/idt
-	mkdir -p $(OBJ_DIR)/driver
-	mkdir -p $(OBJ_DIR)/fs
+ifndef VERBOSE
+.SILENT:
+endif
 
-$(OBJ_DIR)/%.o: src/%.c obj_dirs
-	gcc $(C_FLAGS)  $< -o $@
+$(OBJ_DIR)/%.o: src/%.c
+	$(info -> Compiling $<)
+	$(eval P := $(shell dirname $@))
+	mkdir -p $(P)
+	gcc $(C_FLAGS) $< -o $@
 
-$(OBJ_DIR)/%.o: src/%.s obj_dirs
+$(OBJ_DIR)/%.o: src/%.s
+	$(info -> Assembling $<)
+	$(eval P := $(shell dirname $@))
+	mkdir -p $(P)
 	nasm $(AS_FLAGS) $< -o $@
 
 kernel.elf: $(OBJECTS)
+	$(info -> Linking objects)
 	ld -T src/link.ld -melf_i386 $(OBJECTS) -o $(KERNEL_OUTPUT)
 
-$(ISO_OUTPUT): kernel.elf
+initrd: $(INITRD_FILES)
+	$(info -> Building initrd)
+	./mkrd $(INITRD_OUTPUT) $(INITRD_FILES)
+
+$(ISO_OUTPUT): kernel.elf initrd
+	$(info -> Building .iso)
+	./mkrd $(INITRD_OUTPUT) $(INITRD_FILES)
 	genisoimage -R -b boot/grub/stage2_eltorito -no-emul-boot -boot-load-size 4 -A os -input-charset utf8 -quiet -boot-info-table -o $(ISO_OUTPUT) build/iso
 
 clean:
 	rm -rf $(OBJ_DIR)/*
 	rm $(KERNEL_OUTPUT)
 	rm $(ISO_OUTPUT)
+	rm $(INITRD_OUTPUT)
 
 run:
 	VBoxManage startvm Samix
 	#VBoxManage debugvm "Samix" log
 
-mkrd: $(MKRD_SRC) $(INITRD_FILES)
+mkrd: $(MKRD_SRC)
 	gcc -Isrc/inc $(MKRD_SRC) -o mkrd
-	./mkrd $(INITRD_OUTPUT) $(INITRD_FILES)
+
+clean_mkrd:
+	rm mkrd
