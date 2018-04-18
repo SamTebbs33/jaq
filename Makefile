@@ -13,11 +13,16 @@ AS_FLAGS = -f elf
 KERNEL_OUTPUT = $(BUILD_DIR)/iso/boot/kernel.elf
 ISO_OUTPUT = $(BUILD_DIR)/os.iso
 
+MKRD_SRC = src/tools/mkrd.c
+INITRD_FILES = initrd/test1.txt initrd/test2.txt
+INITRD_OUTPUT = $(BUILD_DIR)/iso/modules/initrd.rd
+
 all: $(ISO_OUTPUT)
 
 obj_dirs:
 	mkdir -p $(OBJ_DIR)/kernel
 	mkdir -p $(OBJ_DIR)/driver
+	mkdir -p $(OBJ_DIR)/fs
 
 $(OBJ_DIR)/%.o: src/%.c obj_dirs
 	gcc $(C_FLAGS)  $< -o $@
@@ -39,3 +44,7 @@ clean:
 run:
 	VBoxManage startvm Samix
 	#VBoxManage debugvm "Samix" log
+
+mkrd: $(MKRD_SRC) $(INITRD_FILES)
+	gcc -Isrc/inc $(MKRD_SRC) -o mkrd
+	./mkrd $(INITRD_OUTPUT) $(INITRD_FILES)
