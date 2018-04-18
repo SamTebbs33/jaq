@@ -59,7 +59,7 @@ run:
 	#VBoxManage debugvm "Samix" log
 
 mkrd: $(MKRD_SRC)
-	gcc -Isrc/inc $(MKRD_SRC) -o mkrd
+	gcc -std=gnu99 -Isrc/inc $(MKRD_SRC) -o mkrd
 
 clean_mkrd:
 	rm mkrd
