@@ -32,9 +32,6 @@ void kmain(multiboot_info_t* mb_info) {
 
     if(mb_info->mods_count == 1) {
         fs_root = initrd_init(initrd_start);
-        fs_node_t* child = NULL;
-        uint32_t i = 0;
-        while((child = fs_readdir(fs_root, i++))) print(child->name);
     }
     // TODO: Load drivers from initrd
 }
