@@ -53,8 +53,8 @@ initrd: $(INITRD_FILES)
 
 $(ISO_OUTPUT): $(KERNEL_OUTPUT) initrd
 	$(info -> Building .iso)
-	grub-mkrescue -o $(ISO_OUTPUT) $(BUILD_DIR)/iso
-	#mkisofs -R -b boot/grub/stage2_eltorito -no-emul-boot -boot-load-size 4 -A os -input-charset utf8 -quiet -boot-info-table -o $(ISO_OUTPUT) build/iso
+	#grub-mkrescue -o $(ISO_OUTPUT) $(BUILD_DIR)/iso
+	mkisofs -R -b boot/grub/stage2_eltorito -no-emul-boot -boot-load-size 4 -A os -input-charset utf8 -quiet -boot-info-table -o $(ISO_OUTPUT) build/iso
 
 clean:
 	rm -rf $(OBJ_DIR)/*
