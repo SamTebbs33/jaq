@@ -7,7 +7,7 @@
 
 #define SERIAL_PORT_LCR (uint16_t) 3
 // Not that for stop bits sending 0 = 1 and sending 1 = 2 (or 1.5 if char bits is 5)
-#define SERIAL_LCR_VAL(char_len, stop_bits, parity, msb) (uint8_t) ((char_len - 1) & 0x3 | stop_bits << 2 | (parity & 0x7 << 3) | (msb & 0x1) << 7)
+#define SERIAL_LCR_VAL(char_len, stop_bits, parity, msb) (uint8_t) (((char_len - 1) & 0x3) | (stop_bits << 2) | (parity & 0x7 << 3) | ((msb & 0x1) << 7))
 
 void serial_init(uint16_t port, uint32_t baud, bool enable_interrupts, uint8_t char_len, bool single_stop_bit, bool parity, uint8_t interrupts_mode) {
     // Set baud rate
