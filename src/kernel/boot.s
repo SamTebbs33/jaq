@@ -22,7 +22,7 @@ kernel_stack_end:
 
 start:
     mov $kernel_stack_end, %esp
-    push ebx
+    push %ebx
     call kmain
     cli
 .hlt:
