@@ -1,60 +1,60 @@
-ALIGNMENT   equ 1
-MEM_INFO    equ 2
-MAGIC       equ 0x1BADB002
-FLAGS       equ ALIGNMENT | MEM_INFO
-CHECKSUM    equ -(MAGIC + FLAGS)
+.set ALIGNMENT, 1
+.set MEM_INFO, 2
+.set MAGIC, 0x1BADB002
+.set FLAGS, ALIGNMENT | MEM_INFO
+.set CHECKSUM, -(MAGIC + FLAGS)
 
-bits 32
+.section .multiboot
+.align 4
+    .long  MAGIC
+    .long  FLAGS
+    .long  CHECKSUM
 
-section .multiboot
-align 4
-    dd  MAGIC
-    dd  FLAGS
-    dd  CHECKSUM
-
-section .bss
-align 16
+.section .bss
+.align 16
 kernel_stack:
-    resb 16384
+    .skip 16384
 kernel_stack_end:
 
-section .text
-global start
-extern kmain
+.section .text
+.global start
+.extern kmain
 
 start:
-    mov esp, kernel_stack_end
-    push    ebx
-    cli
+    mov $kernel_stack_end, %esp
+    push %ebx
     call kmain
-    jmp $
+    cli
+.hlt:
+    hlt
+    jmp .hlt
 
-global gdt_flush
+.global gdt_flush
 
 gdt_flush:
-    mov eax, [esp + 4]
-    lgdt [eax]
+    mov -4(%esp), %eax
+    lgdt (%eax)
 
-    mov ax, 0x10
-    mov ds, ax
-    mov es, ax
-    mov fs, ax
-    mov gs, ax
-    mov ss, ax
+    mov 0x10, %ax
+    mov %ax, %ds
+    mov %ax, %es
+    mov %ax, %fs
+    mov %ax, %gs
+    mov %ax, %ss
 
-    ; Enter protected mode
-    mov eax, cr0
-    or al, 1
-    mov cr0, eax
+    // Enter protected mode
+    mov %cr0, %eax
+    or 1, %al
+    mov %eax, %cr0
 
-    jmp 0x08:.flush
+    ljmp $0x08, $.flush
 .flush:
     ret
 
-global idt_flush
+.global idt_flush
 
 idt_flush:
-    mov eax, [esp + 4]
-    lidt [eax]
+    mov -4(%esp), %eax
+    lidt (%eax)
     sti
     ret

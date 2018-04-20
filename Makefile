@@ -1,3 +1,7 @@
+CC = i686-elf-gcc
+AS = i686-elf-as
+LD = i686-elf-gcc
+
 BUILD_DIR = build
 OBJ_DIR = $(BUILD_DIR)/obj
 
@@ -7,8 +11,9 @@ FS_OBJECT_NAMES = initrd fs
 OBJECT_NAMES = $(patsubst %,kernel/%,$(KERNEL_OBJECT_NAMES)) $(patsubst %,driver/%,$(DRIVER_OBJECT_NAMES)) $(patsubst %,fs/%,$(FS_OBJECT_NAMES))
 OBJECTS = $(patsubst %,$(OBJ_DIR)/%.o,$(OBJECT_NAMES))
 
-C_FLAGS = -std=gnu99 -m32 -Isrc/inc -nostdlib -ffreestanding -lgcc -Wall -Wextra -Werror -Wno-unused-parameter -Wno-unused-variable -c
-AS_FLAGS = -f elf
+C_FLAGS = -std=gnu99 -Isrc/inc -nostdlib -ffreestanding -lgcc -Wall -Wextra -Werror -Wno-unused-parameter -Wno-unused-variable -c
+AS_FLAGS =
+LD_FLAGS = -lgcc -ffreestanding -O2 -nostdlib
 
 KERNEL_OUTPUT = $(BUILD_DIR)/iso/boot/kernel.elf
 ISO_OUTPUT = $(BUILD_DIR)/os.iso
@@ -28,26 +33,28 @@ $(OBJ_DIR)/%.o: src/%.c
 	$(info -> Compiling $<)
 	$(eval P := $(shell dirname $@))
 	mkdir -p $(P)
-	gcc $(C_FLAGS) $< -o $@
+	$(CC) $(C_FLAGS) $< -o $@
 
 $(OBJ_DIR)/%.o: src/%.s
 	$(info -> Assembling $<)
 	$(eval P := $(shell dirname $@))
 	mkdir -p $(P)
-	nasm $(AS_FLAGS) $< -o $@
+	$(AS) $(AS_FLAGS) $< -o $@
 
-kernel.elf: $(OBJECTS)
+$(KERNEL_OUTPUT): $(OBJECTS)
 	$(info -> Linking objects)
-	ld -T src/link.ld -melf_i386 $(OBJECTS) -o $(KERNEL_OUTPUT)
+	$(LD) -T src/link.ld $(LD_FLAGS) $(OBJECTS) -o $(KERNEL_OUTPUT)
+	grub-file --is-x86-multiboot $(KERNEL_OUTPUT)
 
 initrd: $(INITRD_FILES)
 	$(info -> Building initrd)
 	mkdir -p $(MODULES_OUTPUT)
 	./mkrd $(INITRD_OUTPUT) $(INITRD_FILES)
 
-$(ISO_OUTPUT): kernel.elf initrd
+$(ISO_OUTPUT): $(KERNEL_OUTPUT) initrd
 	$(info -> Building .iso)
-	genisoimage -R -b boot/grub/stage2_eltorito -no-emul-boot -boot-load-size 4 -A os -input-charset utf8 -quiet -boot-info-table -o $(ISO_OUTPUT) build/iso
+	#grub-mkrescue -o $(ISO_OUTPUT) $(BUILD_DIR)/iso
+	mkisofs -R -b boot/grub/stage2_eltorito -no-emul-boot -boot-load-size 4 -A os -input-charset utf8 -quiet -boot-info-table -o $(ISO_OUTPUT) build/iso
 
 clean:
 	rm -rf $(OBJ_DIR)/*
@@ -57,8 +64,7 @@ clean:
 
 run:
 	echo "" > qemu.log
-	qemu-system-x86_64 -cdrom build/os.iso -m 32 -boot d -serial file:qemu.log &
-	tail -f qemu.log
+	qemu-system-i386 -cdrom build/os.iso -boot d -serial file:qemu.log
 
 mkrd: $(MKRD_SRC)
 	gcc -std=gnu99 -Isrc/inc $(MKRD_SRC) -o mkrd
