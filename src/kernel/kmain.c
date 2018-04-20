@@ -7,6 +7,7 @@
 #include "idt/idt.h"
 #include "../driver/keyboard.h"
 #include "../driver/timer.h"
+#include "../driver/serial.h"
 #include "../fs/initrd.h"
 #include "mem/paging.h"
 #include "multiboot.h"
@@ -53,6 +54,8 @@ void kmain(multiboot_info_t* mb_info) {
     paging_init(total_mem, initrd_end);
     keyboard_init();
     timer_init(50);
+    serial_init(SERIAL_COM1_PORT, 38400, false, 8, true, false, 0);
+    serial_write(SERIAL_COM1_PORT, 'j');
 
     print_clear();
     print("Jaq OS ");
