@@ -18,5 +18,6 @@
 
 void serial_init(uint16_t port, uint32_t baud, bool enable_interrupts, uint8_t char_len, bool single_stop_bit, bool parity, uint8_t interrupts_mode);
 void serial_write(uint16_t port, char ch);
+void serial_write_str(uint16_t port, char* str);
 
 #endif //JAQ_SERIAL_H

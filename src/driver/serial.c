@@ -29,3 +29,8 @@ void serial_write(uint16_t port, char ch) {
     while (is_transmit_empty(port) == 0);
     outb(port, ch);
 }
+
+void serial_write_str(uint16_t port, char *str) {
+    char ch;
+    while ((ch = *str++)) serial_write(port, ch);
+}
