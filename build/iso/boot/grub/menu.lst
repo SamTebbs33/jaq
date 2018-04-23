@@ -1,6 +1,6 @@
-default=0
-timeout=0
+set timeout=15
+set default=0
 
-title jaq
+title "Jaq"
 kernel /boot/kernel.elf
 module /modules/initrd.rd
