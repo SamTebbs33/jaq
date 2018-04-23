@@ -1,6 +1,0 @@
-set timeout=15
-set default=0
-
-title "Jaq"
-kernel /boot/kernel.elf
-module /modules/initrd.rd
