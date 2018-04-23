@@ -1,6 +1,15 @@
-CC = i686-elf-gcc
-AS = i686-elf-as
-LD = i686-elf-gcc
+CC = ~/opt/cross/bin/i686-elf-gcc
+AS = nasm
+LD = ~/opt/cross/bin/i686-elf-gcc
+MKISO = ~/opt/cross/bin/grub-mkrescue
+GRUBFILE = ~/opt/cross/bin/grub-file
+EMU = qemu-system-i386
+
+CC_FLAGS = -std=gnu99 -Isrc/inc -ffreestanding -Wall -Wextra -Werror -Wno-unused-parameter -Wno-unused-variable -lgcc
+AS_FLAGS = -f elf
+LD_FLAGS = -ffreestanding -O2 -nostdlib -lgcc
+EMU_FLAGS = -cdrom $(ISO_OUTPUT) -boot d -serial stdio
+GRUBFILE_FLAGS = --is-x86-multiboot 
 
 BUILD_DIR = build
 OBJ_DIR = $(BUILD_DIR)/obj
@@ -11,17 +20,18 @@ FS_OBJECT_NAMES = initrd fs
 OBJECT_NAMES = $(patsubst %,kernel/%,$(KERNEL_OBJECT_NAMES)) $(patsubst %,driver/%,$(DRIVER_OBJECT_NAMES)) $(patsubst %,fs/%,$(FS_OBJECT_NAMES))
 OBJECTS = $(patsubst %,$(OBJ_DIR)/%.o,$(OBJECT_NAMES))
 
-C_FLAGS = -std=gnu99 -Isrc/inc -nostdlib -ffreestanding -lgcc -Wall -Wextra -Werror -Wno-unused-parameter -Wno-unused-variable -c
-AS_FLAGS =
-LD_FLAGS = -lgcc -ffreestanding -O2 -nostdlib
-
 KERNEL_OUTPUT = $(BUILD_DIR)/iso/boot/kernel.elf
 ISO_OUTPUT = $(BUILD_DIR)/os.iso
 MODULES_OUTPUT = $(BUILD_DIR)/iso/modules
 
 MKRD_SRC = src/tools/mkrd.c
+MKRD_OUTPUT = mkrd
+
 INITRD_FILES = initrd/test1.txt initrd/test2.txt
 INITRD_OUTPUT = $(MODULES_OUTPUT)/initrd.rd
+
+LINK_SCRIPT = src/link.ld
+GRUB_CFG = $(BUILD_DIR)/iso/boot/grub/grub.cfg
 
 all: $(ISO_OUTPUT)
 
@@ -33,7 +43,7 @@ $(OBJ_DIR)/%.o: src/%.c
 	$(info -> Compiling $<)
 	$(eval P := $(shell dirname $@))
 	mkdir -p $(P)
-	$(CC) $(C_FLAGS) $< -o $@
+	$(CC) $(CC_FLAGS) -c $< -o $@
 
 $(OBJ_DIR)/%.o: src/%.s
 	$(info -> Assembling $<)
@@ -41,20 +51,23 @@ $(OBJ_DIR)/%.o: src/%.s
 	mkdir -p $(P)
 	$(AS) $(AS_FLAGS) $< -o $@
 
-$(KERNEL_OUTPUT): $(OBJECTS)
+$(KERNEL_OUTPUT): $(OBJECTS) $(LINK_SCRIPT)
 	$(info -> Linking objects)
-	$(LD) -T src/link.ld $(LD_FLAGS) $(OBJECTS) -o $(KERNEL_OUTPUT)
-	grub-file --is-x86-multiboot $(KERNEL_OUTPUT)
+	$(LD) -T $(LINK_SCRIPT) $(LD_FLAGS) $(OBJECTS) -o $(KERNEL_OUTPUT)
+	$(GRUBFILE) $(GRUBFILE_FLAGS) $(KERNEL_OUTPUT)
 
-initrd: $(INITRD_FILES)
+$(INITRD_OUTPUT): $(INITRD_FILES) $(MKRD_OUTPUT)
 	$(info -> Building initrd)
 	mkdir -p $(MODULES_OUTPUT)
-	./mkrd $(INITRD_OUTPUT) $(INITRD_FILES)
+	./$(MKRD_OUTPUT) $(INITRD_OUTPUT) $(INITRD_FILES)
 
-$(ISO_OUTPUT): $(KERNEL_OUTPUT) initrd
+$(ISO_OUTPUT): $(KERNEL_OUTPUT) $(INITRD_OUTPUT) $(GRUB_CFG)
 	$(info -> Building .iso)
-	#grub-mkrescue -o $(ISO_OUTPUT) $(BUILD_DIR)/iso
-	mkisofs -R -b boot/grub/stage2_eltorito -no-emul-boot -boot-load-size 4 -A os -input-charset utf8 -quiet -boot-info-table -o $(ISO_OUTPUT) build/iso
+	$(MKISO) -o $(ISO_OUTPUT) $(BUILD_DIR)/iso
+
+$(MKRD_OUTPUT): $(MKRD_SRC)
+	$(info -> Compiling $<)
+	gcc -std=gnu99 -Isrc/inc $(MKRD_SRC) -o mkrd
 
 clean:
 	rm -rf $(OBJ_DIR)/*
@@ -63,11 +76,8 @@ clean:
 	rm $(INITRD_OUTPUT)
 
 run:
-	echo "" > qemu.log
-	qemu-system-i386 -cdrom build/os.iso -boot d -serial file:qemu.log
-
-mkrd: $(MKRD_SRC)
-	gcc -std=gnu99 -Isrc/inc $(MKRD_SRC) -o mkrd
+	$(info -> Running qemu)
+	$(EMU) $(EMU_FLAGS)
 
 clean_mkrd:
 	rm mkrd

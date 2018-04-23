@@ -53,7 +53,6 @@ void kmain(multiboot_info_t* mb_info) {
     idt_init();
     paging_init(total_mem, initrd_end);
     keyboard_init();
-    timer_init(50);
     serial_init(SERIAL_COM1_PORT, 38400, false, 8, true, false, 0);
     serial_write(SERIAL_COM1_PORT, 'j');
 
@@ -65,5 +64,6 @@ void kmain(multiboot_info_t* mb_info) {
     if(mb_info->mods_count == 1) {
         fs_root = initrd_init(initrd_start);
     }
+
     // TODO: Load drivers from initrd
 }
