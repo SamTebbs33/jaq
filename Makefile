@@ -3,10 +3,12 @@ AS = nasm
 LD = ~/opt/cross/bin/i686-elf-gcc
 MKISO = ~/opt/cross/bin/grub-mkrescue
 GRUBFILE = ~/opt/cross/bin/grub-file
+EMU = qemu-system-i386
 
 CC_FLAGS = -std=gnu99 -Isrc/inc -ffreestanding -Wall -Wextra -Werror -Wno-unused-parameter -Wno-unused-variable -lgcc
 AS_FLAGS = -f elf
 LD_FLAGS = -ffreestanding -O2 -nostdlib -lgcc
+EMU_FLAGS = -cdrom $(ISO_OUTPUT) -boot d -serial stdio
 GRUBFILE_FLAGS = --is-x86-multiboot 
 
 BUILD_DIR = build
@@ -75,8 +77,7 @@ clean:
 
 run:
 	$(info -> Running qemu)
-	echo "" > qemu.log
-	qemu-system-i386 -cdrom $(ISO_OUTPUT) -boot d -serial file:qemu.log
+	$(EMU) $(EMU_FLAGS)
 
 clean_mkrd:
 	rm mkrd
