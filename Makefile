@@ -2,11 +2,12 @@ CC = ~/opt/cross/bin/i686-elf-gcc
 AS = nasm
 LD = ~/opt/cross/bin/i686-elf-gcc
 MKISO = ~/opt/cross/bin/grub-mkrescue
-GRUBFILE= ~/opt/cross/bin/grub-file
+GRUBFILE = ~/opt/cross/bin/grub-file
 
 CC_FLAGS = -std=gnu99 -Isrc/inc -ffreestanding -Wall -Wextra -Werror -Wno-unused-parameter -Wno-unused-variable -lgcc
 AS_FLAGS = -f elf
 LD_FLAGS = -ffreestanding -O2 -nostdlib -lgcc
+GRUBFILE_FLAGS = --is-x86-multiboot 
 
 BUILD_DIR = build
 OBJ_DIR = $(BUILD_DIR)/obj
@@ -51,7 +52,7 @@ $(OBJ_DIR)/%.o: src/%.s
 $(KERNEL_OUTPUT): $(OBJECTS) $(LINK_SCRIPT)
 	$(info -> Linking objects)
 	$(LD) -T $(LINK_SCRIPT) $(LD_FLAGS) $(OBJECTS) -o $(KERNEL_OUTPUT)
-	$(GRUBFILE) --is-x86-multiboot $(KERNEL_OUTPUT)
+	$(GRUBFILE) $(GRUBFILE_FLAGS) $(KERNEL_OUTPUT)
 
 $(INITRD_OUTPUT): $(INITRD_FILES) $(MKRD_OUTPUT)
 	$(info -> Building initrd)
