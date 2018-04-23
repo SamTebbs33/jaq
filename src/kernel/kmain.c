@@ -54,7 +54,6 @@ void kmain(multiboot_info_t* mb_info) {
     paging_init(total_mem, initrd_end);
     keyboard_init();
     serial_init(SERIAL_COM1_PORT, 38400, false, 8, true, false, 0);
-    serial_write(SERIAL_COM1_PORT, 'j');
 
     print_clear();
     print("Jaq OS ");
