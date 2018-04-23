@@ -51,7 +51,7 @@ $(OBJ_DIR)/%.o: src/%.s
 $(KERNEL_OUTPUT): $(OBJECTS) $(LINK_SCRIPT)
 	$(info -> Linking objects)
 	$(LD) -T $(LINK_SCRIPT) $(LD_FLAGS) $(OBJECTS) -o $(KERNEL_OUTPUT)
-	$(HOME)/opt/grub/bin/grub-file --is-x86-multiboot $(KERNEL_OUTPUT)
+	$(GRUBFILE) --is-x86-multiboot $(KERNEL_OUTPUT)
 
 $(INITRD_OUTPUT): $(INITRD_FILES) $(MKRD_OUTPUT)
 	$(info -> Building initrd)
@@ -61,7 +61,6 @@ $(INITRD_OUTPUT): $(INITRD_FILES) $(MKRD_OUTPUT)
 $(ISO_OUTPUT): $(KERNEL_OUTPUT) $(INITRD_OUTPUT) $(GRUB_CFG)
 	$(info -> Building .iso)
 	$(MKISO) -o $(ISO_OUTPUT) $(BUILD_DIR)/iso
-	#mkisofs -R -b boot/grub/stage2_eltorito -no-emul-boot -boot-load-size 4 -A os -input-charset utf8 -quiet -boot-info-table -o $(ISO_OUTPUT) build/iso
 
 $(MKRD_OUTPUT): $(MKRD_SRC)
 	$(info -> Compiling $<)
