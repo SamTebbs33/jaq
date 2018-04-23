@@ -1,10 +1,11 @@
-CC = i686-elf-gcc
-AS = i686-elf-as
-LD = i686-elf-gcc
-MKISO = ~/opt/grub/bin/grub-mkrescue
+CC = ~/opt/cross/bin/i686-elf-gcc
+AS = nasm
+LD = ~/opt/cross/bin/i686-elf-gcc
+MKISO = ~/opt/cross/bin/grub-mkrescue
+GRUBFILE= ~/opt/cross/bin/grub-file
 
 CC_FLAGS = -std=gnu99 -Isrc/inc -ffreestanding -Wall -Wextra -Werror -Wno-unused-parameter -Wno-unused-variable -lgcc
-AS_FLAGS =
+AS_FLAGS = -f elf
 LD_FLAGS = -ffreestanding -O2 -nostdlib -lgcc
 
 BUILD_DIR = build
