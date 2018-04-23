@@ -14,6 +14,7 @@
 #include "util/maths.h"
 #include "mem/mem.h"
 #include "screen/framebuffer.h"
+#include "log/log.h"
 #include <driver_ifc.h>
 
 fs_node_t *fs_root;
@@ -45,15 +46,22 @@ driver_ifc_t driver_ifc = {
 };
 
 void kmain(multiboot_info_t* mb_info) {
+    serial_init(SERIAL_COM1_PORT, 38400, false, 8, true, false, 0);
+
+    log_info("Parsing multiboot info\n");
     uint32_t total_mem = mb_info->mem_upper + mb_info->mem_lower;
     uint32_t initrd_start = *(uint32_t*) mb_info->mods_addr;
     uint32_t initrd_end = *(uint32_t*) (mb_info->mods_addr + 4);
 
+    log_info("Initialising GDT\n");
     gdt_init();
+    log_info("Initialising IDT\n");
     idt_init();
+    log_info("Initialising paging\n");
     paging_init(total_mem, initrd_end);
+
+    log_info("Initialising devices\n");
     keyboard_init();
-    serial_init(SERIAL_COM1_PORT, 38400, false, 8, true, false, 0);
 
     print_clear();
     print("Jaq OS ");
@@ -61,6 +69,7 @@ void kmain(multiboot_info_t* mb_info) {
     print("MB available\n");
 
     if(mb_info->mods_count == 1) {
+        log_info("Loading initrd\n");
         fs_root = initrd_init(initrd_start);
     }
 
