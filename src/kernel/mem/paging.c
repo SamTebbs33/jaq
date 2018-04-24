@@ -149,4 +149,5 @@ page_t *paging_get_page(uint32_t addr, page_directory_t *page_dir, bool create) 
 
 void page_fault(interrupt_registers_t registers) {
     PANIC("Page fault");
+    // TODO: Later, fix the issue by swapping pages back from disk etc.
 }
