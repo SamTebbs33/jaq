@@ -9,7 +9,7 @@
 #define LOG_LEVEL_ERR "ERROR"
 #define LOG_LEVEL_WARNING "WARNING"
 
-void log(const char* level, char* msg);
+void log(char* level, char* msg);
 void log_info(char* msg);
 void log_error(char* msg);
 void log_warning(char* msg);

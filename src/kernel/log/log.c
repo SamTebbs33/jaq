@@ -5,8 +5,10 @@
 #include "log.h"
 #include "../../driver/serial.h"
 
-void log(const char *level, char *msg) {
-    serial_write_str(SERIAL_COM1_PORT, "[" LOG_LEVEL_INFO "] ");
+void log(char *level, char *msg) {
+    serial_write_str(SERIAL_COM1_PORT, "[");
+    serial_write_str(SERIAL_COM1_PORT, level);
+    serial_write_str(SERIAL_COM1_PORT, "] ");
     serial_write_str(SERIAL_COM1_PORT, msg);
 }
 
