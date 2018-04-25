@@ -34,3 +34,8 @@ void serial_write_str(uint16_t port, char *str) {
     char ch;
     while ((ch = *str++)) serial_write(port, ch);
 }
+
+void serial_write_len(uint16_t port, char *str, size_t len) {
+    size_t i = 0;
+    while (i++ < len) serial_write(port, *str++);
+}
