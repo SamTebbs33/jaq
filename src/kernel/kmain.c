@@ -23,8 +23,8 @@ driver_ifc_t driver_ifc = {
         .mem_ifc = {
                 .kmalloc = kmalloc,
                 .kmalloc_a = kmalloc_a,
-                .kmalloc_p = kmalloc_p,
-                .kmalloc_ap = kmalloc_ap
+                //.kmalloc_p = kmalloc_p,
+                //.kmalloc_ap = kmalloc_ap
         },
         .fs_ifc = {
                 .fs_readdir = fs_readdir,
@@ -63,9 +63,10 @@ void kmain(multiboot_info_t* mb_info) {
     log_info("Initialising devices\n");
     keyboard_init();
 
+    uint32_t fake_total_ram = total_mem - (total_mem % 1024) + 1024;
     print_clear();
     print("Jaq OS ");
-    print_u32(total_mem / 1024);
+    print_u32(fake_total_ram / 1024);
     print("MB available\n");
 
     if(mb_info->mods_count == 1) {
