@@ -1,40 +1,67 @@
 //
-// Created by Samuel Tebbs on 13/04/2018.
+// Created by sam on 24/04/18.
 //
 
-#ifndef JAQ_PAGING_H
-#define JAQ_PAGING_H
+#ifndef JAQ_PAGING2_H
+#define JAQ_PAGING2_H
 
 #include <stdinc.h>
 
-#define BYTES_PER_PAGE 0x1000
-#define PAGES_PER_TABLE 1024
-#define TABLES_PER_DIRECTORY 1024
+#define PAGE_SIZE 4096
+#define PAGE_TABLE_ENTRIES_PER_DIRECTORY 1024
+#define PAGE_ENTRIES_PER_TABLE 1024
+
+#define ALIGN_DOWN(addr) ((addr) - ((addr) % PAGE_SIZE))
+#define ALIGN_UP(addr) (ALIGN_DOWN(addr) + PAGE_SIZE)
+#define IS_PAGE_ALIGNED(addr) (addr % PAGE_SIZE) == 0
 
 typedef struct {
-    uint32_t present : 1;
-    uint32_t writable : 1;
-    uint32_t user_level : 1;
-    uint32_t accessed : 1;
-    uint32_t dirty : 1;
-    uint32_t unused : 7;
-    uint32_t frame : 20;
-} page_t;
+    uint8_t present : 1;
+    uint8_t writable : 1;
+    uint8_t user_level : 1;
+    uint8_t write_through : 1;
+    uint8_t caching_disabled : 1;
+    uint8_t accessed : 1;
+    uint8_t dirty : 1;
+    uint8_t zero : 1;
+    uint8_t global : 1;
+    uint8_t ignored : 3;
+    uint32_t physical_addr : 20; // 4KiB aligned physical address of page
+} page_table_entry_t;
 
 typedef struct {
-    page_t pages[PAGES_PER_TABLE];
+    page_table_entry_t entries[PAGE_ENTRIES_PER_TABLE];
 } page_table_t;
 
 typedef struct {
-    page_table_t* tables[TABLES_PER_DIRECTORY];
-    uint32_t tables_physical[TABLES_PER_DIRECTORY];
-    uint32_t physical_addr;
+    uint8_t present : 1;
+    uint8_t writable : 1;
+    uint8_t user_level : 1;
+    uint8_t write_through : 1;
+    uint8_t caching_disabled : 1;
+    uint8_t accessed : 1;
+    uint8_t zero : 1;
+    uint8_t four_megabyte_pages : 1;
+    uint8_t global : 1;
+    uint8_t ignored : 3;
+    uint32_t table_physical_addr : 20; // 4KiB aligned physical addr of page table
+} page_dir_entry_t;
+
+typedef struct {
+    page_dir_entry_t entries[PAGE_TABLE_ENTRIES_PER_DIRECTORY];
+    page_table_t* tables[PAGE_TABLE_ENTRIES_PER_DIRECTORY];
 } page_directory_t;
 
-void paging_init(uint32_t mem_kilobytes, uint32_t placement_address);
-void paging_set_directory(page_directory_t* new);
-page_t* paging_get_page(uint32_t addr, page_directory_t* page_dir, bool create);
-void alloc_frame(page_t* page, bool is_kernel, bool is_writeable);
-void free_frame(page_t* page);
+typedef void (*page_dir_entry_callback_t)(page_dir_entry_t* entry, page_table_t* table);
+typedef void (*page_table_entry_callback_t)(page_table_entry_t* entry);
 
-#endif //JAQ_PAGING_H
+void paging_init(uint32_t mem_kilobytes, uint32_t placement_addr);
+page_table_entry_t *paging_get_page(uint32_t addr, page_directory_t *directory);
+page_dir_entry_t* paging_get_table(uint32_t addr);
+void paging_set_directory(page_directory_t *directory);
+void paging_free_page(page_table_entry_t *page);
+bool paging_alloc_page(page_table_entry_t *page);
+page_directory_t* paging_create_directory(page_dir_entry_callback_t dir_callback,
+                                          page_table_entry_callback_t table_callback);
+
+#endif //JAQ_PAGING2_H

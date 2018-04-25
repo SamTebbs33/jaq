@@ -208,5 +208,5 @@ void split_right(heap_header_t *hole, size_t size, heap_t *heap) {
 }
 
 bool is_page_aligned(uint32_t addr) {
-    return ((addr & BYTES_PER_PAGE) > 0) ? true : false;
+    return ((addr & PAGE_SIZE) > 0) ? true : false;
 }

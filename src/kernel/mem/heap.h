@@ -32,6 +32,8 @@ typedef struct {
     bool is_kernel, is_writable;
 } heap_t;
 
+#define HEAP_OVERHEAD(num_entries) sizeof(heap_t) + sizeof(heap_index_t) + sizeof(heap_header_t*) * num_entries
+
 heap_t* heap_create(uint32_t start_addr, uint32_t end_addr, bool is_kernel, bool is_writable, uint32_t index_size);
 void* heap_alloc(size_t size, heap_t* heap);
 void heap_free(void* ptr, heap_t* heap);
