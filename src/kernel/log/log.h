@@ -12,10 +12,10 @@
 #define LOG_LEVEL_WARNING "WARNING"
 
 void log(char* level, char* msg);
+void log_len(char* level, char* msg, size_t len);
+void logf(char* level, const char* restrict format, ...);
 void log_info(char* msg);
 void log_error(char* msg);
 void log_warning(char* msg);
-
-void log_u32(uint32_t u32);
 
 #endif //JAQ_LOG_H
