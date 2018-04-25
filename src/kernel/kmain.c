@@ -45,8 +45,13 @@ driver_ifc_t driver_ifc = {
         }
 };
 
+void divide_by_zero(interrupt_registers_t registers) {
+    log_error("Divide by zero\n");
+}
+
 void kmain(multiboot_info_t* mb_info) {
     serial_init(SERIAL_COM1_PORT, 38400, false, 8, true, false, 0);
+    print_clear();
 
     log_info("Parsing multiboot info\n");
     uint32_t total_mem = mb_info->mem_upper + mb_info->mem_lower;
@@ -69,10 +74,21 @@ void kmain(multiboot_info_t* mb_info) {
     print_u32(fake_total_ram / 1024);
     print("MB available\n");
 
+    interrupts_register_handler(ISR_0, divide_by_zero);
+
     if(mb_info->mods_count == 1) {
         log_info("Loading initrd\n");
         fs_root = initrd_init(initrd_start);
     }
+
+    // Testing code for paging
+    // Should trigger a page fault as the address
+    // pointed to by the pointer is outside
+    // paged memory (should be)
+    uint32_t* a = (uint32_t *) 0xC0000000;
+    *a = 3;
+    logf(LOG_LEVEL_INFO, "%d\n", *a);
+    while (true);
 
     // TODO: Load drivers from initrd
 }
