@@ -10,12 +10,14 @@
 #define LOG_LEVEL_INFO "INFO"
 #define LOG_LEVEL_ERR "ERROR"
 #define LOG_LEVEL_WARNING "WARNING"
+#define LOG_LEVEL_DEBUG "DEBUG"
 
 void log(char* level, char* msg);
 void log_len(char* level, char* msg, size_t len);
 void logf(char* level, const char* restrict format, ...);
 void log_info(char* msg);
 void log_error(char* msg);
+void log_debug(char* msg);
 void log_warning(char* msg);
 
 #endif //JAQ_LOG_H

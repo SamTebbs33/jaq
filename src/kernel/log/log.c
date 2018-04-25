@@ -15,6 +15,7 @@ void print_level(char* level) {
 }
 
 void log(char *level, char *msg) {
+    print_level(level);
     serial_write_str(SERIAL_COM1_PORT, msg);
 }
 
@@ -49,6 +50,7 @@ void logf(char *level, const char* restrict format, ...) {
 
     int written = 0;
 
+    print_level(level);
     while (*format != '\0') {
         size_t maxrem = (size_t) (INT32_MAX - written);
 
@@ -87,7 +89,6 @@ void logf(char *level, const char* restrict format, ...) {
             serial_write_len(SERIAL_COM1_PORT, (char *) str, len);
             written += len;
         } else if(*format == 'd') {
-            // TODO
             format++;
             int i = va_arg(parameters, int);
             written += log_u32(i);
@@ -110,4 +111,8 @@ void log_len(char *level, char *msg, size_t len) {
     print_level(level);
     size_t i = 0;
     while (i++ < len) serial_write(SERIAL_COM1_PORT, *msg++);
+}
+
+void log_debug(char *msg) {
+    log(LOG_LEVEL_DEBUG, msg);
 }
