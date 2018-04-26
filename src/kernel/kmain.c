@@ -47,6 +47,7 @@ driver_ifc_t driver_ifc = {
 
 void kmain(multiboot_info_t* mb_info) {
     serial_init(SERIAL_COM1_PORT, 38400, false, 8, true, false, 0);
+    print_clear();
 
     log_info("Parsing multiboot info\n");
     uint32_t total_mem = mb_info->mem_upper + mb_info->mem_lower;
@@ -57,6 +58,7 @@ void kmain(multiboot_info_t* mb_info) {
     gdt_init();
     log_info("Initialising IDT\n");
     idt_init();
+
     log_info("Initialising paging\n");
     paging_init(total_mem, initrd_end);
 
@@ -73,6 +75,11 @@ void kmain(multiboot_info_t* mb_info) {
         log_info("Loading initrd\n");
         fs_root = initrd_init(initrd_start);
     }
+
+    log_info("Done!");
+
+    // Runs forever to make sure interrupts are handled
+    while (true);
 
     // TODO: Load drivers from initrd
 }

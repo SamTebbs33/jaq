@@ -13,6 +13,6 @@ uint8_t inb(uint16_t port);
 extern void log_error(char*);
 extern void log_u32(uint32_t);
 
-#define PANIC(str) { log_error("PANIC: " str " @ " __FILE__ ":"); log_u32(__LINE__); while(1); }
+#define PANIC(str) { logf(LOG_LEVEL_DEBUG, "PANIC: %s @ %s:%d", str, __FILE__, __LINE__); while(1); }
 
 #endif //JAQ_UTIL_H
