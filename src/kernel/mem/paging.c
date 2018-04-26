@@ -53,18 +53,20 @@ void paging_init(uint32_t mem_kilobytes, uint32_t desired_placement_addr) {
     if(desired_placement_addr < UINT32_MAX && desired_placement_addr >= kernel_end_addr) placement_address = desired_placement_addr;
     else placement_address = kernel_end_addr;
 
-    // This gives a 30MiB heap, should be enough right?
+    // This gives a roughly 20MiB heap, depending on our code size and what is allocated before the heap
+    // Should be enough right?
     // Align so it falls on page boundary, so we can easily separate it from the user
     // memory that might come afterwards
-    uint32_t heap_start = ALIGN_UP(placement_address);
-    uint32_t heap_end = (uint32_t) (ALIGN_UP((uint32_t)(heap_start + 1E00000)));
+    uint32_t heap_end = ALIGN_UP(0x1E00000);
 
     // Calculate the number of pages on this machine (memory / page size)
     num_pages = mem_kilobytes_aligned * 1024 / PAGE_SIZE;
     pages_bitmap = (uint32_t *) kmalloc_a(num_pages * sizeof(uint32_t));
 
     // Create the kernel directory
-    kernel_directory = paging_create_directory(heap_start, heap_end, heap_start, heap_end);
+    // Identity map from 0x0 to end of kernel heap, after which user space
+    // will probably be
+    kernel_directory = paging_create_directory(0, heap_end, 0, heap_end);
 
     // Register page fault interrupt handler
     interrupts_register_handler(ISR_14, page_fault_handler);
@@ -75,9 +77,15 @@ void paging_init(uint32_t mem_kilobytes, uint32_t desired_placement_addr) {
     cr0 |= 0x8000000;
     asm ("mov %0, %%cr0":: "r"(cr0));
 
+    // Allocate pages to the kernel
+    for (uint32_t addr = 0; addr < heap_end; addr += PAGE_SIZE) {
+        if(!paging_alloc_page(paging_get_page(addr, kernel_directory))) PANIC("Couldn't allocate a page to the kernel")
+    }
+
+    // Heap starts where we finished allocating memory using placement_address
+    uint32_t heap_start = ALIGN_UP(placement_address);
     // Create the kernel heap
-    // TODO: Allocate pages first
-    kernel_heap = heap_create(placement_address, heap_end, true, true, HEAP_INDEX_SIZE);
+    kernel_heap = heap_create(heap_start, heap_end, true, true, HEAP_INDEX_SIZE);
 
 }
 
@@ -145,6 +153,11 @@ void paging_set_directory(page_directory_t *directory) {
     asm ("mov %0, %%cr3":: "r"((uint32_t) directory));
 }
 
+/*
+ * Creates a directory that maps virtual_start -> virtual_end to physical_start -> physical_end
+ * Probably not be appropriate for fragmented pages where mapping to free frames
+ * would be better
+ */
 page_directory_t * paging_create_directory(uint32_t phys_start, uint32_t phys_end, uint32_t virtual_start, uint32_t virtual_end) {
     if (phys_start > phys_end) PANIC("Improper start and end physical addresses");
     if(!IS_PAGE_ALIGNED(phys_start) || !IS_PAGE_ALIGNED(phys_end)) PANIC("Physical addresses are not page aligned");
@@ -152,19 +165,23 @@ page_directory_t * paging_create_directory(uint32_t phys_start, uint32_t phys_en
     if(!IS_PAGE_ALIGNED(virtual_start) || !IS_PAGE_ALIGNED(virtual_end)) PANIC("Virtual addresses are not page aligned");
     if(virtual_end - virtual_start < phys_end - phys_start) PANIC("Virtual space is smaller than physical space");
 
-    logf(LOG_LEVEL_DEBUG, "Mapping %d -> %d (%d) to %d -> %d (%d)\n",virtual_start, virtual_end, virtual_end - virtual_start, phys_start, phys_end, phys_end - phys_start);
     page_directory_t *dir = (page_directory_t *) kmalloc(sizeof(page_directory_t));
     if (dir) {
         memset(dir, 0, sizeof(page_directory_t));
+        // The physical address to start mapping to
         uint32_t phys_addr = phys_start;
-        uint32_t page = virtual_start / PAGE_SIZE, table_idx = virtual_start / PAGE_SIZE / PAGE_ENTRIES_PER_TABLE;
+        // Figure out the page and tale we're starting at
+        uint32_t page = virtual_start / PAGE_SIZE, table_idx = page / PAGE_ENTRIES_PER_TABLE;
+        // Set the tables in this directory until we either reach the maximum
+        // mapping address or we've finished the directory
         while ((phys_addr < phys_end) && page < PAGES_PER_DIRECTORY) {
-            logf(LOG_LEVEL_DEBUG, "Table %d, %d -> %d\n", table_idx, page * 4096, phys_addr);
             page_table_t* table = (page_table_t *) kmalloc(sizeof(page_table_t));
             dir->tables[table_idx] = table;
-            uint32_t page_idx = page / PAGE_ENTRIES_PER_TABLE;
+            // Index of the page in the table
+            uint32_t page_idx = page % PAGE_ENTRIES_PER_TABLE;
+            // Set the pages in this table until we either reach the maximum
+            // mapping address or we've finished table
             while (phys_addr < phys_end && page_idx < PAGE_ENTRIES_PER_TABLE) {
-                logf(LOG_LEVEL_DEBUG, "Page %d, %d:%d, %d -> %d\n", page, table_idx, page_idx, page * PAGE_SIZE, phys_addr);
                 page_table_entry_t* page_entry = &table->entries[page_idx];
                 page_entry->physical_addr = phys_addr;
                 page_entry->present = 1;

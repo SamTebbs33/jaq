@@ -45,10 +45,6 @@ driver_ifc_t driver_ifc = {
         }
 };
 
-void divide_by_zero(interrupt_registers_t registers) {
-    log_error("Divide by zero\n");
-}
-
 void kmain(multiboot_info_t* mb_info) {
     serial_init(SERIAL_COM1_PORT, 38400, false, 8, true, false, 0);
     print_clear();
@@ -63,11 +59,6 @@ void kmain(multiboot_info_t* mb_info) {
     log_info("Initialising IDT\n");
     idt_init();
 
-    if(mb_info->mods_count == 1) {
-        log_info("Loading initrd\n");
-        fs_root = initrd_init(initrd_start);
-    }
-
     log_info("Initialising paging\n");
     paging_init(total_mem, initrd_end);
 
@@ -80,8 +71,12 @@ void kmain(multiboot_info_t* mb_info) {
     print_u32(fake_total_ram / 1024);
     print("MB available\n");
 
-    interrupts_register_handler(ISR_0, divide_by_zero);
-    print(fs_root->readdir(fs_root, 0)->name);
+    if(mb_info->mods_count == 1) {
+        log_info("Loading initrd\n");
+        fs_root = initrd_init(initrd_start);
+    }
+
+    log_info("Done!");
 
     // Runs forever to make sure interrupts are handled
     while (true);
