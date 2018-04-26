@@ -62,6 +62,12 @@ void kmain(multiboot_info_t* mb_info) {
     gdt_init();
     log_info("Initialising IDT\n");
     idt_init();
+
+    if(mb_info->mods_count == 1) {
+        log_info("Loading initrd\n");
+        fs_root = initrd_init(initrd_start);
+    }
+
     log_info("Initialising paging\n");
     paging_init(total_mem, initrd_end);
 
@@ -75,19 +81,9 @@ void kmain(multiboot_info_t* mb_info) {
     print("MB available\n");
 
     interrupts_register_handler(ISR_0, divide_by_zero);
+    print(fs_root->readdir(fs_root, 0)->name);
 
-    if(mb_info->mods_count == 1) {
-        log_info("Loading initrd\n");
-        fs_root = initrd_init(initrd_start);
-    }
-
-    // Testing code for paging
-    // Should trigger a page fault as the address
-    // pointed to by the pointer is outside
-    // paged memory (should be)
-    uint32_t* a = (uint32_t *) 0xC0000000;
-    *a = 3;
-    logf(LOG_LEVEL_INFO, "%d\n", *a);
+    // Runs forever to make sure interrupts are handled
     while (true);
 
     // TODO: Load drivers from initrd

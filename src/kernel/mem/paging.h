@@ -10,10 +10,11 @@
 #define PAGE_SIZE 4096
 #define PAGE_TABLE_ENTRIES_PER_DIRECTORY 1024
 #define PAGE_ENTRIES_PER_TABLE 1024
+#define PAGES_PER_DIRECTORY (PAGE_TABLE_ENTRIES_PER_DIRECTORY * PAGE_ENTRIES_PER_TABLE)
 
 #define ALIGN_DOWN(addr) ((addr) - ((addr) % PAGE_SIZE))
 #define ALIGN_UP(addr) (ALIGN_DOWN(addr) + PAGE_SIZE)
-#define IS_PAGE_ALIGNED(addr) (addr % PAGE_SIZE) == 0
+#define IS_PAGE_ALIGNED(addr) ((addr | 0xFFFFF000) == 0xFFFFF000)
 
 typedef struct {
     uint8_t present : 1;
@@ -61,7 +62,6 @@ page_dir_entry_t* paging_get_table(uint32_t addr);
 void paging_set_directory(page_directory_t *directory);
 void paging_free_page(page_table_entry_t *page);
 bool paging_alloc_page(page_table_entry_t *page);
-page_directory_t* paging_create_directory(page_dir_entry_callback_t dir_callback,
-                                          page_table_entry_callback_t table_callback);
+page_directory_t* paging_create_directory(uint32_t phys_start, uint32_t phys_end, uint32_t virtual_start, uint32_t virtual_end);
 
 #endif //JAQ_PAGING2_H

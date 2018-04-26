@@ -29,55 +29,13 @@ uint32_t* pages_bitmap;
 #define BITS_PER_FRAME (sizeof(uint32_t) * 8)
 #define FRAME_OFFSET(n) (n / BITS_PER_FRAME)
 #define BIT_OFFSET(n) (n % BITS_PER_FRAME)
-#define FRAME_FROM_ADDR(a) a / PAGE_SIZE
-#define ADDR_FROM_FRAME(a) a * PAGE_SIZE
 
 #define HEAP_INDEX_SIZE 0x20000
-// Address at 40MiB, should be enough
-#define KERNEL_HEAP_MAX_ADDR 0x2800000
 
 page_directory_t* kernel_directory = NULL;
 heap_t* kernel_heap = NULL;
-extern void* kernel_end, *kernel_start;
+extern void* kernel_end;
 extern uint32_t placement_address;
-
-// Global = maybe bad
-static uint32_t page_map_addr, page_map_end_addr ;
-
-void kernel_directory_entry_callback(page_dir_entry_t* entry, page_table_t* table) {
-    entry->present = (uint8_t) (page_map_addr < page_map_end_addr);
-    entry->accessed = 0;
-    // TODO: After enabling paging this may not actually be the physical address
-    // Ensuring that all page tables are kept in kernel memory and
-    // not moving kernel memory around should mitigate this
-    entry->table_physical_addr = (uint32_t) table;
-    entry->caching_disabled = 0;
-    entry->global = 0;
-    entry->ignored = 0;
-    entry->user_level = 0;
-    entry->writable = 1;
-    entry->zero = 0;
-    entry->write_through = 0;
-    entry->four_megabyte_pages = 0;
-}
-
-void kernel_table_entry_callback(page_table_entry_t* entry) {
-    bool within_address_space = page_map_addr < page_map_end_addr;
-    entry->accessed = 0;
-    bool allocated = within_address_space ? paging_alloc_page(entry) : false;
-    entry->present = (uint8_t) allocated;
-    entry->write_through = 0;
-    entry->zero = 0;
-    entry->writable = 1;
-    entry->user_level = 0;
-    entry->ignored = 0;
-    entry->global = 0;
-    entry->caching_disabled = 0;
-    entry->dirty = 0;
-    entry->physical_addr = page_map_addr;
-    // Make sure we don't set the physical address to anything greater than the kernel heap max address
-    if(page_map_addr < page_map_end_addr) page_map_addr += PAGE_SIZE;
-}
 
 void page_fault_handler(interrupt_registers_t registers) {
     PANIC("Page fault");
@@ -95,16 +53,18 @@ void paging_init(uint32_t mem_kilobytes, uint32_t desired_placement_addr) {
     if(desired_placement_addr < UINT32_MAX && desired_placement_addr >= kernel_end_addr) placement_address = desired_placement_addr;
     else placement_address = kernel_end_addr;
 
-    // Physical address at which to start identity mapping for the kernel
-    page_map_addr = 0;
+    // This gives a 30MiB heap, should be enough right?
+    // Align so it falls on page boundary, so we can easily separate it from the user
+    // memory that might come afterwards
+    uint32_t heap_start = ALIGN_UP(placement_address);
+    uint32_t heap_end = (uint32_t) (ALIGN_UP((uint32_t)(heap_start + 1E00000)));
 
-    // Calculate the number of pages on thiframes_bitmaps machine (memory / page size)
+    // Calculate the number of pages on this machine (memory / page size)
     num_pages = mem_kilobytes_aligned * 1024 / PAGE_SIZE;
     pages_bitmap = (uint32_t *) kmalloc_a(num_pages * sizeof(uint32_t));
 
-    page_map_end_addr = mem_kilobytes_aligned;
     // Create the kernel directory
-    kernel_directory = paging_create_directory(kernel_directory_entry_callback, kernel_table_entry_callback);
+    kernel_directory = paging_create_directory(heap_start, heap_end, heap_start, heap_end);
 
     // Register page fault interrupt handler
     interrupts_register_handler(ISR_14, page_fault_handler);
@@ -115,14 +75,10 @@ void paging_init(uint32_t mem_kilobytes, uint32_t desired_placement_addr) {
     cr0 |= 0x8000000;
     asm ("mov %0, %%cr0":: "r"(cr0));
 
-    // Figure out where the kernel heap should start, based on where we have already allocated memory using placement_address
-    // and what is to be allocated using placement_address during heap creation. Plus add PAGE_SIZE little extra for safety
-    uint32_t heap_start = ALIGN_UP(placement_address + HEAP_OVERHEAD(HEAP_INDEX_SIZE)) + PAGE_SIZE;
-    uint32_t heap_size = 0x100000; // Arbitrary heap size really
-    uint32_t heap_end = min_u32(KERNEL_HEAP_MAX_ADDR, ALIGN_UP(heap_start + heap_size));
-
     // Create the kernel heap
-    kernel_heap = heap_create(heap_start, heap_end, true, true, HEAP_INDEX_SIZE);
+    // TODO: Allocate pages first
+    kernel_heap = heap_create(placement_address, heap_end, true, true, HEAP_INDEX_SIZE);
+
 }
 
 void set_frame(uint32_t frame) {
@@ -161,7 +117,6 @@ bool paging_alloc_page(page_table_entry_t *page) {
         set_frame(frame);
         return true;
     } else PANIC("No free frames");
-    return false;
 }
 
 // Free a page's occupation
@@ -190,25 +145,60 @@ void paging_set_directory(page_directory_t *directory) {
     asm ("mov %0, %%cr3":: "r"((uint32_t) directory));
 }
 
-page_directory_t* paging_create_directory(page_dir_entry_callback_t dir_callback,
-                                          page_table_entry_callback_t table_callback) {
-    page_directory_t *dir = (page_directory_t *) kmalloc_a(sizeof(page_directory_t));
-    if (dir) {
-        // Loop through, creating 1024 directory entries, each pointing to a table
-        for (int i = 0; i < PAGE_TABLE_ENTRIES_PER_DIRECTORY; ++i) {
-            page_table_t* table = (page_table_t *) kmalloc_a(sizeof(page_table_t));
-            page_dir_entry_t* dir_entry = &dir->entries[i];
-            kernel_directory->tables[i] = table;
-            // The callback is supposed to do what it needs to do with the table
-            // Setting flags, setting physical address, allocating etc.
-            dir_callback(dir_entry, table);
+page_directory_t * paging_create_directory(uint32_t phys_start, uint32_t phys_end, uint32_t virtual_start, uint32_t virtual_end) {
+    if (phys_start > phys_end) PANIC("Improper start and end physical addresses");
+    if(!IS_PAGE_ALIGNED(phys_start) || !IS_PAGE_ALIGNED(phys_end)) PANIC("Physical addresses are not page aligned");
+    if (virtual_start > virtual_end) PANIC("Improper start and end virtual addresses");
+    if(!IS_PAGE_ALIGNED(virtual_start) || !IS_PAGE_ALIGNED(virtual_end)) PANIC("Virtual addresses are not page aligned");
+    if(virtual_end - virtual_start < phys_end - phys_start) PANIC("Virtual space is smaller than physical space");
 
-            for (int j = 0; j < PAGE_ENTRIES_PER_TABLE; ++j) {
-                page_table_entry_t* table_entry = &table->entries[j];
-                // This callback should do a similar thing to what the
-                // directory entry callback does
-                table_callback(table_entry);
+    logf(LOG_LEVEL_DEBUG, "Mapping %d -> %d (%d) to %d -> %d (%d)\n",virtual_start, virtual_end, virtual_end - virtual_start, phys_start, phys_end, phys_end - phys_start);
+    page_directory_t *dir = (page_directory_t *) kmalloc(sizeof(page_directory_t));
+    if (dir) {
+        memset(dir, 0, sizeof(page_directory_t));
+        uint32_t phys_addr = phys_start;
+        uint32_t page = virtual_start / PAGE_SIZE, table_idx = virtual_start / PAGE_SIZE / PAGE_ENTRIES_PER_TABLE;
+        while ((phys_addr < phys_end) && page < PAGES_PER_DIRECTORY) {
+            logf(LOG_LEVEL_DEBUG, "Table %d, %d -> %d\n", table_idx, page * 4096, phys_addr);
+            page_table_t* table = (page_table_t *) kmalloc(sizeof(page_table_t));
+            dir->tables[table_idx] = table;
+            uint32_t page_idx = page / PAGE_ENTRIES_PER_TABLE;
+            while (phys_addr < phys_end && page_idx < PAGE_ENTRIES_PER_TABLE) {
+                logf(LOG_LEVEL_DEBUG, "Page %d, %d:%d, %d -> %d\n", page, table_idx, page_idx, page * PAGE_SIZE, phys_addr);
+                page_table_entry_t* page_entry = &table->entries[page_idx];
+                page_entry->physical_addr = phys_addr;
+                page_entry->present = 1;
+                page_entry->dirty = 0;
+                page_entry->caching_disabled = 0;
+                page_entry->global = 0;
+                page_entry->ignored = 0;
+                page_entry->user_level = 0;
+                page_entry->writable = 1;
+                page_entry->zero = 0;
+                page_entry->write_through = 0;
+                page_entry->accessed = 0;
+                phys_addr += PAGE_SIZE;
+                page++;
+                page_idx++;
             }
+            page_dir_entry_t* table_entry = &dir->entries[table_idx];
+            table_entry->accessed = 0;
+            table_entry->write_through = 0;
+            table_entry->zero = 0;
+            table_entry->writable = 1;
+            table_entry->user_level = 0;
+            table_entry->ignored = 0;
+            table_entry->global = 0;
+            table_entry->caching_disabled = 0;
+            table_entry->present = 1;
+            table_entry->four_megabyte_pages = 0;
+            // TODO: After paging is enabled, this may not actually be the proper physical address
+            // If all page directories are kept in kernel memory and kernel memory is
+            // always identity mapped, then there should be no problem.
+            // Or fix by always letting alloc_frame give the physical address,
+            // as it keeps track of that kind of thing
+            table_entry->table_physical_addr = (uint32_t) table;
+            table_idx++;
         }
     }
     return dir;
