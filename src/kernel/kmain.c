@@ -45,6 +45,7 @@ driver_ifc_t driver_ifc = {
         }
 };
 
+extern void* kernel_stack;
 void kmain(multiboot_info_t* mb_info) {
     serial_init(SERIAL_COM1_PORT, 38400, false, 8, true, false, 0);
     print_clear();
@@ -55,7 +56,7 @@ void kmain(multiboot_info_t* mb_info) {
     uint32_t initrd_end = *(uint32_t*) (mb_info->mods_addr + 4);
 
     log_info("Initialising GDT\n");
-    gdt_init();
+    gdt_init((uint32_t) &kernel_stack, 0x28);
     log_info("Initialising IDT\n");
     idt_init();
 
