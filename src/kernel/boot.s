@@ -18,6 +18,7 @@ kernel_stack_end:
 
 section .text
 global start
+global kernel_stack
 extern kmain
 
 start:
@@ -30,12 +31,15 @@ start:
     jmp .hlt
 
 global gdt_flush
+KERNEL_CODE_SEGSEL equ 0x8
+KERNEL_DATA_SEGSEL equ 0x10
+TSS_SEGSEL equ 0x28
 
 gdt_flush:
     mov eax, [esp + 4]
     lgdt [eax]
 
-    mov ax, 0x10
+    mov ax, KERNEL_DATA_SEGSEL
     mov ds, ax
     mov es, ax
     mov fs, ax
@@ -47,7 +51,7 @@ gdt_flush:
     or al, 1
     mov cr0, eax
 
-    jmp 0x08:.flush
+    jmp KERNEL_CODE_SEGSEL:.flush
 .flush:
     ret
 
@@ -57,4 +61,11 @@ idt_flush:
     mov eax, [esp + 4]
     lidt [eax]
     sti
+    ret
+
+global tss_flush
+
+tss_flush:
+    mov ax, TSS_SEGSEL
+    ltr ax
     ret
