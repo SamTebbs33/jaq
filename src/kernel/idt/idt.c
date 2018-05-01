@@ -2,6 +2,7 @@
 // Created by Samuel Tebbs on 12/04/2018.
 //
 
+#include <syscalls.h>
 #include "idt.h"
 #include "../util/string.h"
 #include "../util/util.h"
@@ -58,6 +59,9 @@ extern void irq13();
 extern void irq14();
 extern void irq15();
 
+// Syscall handler
+extern void irq96();
+
 extern void idt_flush(uint32_t idt_ptr_addr);
 
 bool handle(interrupt_registers_t registers);
@@ -66,6 +70,10 @@ idt_entry_t idt[IDT_NUM_ENTRIES];
 idt_pointer_t idt_ptr;
 
 interrupt_handler_t handlers[IDT_NUM_ENTRIES];
+
+void general_protection_fault(interrupt_registers_t registers) {
+    logf(LOG_LEVEL_ERR, "General protection fault\n");
+}
 
 void idt_init() {
     idt_ptr.limit = sizeof(idt_entry_t) * IDT_NUM_ENTRIES - 1;
@@ -136,6 +144,10 @@ void idt_init() {
     idt_set_gate(45, (uint32_t) irq13, 0x08, 0x8E);
     idt_set_gate(46, (uint32_t) irq14, 0x08, 0x8E);
     idt_set_gate(47, (uint32_t) irq15, 0x08, 0x8E);
+    // Syscall interrupt
+    idt_set_gate(96, (uint32_t) irq96, 0x08, 0x8E | 0x60);
+
+    interrupts_register_handler(13, general_protection_fault);
 
     idt_flush((uint32_t) &idt_ptr);
 }
@@ -161,17 +173,17 @@ bool handle(interrupt_registers_t registers) {
 }
 
 void isr_handler(interrupt_registers_t registers) {
-    if(!handle(registers)) {
-        PRINT("Unhandled exception: ");
-        print_u32(registers.int_no);
-    }
+    if(!handle(registers)) logf(LOG_LEVEL_ERR, "Unhandled exception %d\n", registers.int_no);
 }
 
 void irq_handler(interrupt_registers_t registers) {
     handle(registers);
-    // Acknowledge the PICs
-    if(registers.int_no >= 40) outb(0xA0, 0x20); // Slave acknowledgment
-    outb(0x20, 0x20); // Master acknowledgment
+    // If this interrupt is coming from the PIC
+    if (registers.int_no <= 47) {
+        // Acknowledge the PICs
+        if (registers.int_no >= 40) outb(0xA0, 0x20); // Slave acknowledgment
+        outb(0x20, 0x20); // Master acknowledgment
+    }
 }
 
 bool interrupts_register_handler(uint8_t interrupt, interrupt_handler_t handler) {
