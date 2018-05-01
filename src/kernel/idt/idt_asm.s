@@ -103,6 +103,7 @@ IRQ 12, 44
 IRQ 13, 45
 IRQ 14, 46
 IRQ 15, 47
+IRQ 96, 128
 
 extern irq_handler
 
