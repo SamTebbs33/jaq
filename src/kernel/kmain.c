@@ -74,9 +74,7 @@ void kmain(multiboot_info_t* mb_info) {
 
     uint32_t fake_total_ram = total_mem - (total_mem % 1024) + 1024;
     print_clear();
-    print("Jaq OS ");
-    print_u32(fake_total_ram / 1024);
-    print("MB available\n");
+    printf("JaqOS, %d MB available\n> ", fake_total_ram / 1024);
 
     // Runs forever to make sure interrupts are handled
     while (true);

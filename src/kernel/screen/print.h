@@ -11,12 +11,13 @@
 #define PRINT_TAB '\t'
 #define PRINT_TAB_SIZE 4
 
+void printf(const char* restrict format, ...);
 void print_ch(char ch);
 void print(char* buff);
-void print_len(char *buff, unsigned int len);
+void print_len(char *buff, size_t len);
 void print_u8(uint8_t u8);
 void print_u16(uint16_t u16);
-void print_u32(uint32_t u32);
+uint32_t print_u32(uint32_t u32);
 void print_bg(char bg);
 void print_fg(char fg);
 void print_at(unsigned int r, unsigned int c);
