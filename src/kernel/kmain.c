@@ -78,8 +78,6 @@ void kmain(multiboot_info_t* mb_info) {
     print_u32(fake_total_ram / 1024);
     print("MB available\n");
 
-    asm("int $0x80");
-
     // Runs forever to make sure interrupts are handled
     while (true);
 }
