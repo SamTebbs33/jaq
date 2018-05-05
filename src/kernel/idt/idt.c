@@ -71,10 +71,6 @@ idt_pointer_t idt_ptr;
 
 interrupt_handler_t handlers[IDT_NUM_ENTRIES];
 
-void general_protection_fault(interrupt_registers_t registers) {
-    logf(LOG_LEVEL_ERR, "General protection fault\n");
-}
-
 void idt_init() {
     idt_ptr.limit = sizeof(idt_entry_t) * IDT_NUM_ENTRIES - 1;
     idt_ptr.base  = (uint32_t) &idt;
@@ -146,9 +142,7 @@ void idt_init() {
     idt_set_gate(47, (uint32_t) irq15, 0x08, 0x8E);
     // Syscall interrupt
     idt_set_gate(96, (uint32_t) irq96, 0x08, 0x8E | 0x60);
-
-    interrupts_register_handler(13, general_protection_fault);
-
+    
     idt_flush((uint32_t) &idt_ptr);
 }
 
