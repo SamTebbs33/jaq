@@ -15,6 +15,7 @@
 #include "mem/mem.h"
 #include "screen/framebuffer.h"
 #include "log/log.h"
+#include "idt/exceptions.h"
 #include <driver_ifc.h>
 #include <syscalls.h>
 
@@ -52,6 +53,7 @@ void kmain(multiboot_info_t* mb_info) {
     gdt_init((uint32_t) &kernel_stack, 0x28);
     log_info("Initialising IDT\n");
     idt_init();
+    exceptions_init();
 
     log_info("Initialising paging\n");
     paging_init(total_mem, initrd_end);
