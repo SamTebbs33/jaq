@@ -36,3 +36,15 @@ void fb_clear(uint8_t fg, uint8_t bg) {
         framebuffer[i] = blank;
 }
 
+void fb_scroll(uint32_t rows) {
+    for (int row = rows; row < FB_ROWS; ++row) {
+        // Move this row up by $rows
+        for (int col = 0; col < FB_COLUMNS; ++col) {
+            uint32_t src = (uint32_t) (row * FB_COLUMNS + col), dest = (row - rows) * FB_COLUMNS + col;
+            uint16_t cell = framebuffer[src];
+            framebuffer[dest] = cell;
+            framebuffer[src] = ' ';
+        }
+    }
+}
+

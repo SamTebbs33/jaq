@@ -22,6 +22,7 @@ void print_bg(char bg);
 void print_fg(char fg);
 void print_at(unsigned int r, unsigned int c);
 void print_clear();
+void print_scroll(uint32_t rows);
 
 #define PRINT(s) print_len(s, sizeof(s))
 

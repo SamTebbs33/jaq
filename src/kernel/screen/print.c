@@ -11,6 +11,10 @@
 char fg = FB_WHITE, bg = FB_BLACK;
 unsigned int row = 0, column = 0;
 
+void print_scroll(uint32_t rows) {
+    fb_scroll(rows);
+}
+
 void print(char* str) {
     char ch;
     while((ch = *str++)) {

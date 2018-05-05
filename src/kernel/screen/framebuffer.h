@@ -31,5 +31,6 @@
 void fb_putc(unsigned char ch, unsigned char fg, unsigned char bg);
 void fb_cursor(unsigned int row, unsigned int column);
 void fb_clear(uint8_t fg, uint8_t bg);
+void fb_scroll(uint32_t rows);
 
 #endif //PROJECT_FRAMEBUFFER_H
