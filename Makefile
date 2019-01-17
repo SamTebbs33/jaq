@@ -1,8 +1,8 @@
-CC = ~/opt/cross/bin/i686-elf-gcc
+CC = i686-elf-gcc
 AS = nasm
-LD = ~/opt/cross/bin/i686-elf-gcc
-MKISO = ~/opt/cross/bin/grub-mkrescue
-GRUBFILE = ~/opt/cross/bin/grub-file
+LD = i686-elf-gcc
+MKISO = grub-mkrescue
+GRUBFILE = grub-file
 EMU = qemu-system-i386
 
 CC_FLAGS = -std=gnu99 -Isrc/inc -ffreestanding -Wall -Wextra -Werror -Wno-unused-parameter -Wno-unused-variable -lgcc
