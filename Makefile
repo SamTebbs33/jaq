@@ -1,15 +1,15 @@
 CC = i686-elf-gcc
-AS = nasm
+AS = i686-elf-as
 LD = i686-elf-gcc
 MKISO = grub-mkrescue
 GRUBFILE = grub-file
 EMU = qemu-system-i386
 
 CC_FLAGS = -std=gnu99 -Isrc/inc -ffreestanding -Wall -Wextra -Werror -Wno-unused-parameter -Wno-unused-variable -lgcc
-AS_FLAGS = -f elf
+AS_FLAGS =
 LD_FLAGS = -ffreestanding -O2 -nostdlib -lgcc
 EMU_FLAGS = -cdrom $(ISO_OUTPUT) -boot d -serial stdio
-GRUBFILE_FLAGS = --is-x86-multiboot 
+GRUBFILE_FLAGS = --is-x86-multiboot
 
 BUILD_DIR = build
 OBJ_DIR = $(BUILD_DIR)/obj

@@ -1,19 +1,19 @@
-%macro ISR_NO_ERR 1
-    global isr%1
-    isr%1:
+.macro ISR_NO_ERR isr_num
+    .global isr\isr_num
+    isr\isr_num:
     cli
     push 0
-    push %1
+    push \isr_num
     jmp isr_common
-%endmacro
+.endm
 
-%macro ISR_ERR 1
-    global isr%1
-    isr%1:
+.macro ISR_ERR isr_num
+    .global isr\isr_num
+    isr\isr_num:
     cli
-    push %1
+    push \isr_num
     jmp isr_common
-%endmacro
+.endm
 
 ISR_NO_ERR 0
 ISR_NO_ERR 1
@@ -48,44 +48,44 @@ ISR_NO_ERR 29
 ISR_ERR 30
 ISR_NO_ERR 31
 
-extern isr_handler
+.extern isr_handler
 
- ; This is the common ISR stub. It saves the processor state, sets
- ; up for kernel mode segments, calls the C-level fault handler,
- ; and finally restores the stack frame.
+ # This is the common ISR stub. It saves the processor state, sets
+ # up for kernel mode segments, calls the C-level fault handler,
+ # and finally restores the stack frame.
 
 isr_common:
    pusha
 
-   mov ax, ds
-   push eax                 ; save the data segment descriptor
+   mov %ds, %ax
+   push %eax                 # save the data segment descriptor
 
-   mov ax, 0x10             ; load the kernel data segment descriptor
-   mov ds, ax
-   mov es, ax
-   mov fs, ax
-   mov gs, ax
+   mov $0x10, %ax             # load the kernel data segment descriptor
+   mov %ax, %ds
+   mov %ax, %es
+   mov %ax, %fs
+   mov %ax, %gs
 
    call isr_handler
 
-   pop eax                  ; reload the original data segment descriptor
-   mov ds, ax
-   mov es, ax
-   mov fs, ax
-   mov gs, ax
+   pop %eax                  # reload the original data segment descriptor
+   mov %ax, %ds
+   mov %ax, %es
+   mov %ax, %fs
+   mov %ax, %gs
 
    popa
-   add esp, 8               ; Cleans up the pushed error code and pushed ISR number
+   add $8, %esp               # Cleans up the pushed error code and pushed ISR number
    iret
 
-%macro IRQ 2
-  global irq%1
-  irq%1:
+.macro IRQ irq_num b
+  .global irq\irq_num
+  irq\irq_num:
     cli
-    push %1
-    push %2
+    push $\irq_num
+    push $\b
     jmp irq_common
-%endmacro
+.endm
 
 IRQ 0, 32
 IRQ 1, 33
@@ -105,32 +105,32 @@ IRQ 14, 46
 IRQ 15, 47
 IRQ 96, 128
 
-extern irq_handler
+.extern irq_handler
 
- ; This is our common IRQ stub. It saves the processor state, sets
- ; up for kernel mode segments, calls the C-level fault handler,
- ; and finally restores the stack frame.
+# This is our common IRQ stub. It saves the processor state, sets
+# up for kernel mode segments, calls the C-level fault handler,
+# and finally restores the stack frame.
 
 irq_common:
    pusha
 
-   mov ax, ds
-   push eax                 ; save the data segment descriptor
+   mov %ds, %ax
+   push %eax                 # save the data segment descriptor
 
-   mov ax, 0x10             ; load the kernel data segment descriptor
-   mov ds, ax
-   mov es, ax
-   mov fs, ax
-   mov gs, ax
+   mov $0x10, %ax             # load the kernel data segment descriptor
+   mov %ax, %ds
+   mov %ax, %es
+   mov %ax, %fs
+   mov %ax, %gs
 
    call irq_handler
 
-   pop ebx                  ; reload the original data segment descriptor
-   mov ds, bx
-   mov es, bx
-   mov fs, bx
-   mov gs, bx
+   pop %ebx                  # reload the original data segment descriptor
+   mov %bx, %ds
+   mov %bx, %es
+   mov %bx, %fs
+   mov %bx, %gs
 
    popa
-   add esp, 8               ; Cleans up the pushed error code and pushed IRQ number
+   add $8, %esp               # Cleans up the pushed error code and pushed IRQ number
    iret
