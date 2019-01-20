@@ -43,6 +43,7 @@ endif
 
 ifdef DEBUG
 CC_FLAGS += -g
+AS_FLAGS += --gstabs+
 EMU_FLAGS += -s -S
 endif
 
