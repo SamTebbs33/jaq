@@ -4,12 +4,14 @@ LD = i686-elf-gcc
 MKISO = grub-mkrescue
 GRUBFILE = grub-file
 EMU = qemu-system-i386
+DEBUGGER = gdb
 
 CC_FLAGS = -std=gnu99 -Isrc/inc -ffreestanding -Wall -Wextra -Werror -Wno-unused-parameter -Wno-unused-variable -lgcc
 AS_FLAGS =
 LD_FLAGS = -ffreestanding -O2 -nostdlib -lgcc
 EMU_FLAGS = -cdrom $(ISO_OUTPUT) -boot d -serial stdio
 GRUBFILE_FLAGS = --is-x86-multiboot
+DEBUGGER_FLAGS = -ex "symbol-file $(KERNEL_OUTPUT)" -ex "target remote localhost:1234"
 
 BUILD_DIR = build
 OBJ_DIR = $(BUILD_DIR)/obj
@@ -37,6 +39,11 @@ all: $(ISO_OUTPUT)
 
 ifndef VERBOSE
 .SILENT:
+endif
+
+ifdef DEBUG
+CC_FLAGS += -g
+EMU_FLAGS += -s
 endif
 
 $(OBJ_DIR)/%.o: src/%.c
@@ -74,6 +81,9 @@ clean:
 	rm $(KERNEL_OUTPUT)
 	rm $(ISO_OUTPUT)
 	rm $(INITRD_OUTPUT)
+
+debug:
+	$(DEBUGGER) $(DEBUGGER_FLAGS)
 
 run:
 	$(info -> Running qemu)
