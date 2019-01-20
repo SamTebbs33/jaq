@@ -43,7 +43,7 @@ endif
 
 ifdef DEBUG
 CC_FLAGS += -g
-EMU_FLAGS += -s
+EMU_FLAGS += -s -S
 endif
 
 $(OBJ_DIR)/%.o: src/%.c
