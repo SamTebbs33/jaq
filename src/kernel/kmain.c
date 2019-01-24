@@ -37,10 +37,6 @@ void kmain(multiboot_info_t* mb_info, uint32_t mb_magic) {
     idt_init();
     exceptions_init();
 
-    int a = total_mem;
-	a -= total_mem;
-	int b = 10 / a;
-
     log_info("Initialising paging\n");
     paging_init(total_mem, initrd_end);
 
