@@ -3,11 +3,11 @@
 //
 
 #include "timer.h"
-#include "interrupts.h"
+#include "../kernel/idt/idt.h"
 #include "../kernel/util/util.h"
 #include "../kernel/screen/print.h"
 
-void on_tick(interrupt_registers_t registers) {
+void on_tick(registers_t* registers) {
 }
 
 void timer_init(uint32_t frequency) {
@@ -24,5 +24,5 @@ void timer_init(uint32_t frequency) {
     outb(0x40, low);
     outb(0x40, high);
 
-    interrupts_register_handler(IRQ_0, on_tick);
+    idt_register_irq_handler(0, on_tick);
 }

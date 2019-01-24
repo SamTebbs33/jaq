@@ -2,7 +2,7 @@
 // Created by sam on 24/04/18.
 //
 
-#include <interrupts.h>
+#include "../idt/idt.h"
 #include "paging.h"
 #include "mem.h"
 #include "../util/string.h"
@@ -37,7 +37,7 @@ heap_t* kernel_heap = NULL;
 extern void* kernel_end;
 extern uint32_t placement_address;
 
-void page_fault_handler(interrupt_registers_t registers) {
+void page_fault_handler(registers_t* registers) {
     PANIC("Page fault");
     // TODO: Make this find page to swap in from disk
     // else terminate offending process
@@ -69,7 +69,7 @@ void paging_init(uint32_t mem_kilobytes, uint32_t desired_placement_addr) {
     kernel_directory = paging_create_directory(0, heap_end, 0, heap_end);
 
     // Register page fault interrupt handler
-    interrupts_register_handler(ISR_14, page_fault_handler);
+    idt_register_isr_handler(14, page_fault_handler);
     paging_set_directory(kernel_directory);
     // Enable paging
     uint32_t cr0;

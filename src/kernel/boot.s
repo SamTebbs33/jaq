@@ -23,12 +23,13 @@ kernel_stack_end:
 
 start:
     mov $kernel_stack_end, %esp
+    # Push magic number from bootloader
+    push %eax
+    # Push multiboot header address
     push %ebx
-    call kmain
     cli
-.hlt:
-    hlt
-    jmp .hlt
+    call kmain
+loop:    jmp loop
 
 .global gdt_flush
 .set KERNEL_CODE_SEGSEL, 0x8
@@ -60,7 +61,6 @@ flush:
 idt_flush:
     mov 4(%esp), %eax
     lidt (%eax)
-    sti
     ret
 
 .global tss_flush

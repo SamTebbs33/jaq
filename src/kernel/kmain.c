@@ -5,6 +5,7 @@
 #include "screen/print.h"
 #include "gdt/gdt.h"
 #include "idt/idt.h"
+#include "idt/exceptions.h"
 #include "../driver/keyboard.h"
 #include "../driver/timer.h"
 #include "../driver/serial.h"
@@ -12,35 +13,16 @@
 #include "mem/paging.h"
 #include "multiboot.h"
 #include "util/maths.h"
+#include "util/util.h"
 #include "mem/mem.h"
 #include "screen/framebuffer.h"
 #include "log/log.h"
-#include "idt/exceptions.h"
-#include <driver_ifc.h>
-#include <syscalls.h>
 
 fs_node_t *fs_root;
-
-syscall_handler_t syscall_handlers[SYSCALL_MAX + 1];
 extern void* kernel_stack;
 
-void handle_syscall(interrupt_registers_t registers) {
-    uint8_t syscall = (uint8_t) (registers.eax & 0xFF);
-    if(syscall_handlers[syscall]) syscall_handlers[syscall](registers);
-    else logf(LOG_LEVEL_WARNING, "Unhandled syscall %d\n", syscall);
-}
-
-void syscall_test(interrupt_registers_t registers) {
-    log_debug("Got test syscall\n");
-}
-
-void syscall_register_handler(uint8_t syscall, syscall_handler_t handler) {
-    if(syscall >= SYSCALL_MAX) return;
-    if(!syscall_handlers[syscall]) syscall_handlers[syscall] = handler;
-    else logf(LOG_LEVEL_WARNING, "Attempted to re-register a handler for syscall %d\n", syscall);
-}
-
-void kmain(multiboot_info_t* mb_info) {
+void kmain(multiboot_info_t* mb_info, uint32_t mb_magic) {
+    ASSERT_EQ_INT("multiboot magic number", mb_magic, MULTIBOOT_BOOTLOADER_MAGIC);
     serial_init(SERIAL_COM1_PORT, 38400, false, 8, true, false, 0);
     print_clear();
 
@@ -71,10 +53,10 @@ void kmain(multiboot_info_t* mb_info) {
         // TODO: Load drivers from initrd
     }
 
-    interrupts_register_handler(SYSCALL_INTERRUPT, handle_syscall);
-    syscall_register_handler(0x3, syscall_test);
+    log_info("Initialising timer\n");
+    timer_init(10);
 
-    log_info("Done!");
+    log_info("Done!\n");
 
     uint32_t fake_total_ram = total_mem - (total_mem % 1024) + 1024;
     print_clear();

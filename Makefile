@@ -6,7 +6,7 @@ GRUBFILE = grub-file
 EMU = qemu-system-i386
 DEBUGGER = gdb
 
-CC_FLAGS = -std=gnu99 -Isrc/inc -ffreestanding -Wall -Wextra -Werror -Wno-unused-parameter -Wno-unused-variable -lgcc
+CC_FLAGS = -std=gnu99 -Isrc/inc -ffreestanding -Wall -Wextra -Werror -Wno-unused-parameter -Wno-unused-variable -lgcc -O0
 AS_FLAGS =
 LD_FLAGS = -ffreestanding -O2 -nostdlib -lgcc
 EMU_FLAGS = -cdrom $(ISO_OUTPUT) -boot d -serial stdio -d int
@@ -39,6 +39,10 @@ all: $(ISO_OUTPUT)
 
 ifndef VERBOSE
 .SILENT:
+endif
+
+ifdef EMU_LOG
+EMU_FLAGS += -d int
 endif
 
 ifdef DEBUG

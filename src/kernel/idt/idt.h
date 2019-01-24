@@ -1,5 +1,5 @@
 //
-// Created by Samuel Tebbs on 12/04/2018.
+// Created by samteb01 on 24/01/19.
 //
 
 #ifndef JAQ_IDT_H
@@ -7,26 +7,36 @@
 
 #include <stdinc.h>
 
-#define IDT_NUM_ENTRIES 256
-
 struct idt_entry {
-    uint16_t base_lo;             // The lower 16 bits of the address to jump to when this interrupt fires.
-    uint16_t sel;                 // Kernel segment selector.
-    uint8_t always0;             // This must always be zero.
-    uint8_t flags;               // More flags. See documentation.
-    uint16_t base_hi;             // The upper 16 bits of the address to jump to.
+    unsigned short base_low;
+    unsigned short sel;
+    unsigned char zero;
+    unsigned char flags;
+    unsigned short base_high;
 } __attribute__((packed));
-typedef struct idt_entry idt_entry_t;
 
-// A struct describing a pointer to an array of interrupt handlers.
-// This is in a format suitable for giving to 'lidt'.
-struct idt_pointer {
-    uint16_t limit;
-    uint32_t base;                // The address of the first element in our idt_entry_t array.
+struct idt_ptr {
+    unsigned short limit;
+    uintptr_t base;
 } __attribute__((packed));
-typedef struct idt_pointer idt_pointer_t;
 
+struct registers {
+    unsigned int gs, fs, es, ds;
+    unsigned int edi, esi, ebp, esp, ebx, edx, ecx, eax;
+    unsigned int int_no, err_code;
+    unsigned int eip, cs, eflags, useresp, ss;
+};
+typedef struct registers registers_t;
+
+typedef void (*interrupt_handler_t) (registers_t*);
+
+struct idt_entry idt[256];
+struct idt_ptr idtp;
+
+extern void idt_load();
+void idt_set_gate(uint8_t num, uint32_t base, uint16_t sel, uint8_t flags);
 void idt_init();
-void idt_set_gate(uint8_t idx, uint32_t base, uint16_t sel, uint8_t flags);
+void idt_register_irq_handler(int irq, interrupt_handler_t handler);
+void idt_register_isr_handler(int isr, interrupt_handler_t handler);
 
 #endif //JAQ_IDT_H
