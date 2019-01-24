@@ -27,7 +27,7 @@ ISO_OUTPUT = $(BUILD_DIR)/os.iso
 MODULES_OUTPUT = $(BUILD_DIR)/iso/modules
 
 MKRD_SRC = src/tools/mkrd.c
-MKRD_OUTPUT = mkrd
+MKRD_OUTPUT = $(BUILD_DIR)/mkrd
 
 INITRD_FILES = initrd/test1.txt initrd/test2.txt
 INITRD_OUTPUT = $(MODULES_OUTPUT)/initrd.rd
@@ -79,7 +79,7 @@ $(ISO_OUTPUT): $(KERNEL_OUTPUT) $(INITRD_OUTPUT) $(GRUB_CFG)
 
 $(MKRD_OUTPUT): $(MKRD_SRC)
 	$(info -> Compiling $<)
-	gcc -std=gnu99 -Isrc/inc $(MKRD_SRC) -o mkrd
+	gcc -std=gnu99 -Isrc/inc $(MKRD_SRC) -o $(MKRD_OUTPUT)
 
 clean:
 	rm -rf $(OBJ_DIR)/*
