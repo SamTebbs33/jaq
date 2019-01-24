@@ -6,7 +6,7 @@
 #define JAQ_INITRD_H
 
 #include <stdinc.h>
-#include "fs.h"
+#include <fs.h>
 #include <multiboot.h>
 
 #define INITRD_FILENAME_MAX 64

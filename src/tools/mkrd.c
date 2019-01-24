@@ -7,7 +7,7 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "../fs/initrd.h"
+#include <initrd.h>
 
 uint32_t write_header(char *filename, FILE *file, uint32_t offset, FILE *output_file);
 

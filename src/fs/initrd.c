@@ -2,10 +2,10 @@
 // Created by Samuel Tebbs on 17/04/2018.
 //
 
-#include "initrd.h"
-#include "../kernel/mem/mem.h"
-#include "../kernel/util/string.h"
-#include "fs.h"
+#include <initrd.h>
+#include <mem.h>
+#include <string.h>
+#include <fs.h>
 
 initrd_t* initrd;
 fs_node_t* root;

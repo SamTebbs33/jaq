@@ -3,10 +3,10 @@
 //
 
 #include <stdarg.h>
-#include "print.h"
-#include "framebuffer.h"
-#include "../util/maths.h"
-#include "../util/string.h"
+#include <print.h>
+#include <framebuffer.h>
+#include <maths.h>
+#include <string.h>
 
 char fg = FB_WHITE, bg = FB_BLACK;
 unsigned int row = 0, column = 0;

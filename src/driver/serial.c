@@ -2,8 +2,8 @@
 // Created by Samuel Tebbs on 20/04/2018.
 //
 
-#include "serial.h"
-#include "../kernel/util/util.h"
+#include <serial.h>
+#include <util.h>
 
 #define SERIAL_PORT_LCR (uint16_t) 3
 // Not that for stop bits sending 0 = 1 and sending 1 = 2 (or 1.5 if char bits is 5)

@@ -2,9 +2,9 @@
 // Created by Samuel Tebbs on 13/04/2018.
 //
 
-#include "mem.h"
-#include "paging.h"
-#include "heap.h"
+#include <mem.h>
+#include <paging.h>
+#include <heap.h>
 
 uint32_t placement_address;
 extern heap_t* kernel_heap;

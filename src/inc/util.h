@@ -5,10 +5,10 @@
 #ifndef JAQ_UTIL_H
 #define JAQ_UTIL_H
 
-#include "string.h"
+#include <string.h>
 #include <stdinc.h>
 #include <stdarg.h>
-#include "../log/log.h"
+#include <log.h>
 
 void outb(uint16_t port, uint8_t val);
 uint8_t inb(uint16_t port);

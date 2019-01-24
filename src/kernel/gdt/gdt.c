@@ -2,7 +2,7 @@
 // Created by Samuel Tebbs on 12/04/2018.
 //
 
-#include "gdt.h"
+#include <gdt.h>
 
 gdt_entry_t gdt[GDT_NUM_ENTRIES];
 gdt_pointer_t gdt_ptr;

@@ -2,10 +2,10 @@
 // Created by Samuel Tebbs on 12/04/2018.
 //
 
-#include "timer.h"
-#include "../kernel/idt/idt.h"
-#include "../kernel/util/util.h"
-#include "../kernel/screen/print.h"
+#include <timer.h>
+#include <idt.h>
+#include <util.h>
+#include <print.h>
 
 void on_tick(registers_t* registers) {
 }

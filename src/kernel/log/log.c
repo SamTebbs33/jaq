@@ -4,9 +4,9 @@
 
 #include <stdarg.h>
 #include <stdinc.h>
-#include "log.h"
-#include "../../driver/serial.h"
-#include "../util/string.h"
+#include <log.h>
+#include <serial.h>
+#include <string.h>
 
 void print_level(char* level) {
     serial_write_str(SERIAL_COM1_PORT, "[");

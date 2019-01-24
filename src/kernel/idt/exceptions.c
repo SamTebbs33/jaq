@@ -2,9 +2,9 @@
 // Created by sam on 05/05/18.
 //
 
-#include "idt.h"
-#include "exceptions.h"
-#include "../util/util.h"
+#include <idt.h>
+#include <exceptions.h>
+#include <util.h>
 
 void divide_by_zero(registers_t* registers) {
     PANIC("Divide by zero");

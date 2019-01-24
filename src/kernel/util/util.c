@@ -2,7 +2,7 @@
 // Created by Samuel Tebbs on 12/04/2018.
 //
 
-#include "util.h"
+#include <util.h>
 
 void outb(uint16_t port, uint8_t val) {
     asm volatile ("outb %0, %1" : : "a"(val), "Nd"(port));

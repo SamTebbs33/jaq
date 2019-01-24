@@ -2,14 +2,14 @@
 // Created by sam on 24/04/18.
 //
 
-#include "../idt/idt.h"
-#include "paging.h"
-#include "mem.h"
-#include "../util/string.h"
-#include "../log/log.h"
-#include "heap.h"
-#include "../util/maths.h"
-#include "../util/util.h"
+#include <idt.h>
+#include <paging.h>
+#include <mem.h>
+#include <string.h>
+#include <log.h>
+#include <heap.h>
+#include <maths.h>
+#include <util.h>
 
 // Current system creates pages for the whole RAM space at the start
 // Maybe add more pages to reflect virtual memory in swapspace.

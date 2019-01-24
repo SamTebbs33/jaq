@@ -2,10 +2,10 @@
 // Created by Samuel Tebbs on 12/04/2018.
 //
 
-#include "keyboard.h"
-#include "../kernel/idt/idt.h"
-#include "../kernel/screen/print.h"
-#include "../kernel/util/util.h"
+#include <keyboard.h>
+#include <idt.h>
+#include <print.h>
+#include <util.h>
 
 #define KEYBOARD_PORT 0x60
 

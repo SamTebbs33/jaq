@@ -2,10 +2,10 @@
 // Created by samteb01 on 24/01/19.
 //
 
-#include "idt.h"
+#include <idt.h>
 
-#include "../util/string.h"
-#include "../util/util.h"
+#include <string.h>
+#include <util.h>
 
 #define IRQ_ON asm volatile ("sti")
 #define IRQ_OFF asm volatile ("cli")

@@ -2,21 +2,21 @@
 // Created by Samuel Tebbs on 12/04/2018.
 //
 
-#include "screen/print.h"
-#include "gdt/gdt.h"
-#include "idt/idt.h"
-#include "idt/exceptions.h"
-#include "../driver/keyboard.h"
-#include "../driver/timer.h"
-#include "../driver/serial.h"
-#include "../fs/initrd.h"
-#include "mem/paging.h"
-#include "multiboot.h"
-#include "util/maths.h"
-#include "util/util.h"
-#include "mem/mem.h"
-#include "screen/framebuffer.h"
-#include "log/log.h"
+#include <print.h>
+#include <gdt.h>
+#include <idt.h>
+#include <exceptions.h>
+#include <keyboard.h>
+#include <timer.h>
+#include <serial.h>
+#include <initrd.h>
+#include <paging.h>
+#include <multiboot.h>
+#include <maths.h>
+#include <util.h>
+#include <mem.h>
+#include <framebuffer.h>
+#include <log.h>
 
 fs_node_t *fs_root;
 extern void* kernel_stack;

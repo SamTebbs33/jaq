@@ -2,7 +2,7 @@
 // Created by Samuel Tebbs on 17/04/2018.
 //
 
-#include "string.h"
+#include <string.h>
 
 void* memset(void *buff, char value, size_t len) {
     char* buff2 = buff;
