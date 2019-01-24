@@ -9,7 +9,7 @@ DEBUGGER = gdb
 CC_FLAGS = -std=gnu99 -Isrc/inc -ffreestanding -Wall -Wextra -Werror -Wno-unused-parameter -Wno-unused-variable -lgcc
 AS_FLAGS =
 LD_FLAGS = -ffreestanding -O2 -nostdlib -lgcc
-EMU_FLAGS = -cdrom $(ISO_OUTPUT) -boot d -serial stdio
+EMU_FLAGS = -cdrom $(ISO_OUTPUT) -boot d -serial stdio -d int
 GRUBFILE_FLAGS = --is-x86-multiboot
 DEBUGGER_FLAGS = -ex "symbol-file $(KERNEL_OUTPUT)" -ex "target remote localhost:1234"
 

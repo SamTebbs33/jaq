@@ -167,10 +167,12 @@ bool handle(interrupt_registers_t registers) {
 }
 
 void isr_handler(interrupt_registers_t registers) {
+    logf(LOG_LEVEL_DEBUG, "ISR %d\n", registers.int_no);
     if(!handle(registers)) logf(LOG_LEVEL_ERR, "Unhandled exception %d\n", registers.int_no);
 }
 
 void irq_handler(interrupt_registers_t registers) {
+    logf(LOG_LEVEL_DEBUG, "IRQ %d\n", registers.int_no);
     handle(registers);
     // If this interrupt is coming from the PIC
     if (registers.int_no <= 47) {
