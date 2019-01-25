@@ -29,7 +29,7 @@ MODULES_OUTPUT = $(BUILD_DIR)/iso/modules
 MKRD_SRC = src/tools/mkrd.c
 MKRD_OUTPUT = $(BUILD_DIR)/mkrd
 
-INITRD_FILES = initrd/test1.txt initrd/test2.txt
+INITRD_FILES = initrd/test1.txt initrd/test2.txt initrd/keymaps/macbook_en_GB.txt
 INITRD_OUTPUT = $(MODULES_OUTPUT)/initrd.rd
 
 LINK_SCRIPT = src/link.ld

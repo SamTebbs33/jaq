@@ -25,5 +25,6 @@ void print_clear();
 void print_scroll(uint32_t rows);
 
 #define PRINT(s) print_len(s, sizeof(s))
+#define PRINT_CH(ch) print_ch(ch)
 
 #endif //SAMIX_PRINT_H

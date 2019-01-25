@@ -40,14 +40,14 @@ void kmain(multiboot_info_t* mb_info, uint32_t mb_magic) {
     log_info("Initialising paging\n");
     paging_init(total_mem, initrd_end);
 
-    log_info("Initialising devices\n");
-    keyboard_init();
-
     if(mb_info->mods_count == 1) {
         log_info("Loading initrd\n");
         fs_root = initrd_init(initrd_start);
         // TODO: Load drivers from initrd
     }
+
+    log_info("Initialising devices\n");
+    keyboard_init();
 
     log_info("Initialising timer\n");
     timer_init(10);
