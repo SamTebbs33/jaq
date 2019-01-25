@@ -53,6 +53,8 @@ typedef struct fs_node {
     uint32_t seek;
 } fs_node_t;
 
+extern fs_node_t* fs_root;
+
 fs_node_t* fs_make_node(char* name, fs_node_perms_t perms, fs_node_flags_t flags, fs_node_user_t user, fs_node_group_t group,
     fs_node_read_t read, fs_node_write_t write, fs_node_open_t open, fs_node_close_t close, fs_node_finddir_t finddir, fs_node_readdir_t readdir, size_t len, uint32_t impl);
 size_t fs_read(fs_node_t* node, void* buff, size_t len, size_t offset);

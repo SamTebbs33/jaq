@@ -9,7 +9,7 @@ DEBUGGER = gdb
 CC_FLAGS = -std=gnu99 -Isrc/inc -ffreestanding -Wall -Wextra -Werror -Wno-unused-parameter -Wno-unused-variable -lgcc -O0
 AS_FLAGS =
 LD_FLAGS = -ffreestanding -O2 -nostdlib -lgcc
-EMU_FLAGS = -cdrom $(ISO_OUTPUT) -boot d -serial stdio -d int
+EMU_FLAGS = -cdrom $(ISO_OUTPUT) -boot d -serial stdio
 GRUBFILE_FLAGS = --is-x86-multiboot
 DEBUGGER_FLAGS = -ex "symbol-file $(KERNEL_OUTPUT)" -ex "target remote localhost:1234"
 
@@ -29,7 +29,7 @@ MODULES_OUTPUT = $(BUILD_DIR)/iso/modules
 MKRD_SRC = src/tools/mkrd.c
 MKRD_OUTPUT = $(BUILD_DIR)/mkrd
 
-INITRD_FILES = initrd/test1.txt initrd/test2.txt
+INITRD_FILES = initrd/test1.txt initrd/test2.txt initrd/default_keymap.txt
 INITRD_OUTPUT = $(MODULES_OUTPUT)/initrd.rd
 
 LINK_SCRIPT = src/link.ld
