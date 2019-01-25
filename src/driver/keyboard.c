@@ -11,22 +11,6 @@
 
 #define KEYBOARD_PORT 0x60
 
-#define CHAR_ESCAPE '\e'
-#define CHAR_BKSPC '\b'
-#define CHAR_TAB '\t'
-#define CHAR_ENTER '\n'
-#define CHAR_CTRL '\a'
-#define CHAR_LSHIFT '\f'
-#define CHAR_RSHIFT CHAR_LSHIFT
-#define CHAR_ALT '\v'
-#define CHAR_SPACE ' '
-#define CHAR_CAPS '\x1'
-#define CHAR_UP '\x11'
-#define CHAR_LEFT '\x12'
-#define CHAR_RIGHT '\x13'
-#define CHAR_DOWN '\x14'
-//TODO: Add support for function keys
-
 struct key_mapping {
     char ascii;
     const char* name;
@@ -47,14 +31,32 @@ struct key_mapping mapping[] = {
         {CHAR_LEFT, "left"},
         {CHAR_RIGHT, "right"},
         {CHAR_DOWN, "down"},
+        {CHAR_ALT_RELEASED, "alt-r"},
+        {CHAR_RSHIFT_RELEASED, "rshift-r"},
+        {CHAR_LSHIFT_RELEASED, "lshift-r"},
         {'\0', NULL}
 };
 
 char keymap[256][3];
+int modifier = 0;
 
 void on_key(registers_t* registers) {
     uint8_t scan_code = inb(KEYBOARD_PORT);
-	if(keymap[scan_code][0] != '\0') PRINT_CH(keymap[scan_code][0]);
+    char ascii = keymap[scan_code][modifier];
+    switch (ascii) {
+        case CHAR_ALT:
+            modifier = 2;
+            break;
+        case CHAR_LSHIFT:
+            modifier = 1;
+            break;
+        case CHAR_LSHIFT_RELEASED:
+        case CHAR_ALT_RELEASED:
+            modifier = 0;
+            break;
+        default:
+            if(ascii >= ' ' && ascii <= '~') PRINT_CH(ascii);
+    }
 }
 
 bool is_digit(char ch) {
@@ -66,7 +68,6 @@ int to_digit(char ch) {
 }
 
 bool parse_keymap(char* buff) {
-	memset(keymap, '\0', 256 * 3);
     unsigned int i = 0;
     size_t len = strlen(buff);
     while(i < len) {
@@ -131,6 +132,6 @@ bool load_keymap(char* path) {
 
 void keyboard_init() {
     memset(keymap, 0, 256 * 3);
-    load_keymap("initrd/default_keymap.txt");
+    load_keymap("initrd/keymaps/macbook_en_GB.txt");
     idt_register_irq_handler(1, on_key);
 }
