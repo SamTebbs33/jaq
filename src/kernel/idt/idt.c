@@ -101,7 +101,6 @@ void idt_remap_pic() {
 void irq_handler(registers_t* r) {
     IRQ_OFF;
     int32_t interrupt = r->int_no - 32;
-    logf(LOG_LEVEL_DEBUG, "IRQ triggered: %d mapped to %d\n", r->int_no, interrupt);
     if (interrupt <= 15 && interrupt >= 0 && irq_handlers[interrupt]) irq_handlers[interrupt](r);
     if (interrupt >= 12) outb(0xA0, 0x20); // Acknowledge the slave
     outb(0x20, 0x20); // Acknowledge the master
@@ -109,7 +108,6 @@ void irq_handler(registers_t* r) {
 }
 
 void isr_handler(registers_t* r) {
-    logf(LOG_LEVEL_DEBUG, "ISR %d\n", r->int_no);
     if (r->int_no == 8 || r->int_no >= 32) {
         while(1) { asm volatile ("hlt"); }
     }
