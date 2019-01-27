@@ -4,8 +4,8 @@
 
 #include <heap.h>
 #include <mem.h>
-#include <paging.h>
 #include <util.h>
+#include <arch.h>
 
 bool is_page_aligned(uint32_t addr);
 
@@ -208,5 +208,5 @@ void split_right(heap_header_t *hole, size_t size, heap_t *heap) {
 }
 
 bool is_page_aligned(uint32_t addr) {
-    return ((addr & PAGE_SIZE) > 0) ? true : false;
+    return ((addr & ARCH_PAGE_SIZE) > 0) ? true : false;
 }

@@ -3,9 +3,10 @@
 //
 
 #include <idt.h>
-
 #include <string.h>
 #include <util.h>
+#include <exceptions.h>
+#include <arch.h>
 
 #define IRQ_ON asm volatile ("sti")
 #define IRQ_OFF asm volatile ("cli")
@@ -61,8 +62,8 @@ extern void irq13();
 extern void irq14();
 extern void irq15();
 
-static interrupt_handler_t irq_handlers[16] = { NULL };
-static interrupt_handler_t isr_handlers[32] = { NULL };
+static arch_interrupt_handler_t irq_handlers[16] = { NULL };
+static arch_interrupt_handler_t isr_handlers[32] = { NULL };
 
 void idt_set_gate(uint8_t num, uint32_t base, uint16_t sel, uint8_t flags) {
     idt[num].base_low =		(base & 0xFFFF);
@@ -72,48 +73,52 @@ void idt_set_gate(uint8_t num, uint32_t base, uint16_t sel, uint8_t flags) {
     idt[num].flags =		flags | 0x60;
 }
 
-void idt_register_isr_handler(int isr, interrupt_handler_t handler) {
+void idt_register_isr_handler(int isr, arch_interrupt_handler_t handler) {
     isr_handlers[isr] = handler;
 }
 
-void idt_register_irq_handler(int irq, interrupt_handler_t handler) {
+void idt_register_irq_handler(int irq, arch_interrupt_handler_t handler) {
     irq_handlers[irq] = handler;
+}
+
+void arch_register_interrupt_handler(int interrupt, arch_interrupt_handler_t handler) {
+    if(interrupt > 31 && interrupt != 127) idt_register_irq_handler(interrupt - 32, handler);
+    else idt_register_isr_handler(interrupt, handler);
 }
 
 void idt_remap_pic() {
     // Initialisation
-    outb(0x20, 0x11);
-    outb(0xA0, 0x11);
+    arch_outb(0x20, 0x11);
+    arch_outb(0xA0, 0x11);
     // Offsets
-    outb(0x21, 0x20);
-    outb(0xA1, 0x28);
+    arch_outb(0x21, 0x20);
+    arch_outb(0xA1, 0x28);
     // Cascading
-    outb(0x21, 0x04);
-    outb(0xA1, 0x02);
+    arch_outb(0x21, 0x04);
+    arch_outb(0xA1, 0x02);
     // Environments
-    outb(0x21, 0x01);
-    outb(0xA1, 0x01);
+    arch_outb(0x21, 0x01);
+    arch_outb(0xA1, 0x01);
     // Interrupt masking
-    outb(0x21, 0x0);
-    outb(0xA1, 0x0);
+    arch_outb(0x21, 0x0);
+    arch_outb(0xA1, 0x0);
 }
 
-void irq_handler(registers_t* r) {
+void irq_handler(arch_registers_t* r) {
     IRQ_OFF;
     int32_t interrupt = r->int_no - 32;
     if (interrupt <= 15 && interrupt >= 0 && irq_handlers[interrupt]) irq_handlers[interrupt](r);
-    if (interrupt >= 12) outb(0xA0, 0x20); // Acknowledge the slave
-    outb(0x20, 0x20); // Acknowledge the master
+    if (interrupt >= 12) arch_outb(0xA0, 0x20); // Acknowledge the slave
+    arch_outb(0x20, 0x20); // Acknowledge the master
     IRQ_ON;
 }
 
-void isr_handler(registers_t* r) {
+void isr_handler(arch_registers_t* r) {
     if (r->int_no == 8 || r->int_no >= 32) {
         while(1) { asm volatile ("hlt"); }
     }
     IRQ_OFF;
-    void (*handler)(registers_t* r);
-    handler = isr_handlers[r->int_no];
+    arch_interrupt_handler_t handler = isr_handlers[r->int_no];
     if (handler) {
         handler(r);
     } else {
@@ -180,4 +185,5 @@ void idt_init() {
     idt_set_gate(46, (uint32_t)irq14, 0x08, 0x8E);
     idt_set_gate(47, (uint32_t)irq15, 0x08, 0x8E);
     IRQ_ON;
+    exceptions_init();
 }

@@ -6,7 +6,7 @@ GRUBFILE = grub-file
 EMU = qemu-system-i386
 DEBUGGER = gdb
 
-CC_FLAGS = -std=gnu99 -Isrc/inc -ffreestanding -Wall -Wextra -Werror -Wno-unused-parameter -Wno-unused-variable -lgcc -O0
+CC_FLAGS = -DARCH=\"$(ARCH)\" -std=gnu99 -Isrc/inc -ffreestanding -Wall -Wextra -Werror -Wno-unused-parameter -Wno-unused-variable -lgcc -O0
 AS_FLAGS =
 LD_FLAGS = -ffreestanding -O2 -nostdlib -lgcc
 EMU_FLAGS = -cdrom $(ISO_OUTPUT) -boot d -serial stdio
@@ -16,11 +16,9 @@ DEBUGGER_FLAGS = -ex "symbol-file $(KERNEL_OUTPUT)" -ex "target remote localhost
 BUILD_DIR = build
 OBJ_DIR = $(BUILD_DIR)/obj
 
-KERNEL_OBJECT_NAMES = boot idt/idt_asm kmain screen/framebuffer screen/print util/util gdt/gdt idt/idt mem/mem mem/heap util/string util/maths log/log mem/paging idt/exceptions
+KERNEL_OBJECT_NAMES = kmain screen/framebuffer screen/print mem/mem mem/heap util/string util/maths log/log
 DRIVER_OBJECT_NAMES = keyboard timer serial
 FS_OBJECT_NAMES = initrd fs
-OBJECT_NAMES = $(patsubst %,kernel/%,$(KERNEL_OBJECT_NAMES)) $(patsubst %,driver/%,$(DRIVER_OBJECT_NAMES)) $(patsubst %,fs/%,$(FS_OBJECT_NAMES))
-OBJECTS = $(patsubst %,$(OBJ_DIR)/%.o,$(OBJECT_NAMES))
 
 KERNEL_OUTPUT = $(BUILD_DIR)/iso/boot/kernel.elf
 ISO_OUTPUT = $(BUILD_DIR)/os.iso
@@ -36,6 +34,13 @@ LINK_SCRIPT = src/link.ld
 GRUB_CFG = $(BUILD_DIR)/iso/boot/grub/grub.cfg
 
 all: $(ISO_OUTPUT)
+
+ARCH ?= $(shell arch)
+
+include src/arch/$(ARCH)/Makefile
+
+OBJECT_NAMES = $(patsubst %,kernel/%,$(KERNEL_OBJECT_NAMES)) $(patsubst %,driver/%,$(DRIVER_OBJECT_NAMES)) $(patsubst %,fs/%,$(FS_OBJECT_NAMES)) $(patsubst %,arch/x86/%,$(ARCH_OBJECT_NAMES))
+OBJECTS = $(patsubst %,$(OBJ_DIR)/%.o,$(OBJECT_NAMES))
 
 ifndef VERBOSE
 .SILENT:

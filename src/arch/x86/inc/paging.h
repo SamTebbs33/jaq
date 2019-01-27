@@ -56,7 +56,7 @@ typedef struct {
 typedef void (*page_dir_entry_callback_t)(page_dir_entry_t* entry, page_table_t* table);
 typedef void (*page_table_entry_callback_t)(page_table_entry_t* entry);
 
-void paging_init(uint32_t mem_kilobytes, uint32_t placement_addr);
+void paging_init(uint32_t total_mem, uint32_t initrd_end);
 page_table_entry_t *paging_get_page(uint32_t addr, page_directory_t *directory);
 page_dir_entry_t* paging_get_table(uint32_t addr);
 void paging_set_directory(page_directory_t *directory);

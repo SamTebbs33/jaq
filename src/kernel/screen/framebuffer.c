@@ -1,5 +1,5 @@
 #include <framebuffer.h>
-#include <util.h>
+#include <arch.h>
 
 #define CURSOR_CMD_PORT 0x3D4
 #define CURSOR_DATA_PORT 0x3D5
@@ -22,10 +22,10 @@ void fb_putc(unsigned char ch, unsigned char fg, unsigned char bg) {
 void fb_cursor(unsigned int row, unsigned int column) {
     unsigned int cursor = row * FB_COLUMNS + column;
     cell_counter = cursor;
-    outb(CURSOR_CMD_PORT, CURSOR_CMD_HIGH_BYTE);
-    outb(CURSOR_DATA_PORT, (cursor >> 8) & 0x00FF);
-    outb(CURSOR_CMD_PORT, CURSOR_CMD_LOW_BYTE);
-    outb(CURSOR_DATA_PORT, cursor & 0x00FF);
+    arch_outb(CURSOR_CMD_PORT, CURSOR_CMD_HIGH_BYTE);
+    arch_outb(CURSOR_DATA_PORT, (cursor >> 8) & 0x00FF);
+    arch_outb(CURSOR_CMD_PORT, CURSOR_CMD_LOW_BYTE);
+    arch_outb(CURSOR_DATA_PORT, cursor & 0x00FF);
 }
 
 void fb_clear(uint8_t fg, uint8_t bg) {

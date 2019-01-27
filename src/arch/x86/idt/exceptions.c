@@ -6,95 +6,95 @@
 #include <exceptions.h>
 #include <util.h>
 
-void divide_by_zero(registers_t* registers) {
+void divide_by_zero(arch_registers_t* registers) {
     PANIC("Divide by zero");
 }
 
-void debug(registers_t* registers) {
+void debug(arch_registers_t* registers) {
     PANIC("Debug");
 }
 
-void non_maskable_interrupt(registers_t* registers) {
+void non_maskable_interrupt(arch_registers_t* registers) {
     PANIC("Non maskable interrupt");
 }
 
-void breakpoint(registers_t* registers) {
+void breakpoint(arch_registers_t* registers) {
     PANIC("Breakpoint");
 }
 
-void overflow(registers_t* registers) {
+void overflow(arch_registers_t* registers) {
     PANIC("Overflow");
 }
 
-void bound_range_exceeded(registers_t* registers) {
+void bound_range_exceeded(arch_registers_t* registers) {
     PANIC("Bound range exceeded");
 }
 
-void invalid_opcode(registers_t* registers) {
+void invalid_opcode(arch_registers_t* registers) {
     PANIC("Invalid opcode");
 }
 
-void device_not_available(registers_t* registers) {
+void device_not_available(arch_registers_t* registers) {
     PANIC("Device not available");
 }
 
-void double_fault(registers_t* registers) {
+void double_fault(arch_registers_t* registers) {
     PANIC("Double fault");
 }
 
-void invalid_tss(registers_t* registers) {
+void invalid_tss(arch_registers_t* registers) {
     PANIC("Invalid TSS");
 }
 
-void segment_not_present(registers_t* registers) {
+void segment_not_present(arch_registers_t* registers) {
     PANIC("Segment not present");
 }
 
-void stack_segment_fault(registers_t* registers) {
+void stack_segment_fault(arch_registers_t* registers) {
     PANIC("Stack-segment fault");
 }
 
-void general_protection_fault(registers_t* registers) {
+void general_protection_fault(arch_registers_t* registers) {
     PANIC("General protection fault");
 }
 
-void page_fault(registers_t* registers) {
+void page_fault(arch_registers_t* registers) {
     PANIC("Page fault");
 }
 
-void reserved(registers_t* registers) {
+void reserved(arch_registers_t* registers) {
     PANIC("Reserved");
 }
 
-void floating_point_exception(registers_t* registers) {
+void floating_point_exception(arch_registers_t* registers) {
     PANIC("x87 floating point exception");
 }
 
-void alignment_check(registers_t* registers) {
+void alignment_check(arch_registers_t* registers) {
     PANIC("Alignment check");
 }
 
-void machine_check(registers_t* registers) {
+void machine_check(arch_registers_t* registers) {
     PANIC("Machine check");
 }
 
-void simd_floating_point_exception(registers_t* registers) {
+void simd_floating_point_exception(arch_registers_t* registers) {
     PANIC("SIMD floating point exception");
 }
 
-void virtualization_exception(registers_t* registers) {
+void virtualization_exception(arch_registers_t* registers) {
     PANIC("Virtualization exception");
 }
 
-void reserved2(registers_t* registers) {
+void reserved2(arch_registers_t* registers) {
     PANIC("Reserved 2");
 }
 
-void security_exception(registers_t* registers) {
+void security_exception(arch_registers_t* registers) {
     PANIC("Security exception");
 }
 
-void reserved3(registers_t* registers) {
+void reserved3(arch_registers_t* registers) {
     PANIC("Reserved 3");
 }
 

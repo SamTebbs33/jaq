@@ -37,7 +37,7 @@ heap_t* kernel_heap = NULL;
 extern void* kernel_end;
 extern uint32_t placement_address;
 
-void page_fault_handler(registers_t* registers) {
+void page_fault_handler(arch_registers_t* registers) {
     PANIC("Page fault");
     // TODO: Make this find page to swap in from disk
     // else terminate offending process

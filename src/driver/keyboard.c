@@ -3,11 +3,11 @@
 //
 
 #include <keyboard.h>
-#include <idt.h>
 #include <print.h>
-#include <util.h>
+#include <arch.h>
 #include <fs.h>
 #include <log.h>
+#include <string.h>
 
 #define KEYBOARD_PORT 0x60
 
@@ -40,8 +40,8 @@ struct key_mapping mapping[] = {
 char keymap[256][3];
 int modifier = 0;
 
-void on_key(registers_t* registers) {
-    uint8_t scan_code = inb(KEYBOARD_PORT);
+void on_key(arch_registers_t* registers) {
+    uint8_t scan_code = arch_inb(KEYBOARD_PORT);
     char ascii = keymap[scan_code][modifier];
     switch (ascii) {
         case CHAR_ALT:
@@ -133,5 +133,5 @@ bool load_keymap(char* path) {
 void keyboard_init() {
     memset(keymap, 0, 256 * 3);
     load_keymap("initrd/keymaps/macbook_en_GB.txt");
-    idt_register_irq_handler(1, on_key);
+    arch_register_interrupt_handler(ARCH_INTERRUPT_KEYBOARD, on_key);
 }
