@@ -26,13 +26,16 @@ In the project root, run `make` to compile the changed source files, optionally 
 * `VERBOSE=1`: Display the commands executed in the Makefile.
 * `ARCH=target-arch`: Set the target architecture. Default is the output of the `arch` command. Can be one of:
   * `x86`: Build for x86.
+* `GRUB_CFG=/path/to/grub.cfg`: Override the path to the grub.cfg file to include in the build image.
+* `BUILD_DIR=/path/to/build/dir`: Override the destination for all built objects. Default is "build".
+* `CHECK_MULTIBOOT=0`: Skip the multiboot compatibility check.
 * `CC=/path/to/cc`: Override the C compiler used. Default is "i686-elf-gcc".
 * `AS=/path/to/as`: Override the assembler used. Default is "i686-elf-as".
 * `LD=/path/to/ld`: Override the linker used. Default is "i686-elf-gcc".
 * `MKISO=/path/to/mkiso`: Override the program used to create the iso image. Default is "grub-mkrescue".
 * `GRUBFILE=/path/to/grub-file`: Override the grub-file program used to check multiboot compatibility. Default is "grub-file".
 
-The flags passed to the programs above can be overridden by setting the `<program>_FLAGS` flag (doesn't apply to `MKISO`).
+The flags passed to the programs above can be overridden by setting the `<program>_FLAGS` flag (doesn't apply to `MKISO`), and can be added to by setting `EXTRA_<program>_FLAGS` (generally the preferred option).
 
 ## Running
 
@@ -48,10 +51,11 @@ In the project root, run `make run` to launch the emulator with the built kernel
 * `VERBOSE=1`: Display the commands executed in the Makefile.
 * `ARCH=target-arch`: Set the target architecture. Default is the output of the `arch` command. Can be one of:
   * `x86`: Build for x86.
+* `BUILD_DIR=/path/to/build/dir`: Override the directory in which to look for the built objects. Default is "build".
 * `EMU=/path/to/emulator`: Override the emulator used. Default is "qemu-system-i386".
 * `DEBUGGER=/path/to/debugger`: Override the debugger used. Default is "gdb".
 
-The flags passed to the programs above can be overridden by setting the `<program>_FLAGS` flag.
+The flags passed to the programs above can be overridden by setting the `<program>_FLAGS` flag, and can be added to by setting `EXTRA_<program>_FLAGS` (generally the preferred option).
 
 ## Structure
 All source code files are under the "src" directory. Each architecture has all of its own files in its "arch/x" directory, e.g. all x86-specific code and files are under "arch/x86". All build files are put in "build/".

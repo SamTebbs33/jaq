@@ -6,14 +6,14 @@ GRUBFILE = grub-file
 EMU = qemu-system-i386
 DEBUGGER = gdb
 
-CC_FLAGS = -DARCH=\"$(ARCH)\" -std=gnu99 -Isrc/inc -ffreestanding -Wall -Wextra -Werror -Wno-unused-parameter -Wno-unused-variable -lgcc -O0
-AS_FLAGS =
-LD_FLAGS = -ffreestanding -O2 -nostdlib -lgcc
-EMU_FLAGS = -cdrom $(ISO_OUTPUT) -boot d -serial stdio
-GRUBFILE_FLAGS = --is-x86-multiboot
-DEBUGGER_FLAGS = -ex "symbol-file $(KERNEL_OUTPUT)" -ex "target remote localhost:1234"
+CC_FLAGS ?= -DARCH=\"$(ARCH)\" -std=gnu99 -Isrc/inc -ffreestanding -Wall -Wextra -Werror -Wno-unused-parameter -Wno-unused-variable -lgcc -O0 $(EXTRA_CC_FLAGS)
+AS_FLAGS ?= $(EXTRA_AS_FLAGS)
+LD_FLAGS ?= -ffreestanding -O2 -nostdlib -lgcc $(EXTRA_LD_FLAGS)
+EMU_FLAGS ?= -cdrom $(ISO_OUTPUT) -boot d -serial stdio $(EXTRA_EMU_FLAGS)
+GRUBFILE_FLAGS ?= --is-x86-multiboot $(EXTRA_GRUBFILE_FLAGS)
+DEBUGGER_FLAGS ?= -ex "symbol-file $(KERNEL_OUTPUT)" -ex "target remote localhost:1234" $(EXTRA_DEBUGGER_FLAGS)
 
-BUILD_DIR = build
+BUILD_DIR ?= build
 OBJ_DIR = $(BUILD_DIR)/obj
 
 KERNEL_OBJECT_NAMES = kmain screen/framebuffer screen/print mem/mem mem/heap util/string util/maths log/log
@@ -27,11 +27,15 @@ MODULES_OUTPUT = $(BUILD_DIR)/iso/modules
 MKRD_SRC = src/tools/mkrd.c
 MKRD_OUTPUT = $(BUILD_DIR)/mkrd
 
-INITRD_FILES = initrd/test1.txt initrd/test2.txt initrd/keymaps/macbook_en_GB.txt
+INITRD_FILES = initrd/keymaps/macbook_en_GB.txt
 INITRD_OUTPUT = $(MODULES_OUTPUT)/initrd.rd
 
 LINK_SCRIPT = src/link.ld
-GRUB_CFG = $(BUILD_DIR)/iso/boot/grub/grub.cfg
+GRUB_CFG ?= grub-files/grub.cfg
+STAGE2 = grub-files/stage2_eltorito
+GRUB_FILES = $(GRUB_CFG) $(STAGE2)
+
+CHECK_MULTIBOOT ?= 1
 
 all: $(ISO_OUTPUT)
 
@@ -70,21 +74,30 @@ $(OBJ_DIR)/%.o: src/%.s
 
 $(KERNEL_OUTPUT): $(OBJECTS) $(LINK_SCRIPT)
 	$(info -> Linking objects)
+	mkdir -p $(shell dirname $(KERNEL_OUTPUT))
 	$(LD) -T $(LINK_SCRIPT) $(LD_FLAGS) $(OBJECTS) -o $(KERNEL_OUTPUT)
-	$(GRUBFILE) $(GRUBFILE_FLAGS) $(KERNEL_OUTPUT)
 
 $(INITRD_OUTPUT): $(INITRD_FILES) $(MKRD_OUTPUT)
 	$(info -> Building initrd)
 	mkdir -p $(MODULES_OUTPUT)
 	./$(MKRD_OUTPUT) $(INITRD_OUTPUT) $(INITRD_FILES)
 
-$(ISO_OUTPUT): $(KERNEL_OUTPUT) $(INITRD_OUTPUT) $(GRUB_CFG)
+$(ISO_OUTPUT): $(KERNEL_OUTPUT) check-multiboot $(INITRD_OUTPUT) $(GRUB_FILES)
 	$(info -> Building .iso)
+	mkdir -p $(BUILD_DIR)/iso/boot/grub
+	cp $(GRUB_FILES) $(BUILD_DIR)/iso/boot/grub/
 	$(MKISO) -o $(ISO_OUTPUT) $(BUILD_DIR)/iso
 
 $(MKRD_OUTPUT): $(MKRD_SRC)
 	$(info -> Compiling $<)
 	gcc -std=gnu99 -Isrc/inc $(MKRD_SRC) -o $(MKRD_OUTPUT)
+
+check-multiboot:
+
+ifeq ($(CHECK_MULTIBOOT),1)
+check-multiboot:
+	$(GRUBFILE) $(GRUBFILE_FLAGS) $(KERNEL_OUTPUT)
+endif
 
 clean:
 	rm -rf $(OBJ_DIR)/*
