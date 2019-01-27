@@ -32,17 +32,8 @@
 *.dSYM/
 
 \.idea/
-
 cmake-build-debug/
-
 \.DS_Store
-
 CMakeLists\.txt
-
-build/os\.iso
-
-mkrd
-
-build/iso/modules/initrd\.rd
-
+build
 qemu\.log
