@@ -60,5 +60,8 @@ The flags passed to the programs above can be overridden by setting the `<progra
 ## Structure
 All source code files are under the "src" directory. Each architecture has all of its own files in its "arch/x" directory, e.g. all x86-specific code and files are under "arch/x86". All build files are put in "build/".
 
+## Contributing
+It's great that you'd like to contribute! Please check the [guidelines](CONTRIBUTING.md) for details.
+
 ## Credits
 Some credit goes to the OSDev [forums](https://forums.osdev.org) and [wiki](https://wiki.osdev.org) for their help and useful articles, along with all the projects contributors.

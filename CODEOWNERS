@@ -1,0 +1,4 @@
+# This file details who can review certain changes and who to assign to a PR.
+
+# Global reviewers. Can review any proposed change.
+*                   @SamTebbs33
