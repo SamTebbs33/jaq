@@ -19,7 +19,7 @@ If you'd like to fix a bug, implement a feature etc., then make sure an issue ha
 The next step is to fork the repo, to which all of your commits and pushes should be made.
 
 The last step before you can get to the fun part is to create a branch off the `dev` branch in your forked repo. The name of this branch should be as follows:
-* Start with an identifier: "f" if it's a feature ("enhancement" label), "b" if it's a bug fix ("bug" label) or "q" if it's a code quality change ("code quality" label).
+* Start with an identifier: "f" if it's a feature ("feature" label), "b" if it's a bug fix ("bug" label) or "q" if it's a code quality change ("code quality" label).
 * Followed by a slash and a very brief description of the change with hyphen-separated words.
 
 E.g.: "f/round-robin-scheduler", "b/missing-build-command" or "q/driver-interface-cleanup".
