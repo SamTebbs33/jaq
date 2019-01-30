@@ -7,6 +7,9 @@
 
 #include <paging.h>
 
+/**
+ * The x86 registers saved on interrupt
+ */
 struct arch_registers {
     unsigned int gs, fs, es, ds;
     unsigned int edi, esi, ebp, esp, ebx, edx, ecx, eax;
@@ -15,6 +18,9 @@ struct arch_registers {
 };
 typedef struct arch_registers arch_registers_t;
 
+/**
+ * An x86 interrupt handler
+ */
 typedef void (*arch_interrupt_handler_t) (arch_registers_t*);
 
 #define ARCH_INTERRUPT_TIMER 32

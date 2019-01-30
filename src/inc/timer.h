@@ -7,6 +7,10 @@
 
 #include <stdinc.h>
 
+/**
+ * Initialise the timer
+ * @param frequency The frequency to set it to
+ */
 void timer_init(uint32_t frequency);
 
 #endif //JAQ_TIMER_H

@@ -16,6 +16,9 @@ struct key_mapping {
     const char* name;
 };
 
+/**
+ * This maps special characters to their identifiers in a keymap file
+ */
 struct key_mapping mapping[] = {
         {CHAR_ESCAPE, "esc"},
         {CHAR_BKSPC, "bkspc"},
@@ -37,6 +40,11 @@ struct key_mapping mapping[] = {
         {'\0', NULL}
 };
 
+/**
+ * A map between scan codes and ascii characters. The second dimension of the array determines
+ * the character for each mode, with mode 0 being without shift or alt, mode 1 with shift and
+ * mode 2 with alt
+ */
 char keymap[256][3];
 int modifier = 0;
 
@@ -84,18 +92,18 @@ bool parse_keymap(char* buff) {
             i++;
         }
         i++;
-        // The type: normal, shifted, alted
+        // The type: normal, shifted or alted
         int char_type = 0;
-        // Parse the ascii characters
+        // Parse the ascii characters this scan code applies to
         while(i < len) {
-            char char_buff[16];
-            memset(char_buff, '\0', sizeof(char_buff));
-            size_t j = 0;
             if(char_type >= 3) {
                 log_error("Too many character types");
                 return false;
             }
-            // Parse each one, separated by commas
+            char char_buff[16];
+            memset(char_buff, '\0', sizeof(char_buff));
+            size_t j = 0;
+            // Parse a string until hitting a space or new line
             while(i < len && j < sizeof(char_buff) - 1 && (ch=buff[i]) != ' ' && ch != '\n') {
                 char_buff[j] = ch;
                 i++;
@@ -103,14 +111,17 @@ bool parse_keymap(char* buff) {
             }
             char_buff[j] = '\0';
             char key_char = '\0';
+            // Look through the special mappings to see if it matches one of them
             for (struct key_mapping* k = mapping; k->name; k++) {
                 if(strcmp(char_buff, k->name) == 0) {
                     key_char = k->ascii;
                     break;
                 }
             }
+            // If it isn't a special mapping, set it to the first character of the string read
             if(key_char == '\0') key_char = char_buff[0];
             keymap[scan_code][char_type] = key_char;
+            // Parse the next type (i.e. normal -> shifted, shifted -> alted)
             char_type++;
             i++;
             if (i < len && ch == '\n') {
@@ -124,6 +135,7 @@ bool parse_keymap(char* buff) {
 bool load_keymap(char* path) {
     fs_node_t* file = fs_finddir(fs_root, path);
     if(file) {
+        // Limit keymap files to 512 bytes, for now
         char buff[512];
         if(fs_read(file, buff, sizeof(buff), 0) > 0) return parse_keymap(buff);
     } else logf(LOG_LEVEL_ERR, "Couldn't find keymap at '%s'\n", path);

@@ -25,6 +25,9 @@
 #define CHAR_ALT_RELEASED '\x10'
 //TODO: Add support for function keys
 
+/**
+ * Initialise the keyboard, parse the default keymap and register the IRQ handler
+ */
 void keyboard_init();
 
 #endif //JAQ_KEYBOARD_H

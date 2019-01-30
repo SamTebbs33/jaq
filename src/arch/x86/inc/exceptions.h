@@ -29,6 +29,9 @@
 #define EXCEPTION_SECURITY_EXCEPTION 30
 #define EXCEPTION_RESERVED3 31
 
+/**
+ * Initialise the exception handlers. Requires the IDT to have been set up already.
+ */
 void exceptions_init();
 
 #endif //JAQ_EXCEPTIONS_H

@@ -11,12 +11,15 @@
 #define SERIAL_LCR_VAL(char_len, stop_bits, parity, msb) (uint8_t) (((char_len - 1) & 0x3) | (stop_bits << 2) | (parity & 0x7 << 3) | ((msb & 0x1) << 7))
 
 void serial_init(uint16_t port, uint32_t baud, bool enable_interrupts, uint8_t char_len, bool single_stop_bit, bool parity, uint8_t interrupts_mode) {
-    // Set baud rate
-    arch_outb(port + SERIAL_PORT_LCR, SERIAL_LCR_VAL(0, 0, 0, 1)); // Set MSBit of LCR
+    // Set MSB of LCR
+    arch_outb(port + SERIAL_PORT_LCR, SERIAL_LCR_VAL(0, 0, 0, 1));
     uint16_t divisor = SERIAL_BAUD_DIVISOR(baud);
-    arch_outb(port, (uint8_t) (divisor & 0x00FF)); // Send LSB of divisor
-    arch_outb((uint16_t) (port + 1), (uint8_t) (divisor & 0xFF00)); // Send MSB of divisor
-    arch_outb(port + SERIAL_PORT_LCR, SERIAL_LCR_VAL(char_len, single_stop_bit ? 0 : 1, parity ? 1 : 0, 0)); // Send parameters
+    // Send LSB of baud rate divisor divisor
+    arch_outb(port, (uint8_t) (divisor & 0x00FF));
+    // Send MSB of baud rate divisor divisor
+    arch_outb((uint16_t) (port + 1), (uint8_t) (divisor & 0xFF00));
+    // Send parameters
+    arch_outb(port + SERIAL_PORT_LCR, SERIAL_LCR_VAL(char_len, single_stop_bit ? 0 : 1, parity ? 1 : 0, 0));
     // Enable interrupts and set mode, or disable them
     if(enable_interrupts) arch_outb((uint16_t) (port + 1), interrupts_mode);
     else arch_outb((uint16_t) (port + 1), 0);

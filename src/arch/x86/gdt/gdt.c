@@ -16,12 +16,18 @@ void gdt_init(uint32_t kernel_stack_vaddr, uint16_t segment_selector) {
     gdt_ptr.base = (uint32_t) &gdt;
     gdt_ptr.limit = (sizeof(gdt_entry_t) * GDT_NUM_ENTRIES) - 1;
 
-    gdt_set_entry(0, 0, 0, 0, 0);                // Null segment
-    gdt_set_entry(1, 0, 0xFFFFFFFF, 0x9A, 0xCF); // Code segment
-    gdt_set_entry(2, 0, 0xFFFFFFFF, 0x92, 0xCF); // Data segment
-    gdt_set_entry(3, 0, 0xFFFFFFFF, 0xFA, 0xCF); // User mode code segment
-    gdt_set_entry(4, 0, 0xFFFFFFFF, 0xF2, 0xCF); // User mode data segment
+    // Null segment
+    gdt_set_entry(0, 0, 0, 0, 0);
+    // Code segment
+    gdt_set_entry(1, 0, 0xFFFFFFFF, 0x9A, 0xCF);
+    // Data segment
+    gdt_set_entry(2, 0, 0xFFFFFFFF, 0x92, 0xCF);
+    // User mode code segment
+    gdt_set_entry(3, 0, 0xFFFFFFFF, 0xFA, 0xCF);
+    // User mode data segment
+    gdt_set_entry(4, 0, 0xFFFFFFFF, 0xF2, 0xCF);
 
+    // Set the TSS to initially point to kernel stack and segment
     tss.esp0 = kernel_stack_vaddr;
     tss.ss0 = segment_selector;
     gdt_set_tss_entry(5, (uint32_t) &tss);

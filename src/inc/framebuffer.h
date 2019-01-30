@@ -28,9 +28,32 @@
 #define FB_ROWS 25
 #define FB_CELLS FB_COLUMNS * FB_ROWS
 
+/**
+ * Put a character at the cursor and advance the cursor along by one
+ * @param ch The character
+ * @param fg The foreground colour
+ * @param bg The background colour
+ */
 void fb_putc(unsigned char ch, unsigned char fg, unsigned char bg);
+
+/**
+ * Put the cursor at a certain row and column
+ * @param row The row at which to place the cursor
+ * @param column The column at which to place the cursor
+ */
 void fb_cursor(unsigned int row, unsigned int column);
+
+/**
+ * Clear the screen by printing spaces. Doesn't reset the cursor
+ * @param fg
+ * @param bg
+ */
 void fb_clear(uint8_t fg, uint8_t bg);
+
+/**
+ * Scroll the framebuffer by a number of rows
+ * @param rows The number of rows to scroll by
+ */
 void fb_scroll(uint32_t rows);
 
 #endif //PROJECT_FRAMEBUFFER_H

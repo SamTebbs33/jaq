@@ -105,11 +105,15 @@ void idt_remap_pic() {
 }
 
 void irq_handler(arch_registers_t* r) {
+    // We don't want to be interrupted while in an IRQ handler
     IRQ_OFF;
+    // IRQs are mapped to be >= 32
     int32_t interrupt = r->int_no - 32;
     if (interrupt <= 15 && interrupt >= 0 && irq_handlers[interrupt]) irq_handlers[interrupt](r);
-    if (interrupt >= 12) arch_outb(0xA0, 0x20); // Acknowledge the slave
-    arch_outb(0x20, 0x20); // Acknowledge the master
+    // Acknowledge the slave if it's coming from the slave
+    if (interrupt >= 12) arch_outb(0xA0, 0x20);
+    // Acknowledge the master
+    arch_outb(0x20, 0x20);
     IRQ_ON;
 }
 
@@ -117,6 +121,7 @@ void isr_handler(arch_registers_t* r) {
     if (r->int_no == 8 || r->int_no >= 32) {
         while(1) { asm volatile ("hlt"); }
     }
+    // We don't want to be interrupted while in an ISR handler
     IRQ_OFF;
     arch_interrupt_handler_t handler = isr_handlers[r->int_no];
     if (handler) {
@@ -134,6 +139,7 @@ void idt_init() {
     memset(&idt, 0, sizeof(struct idt_entry) * 256);
     idt_load();
 
+    // Make IDT point to basic ISR handlers
     idt_set_gate(0, (uint32_t)isr0, 0x08, 0x8E);
     idt_set_gate(1, (uint32_t)isr1, 0x08, 0x8E);
     idt_set_gate(2, (uint32_t)isr2, 0x08, 0x8E);
@@ -168,6 +174,7 @@ void idt_init() {
     idt_set_gate(31, (uint32_t)isr31, 0x08, 0x8E);
 
     idt_remap_pic();
+    // Make IDT point to basic ISR handlers
     idt_set_gate(32, (uint32_t)irq0, 0x08, 0x8E);
     idt_set_gate(33, (uint32_t)irq1, 0x08, 0x8E);
     idt_set_gate(34, (uint32_t)irq2, 0x08, 0x8E);
@@ -184,6 +191,8 @@ void idt_init() {
     idt_set_gate(45, (uint32_t)irq13, 0x08, 0x8E);
     idt_set_gate(46, (uint32_t)irq14, 0x08, 0x8E);
     idt_set_gate(47, (uint32_t)irq15, 0x08, 0x8E);
+    // IDT is set up so we can enable interrupts
     IRQ_ON;
+    // Initialise the exception handlers
     exceptions_init();
 }

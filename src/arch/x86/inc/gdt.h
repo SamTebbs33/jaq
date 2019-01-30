@@ -74,8 +74,28 @@ struct tss_entry {
 } __attribute__((packed));
 typedef struct tss_entry tss_t;
 
+/**
+ * Initialise the GDT's entries
+ * @param kernel_stack_vaddr The virtual address of the kernel stack. Gets inserted into the TSS
+ * @param segment_selector The kernel segment selector. Gets inserted into the TSS
+ */
 void gdt_init(uint32_t kernel_stack_vaddr, uint16_t segment_selector);
+
+/**
+ * Set the flags of the corresponding GDT entry
+ * @param idx The index into the GDT
+ * @param base The base address that this segment applies to
+ * @param limit The end address that this segment applies to
+ * @param access The access flag. See spec for details
+ * @param granularity The granularity flag. See spec for details
+ */
 void gdt_set_entry(uint32_t idx, uint32_t base, uint32_t limit, uint8_t access, uint8_t granularity);
+
+/**
+ * Set the flags of the corresponding GDT but tailored for a TSS entry
+ * @param idx The index into the GDT
+ * @param tss_vaddr The virtual address that the entry applies to
+ */
 void gdt_set_tss_entry(uint32_t idx, uint32_t tss_vaddr);
 
 #endif //JAQ_GDT_H

@@ -56,12 +56,55 @@ typedef struct {
 typedef void (*page_dir_entry_callback_t)(page_dir_entry_t* entry, page_table_t* table);
 typedef void (*page_table_entry_callback_t)(page_table_entry_t* entry);
 
+/**
+ * Initialise the paging structures
+ * @param total_mem The total memory to set up paging for
+ * @param initrd_end The end of the initial ramdisk. This is where memory allocation takes place before a heap is set up.
+ */
 void paging_init(uint32_t total_mem, uint32_t initrd_end);
+
+/**
+ * Get the page associated with a given memory address
+ * @param addr The virtual address
+ * @param directory The directory in which to search
+ * @return The page
+ */
 page_table_entry_t *paging_get_page(uint32_t addr, page_directory_t *directory);
+
+/**
+ * Get the page table associated with a given memory address
+ * @param addr The virtual address
+ * @return The table
+ */
 page_dir_entry_t* paging_get_table(uint32_t addr);
+
+/**
+ * Set the current paging directory to be used by the MMU. Causes a TLB flush
+ * @param directory The directory
+ */
 void paging_set_directory(page_directory_t *directory);
+
+/**
+ * Deallocate a page so that it can be allocated some other time. Mark it as non-present
+ * @param page The page to free
+ */
 void paging_free_page(page_table_entry_t *page);
+
+/**
+ * Allocate a page to some physical memory space and mark it as present
+ * @param page The page to allocate
+ * @return True if allocation succeeded, else false
+ */
 bool paging_alloc_page(page_table_entry_t *page);
+
+/**
+ * Create a new page directory
+ * @param phys_start The start of the physical address space
+ * @param phys_end The end of the physical address space
+ * @param virtual_start The start of the virtual address space to which to map
+ * @param virtual_end The end of the virtual address space to which to map
+ * @return The directory created
+ */
 page_directory_t* paging_create_directory(uint32_t phys_start, uint32_t phys_end, uint32_t virtual_start, uint32_t virtual_end);
 
 #endif //JAQ_PAGING2_H
