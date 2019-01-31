@@ -6,120 +6,57 @@
 #include <exceptions.h>
 #include <util.h>
 
-void divide_by_zero(arch_registers_t* registers) {
-    PANIC("Divide by zero");
+#define EXCEPTION_HANDLER(name, string) void name(arch_registers_t* registers) {\
+    PANIC(string ": %d\n", registers->err_code);\
 }
+#define REGISTER_EXCEPTION_HANDLER(isr, name) idt_register_isr_handler(isr, name)
 
-void debug(arch_registers_t* registers) {
-    PANIC("Debug");
-}
-
-void non_maskable_interrupt(arch_registers_t* registers) {
-    PANIC("Non maskable interrupt");
-}
-
-void breakpoint(arch_registers_t* registers) {
-    PANIC("Breakpoint");
-}
-
-void overflow(arch_registers_t* registers) {
-    PANIC("Overflow");
-}
-
-void bound_range_exceeded(arch_registers_t* registers) {
-    PANIC("Bound range exceeded");
-}
-
-void invalid_opcode(arch_registers_t* registers) {
-    PANIC("Invalid opcode");
-}
-
-void device_not_available(arch_registers_t* registers) {
-    PANIC("Device not available");
-}
-
-void double_fault(arch_registers_t* registers) {
-    PANIC("Double fault");
-}
-
-void invalid_tss(arch_registers_t* registers) {
-    PANIC("Invalid TSS");
-}
-
-void segment_not_present(arch_registers_t* registers) {
-    PANIC("Segment not present");
-}
-
-void stack_segment_fault(arch_registers_t* registers) {
-    PANIC("Stack-segment fault");
-}
-
-void general_protection_fault(arch_registers_t* registers) {
-    PANIC("General protection fault");
-}
-
-void page_fault(arch_registers_t* registers) {
-    PANIC("Page fault");
-}
-
-void reserved(arch_registers_t* registers) {
-    PANIC("Reserved");
-}
-
-void floating_point_exception(arch_registers_t* registers) {
-    PANIC("x87 floating point exception");
-}
-
-void alignment_check(arch_registers_t* registers) {
-    PANIC("Alignment check");
-}
-
-void machine_check(arch_registers_t* registers) {
-    PANIC("Machine check");
-}
-
-void simd_floating_point_exception(arch_registers_t* registers) {
-    PANIC("SIMD floating point exception");
-}
-
-void virtualization_exception(arch_registers_t* registers) {
-    PANIC("Virtualization exception");
-}
-
-void reserved2(arch_registers_t* registers) {
-    PANIC("Reserved 2");
-}
-
-void security_exception(arch_registers_t* registers) {
-    PANIC("Security exception");
-}
-
-void reserved3(arch_registers_t* registers) {
-    PANIC("Reserved 3");
-}
+EXCEPTION_HANDLER(exception_divide_by_zero, "Division by zero")
+EXCEPTION_HANDLER(exception_debug, "Debug")
+EXCEPTION_HANDLER(exception_nmi, "Non-maskable interrupt")
+EXCEPTION_HANDLER(exception_breakpoint, "Breakpoint")
+EXCEPTION_HANDLER(exception_overflow, "Overflow")
+EXCEPTION_HANDLER(exception_bound_range_exceeded, "Bound range exceeded")
+EXCEPTION_HANDLER(exception_invalid_opcode, "Invalid opcode")
+EXCEPTION_HANDLER(exception_device_not_available, "Device not available")
+EXCEPTION_HANDLER(exception_double_fault, "Double fault")
+EXCEPTION_HANDLER(exception_invalid_tss, "Invalid TSS")
+EXCEPTION_HANDLER(exception_segment_not_present, "Segment not present")
+EXCEPTION_HANDLER(exception_stack_segment_fault, "Stack segment fault")
+EXCEPTION_HANDLER(exception_gpe, "General protection fault")
+EXCEPTION_HANDLER(exception_page_fault, "Page fault")
+EXCEPTION_HANDLER(exception_reserved, "Reserved exception")
+EXCEPTION_HANDLER(exception_fpe, "Floating point exception")
+EXCEPTION_HANDLER(exception_alignment_check, "Alignment check exception")
+EXCEPTION_HANDLER(exception_machine_check, "Machine check")
+EXCEPTION_HANDLER(exception_simd_fpe, "SIMD floating point exception")
+EXCEPTION_HANDLER(exception_virtualisation, "Virtualisation exception")
+EXCEPTION_HANDLER(exception_reserved2, "Reserved2 exception")
+EXCEPTION_HANDLER(exception_security, "Security exception")
+EXCEPTION_HANDLER(exception_reserved3, "Reserved3 exception")
 
 void exceptions_init() {
-    idt_register_isr_handler(EXCEPTION_DIV_BY_ZERO, divide_by_zero);
-    idt_register_isr_handler(EXCEPTION_DEBUG, debug);
-    idt_register_isr_handler(EXCEPTION_NON_MASKABLE_INT, non_maskable_interrupt);
-    idt_register_isr_handler(EXCEPTION_BREAKPOINT, breakpoint);
-    idt_register_isr_handler(EXCEPTION_OVERFLOW, overflow);
-    idt_register_isr_handler(EXCEPTION_BOUND_RANGE_EXCEEDED, bound_range_exceeded);
-    idt_register_isr_handler(EXCEPTION_INVALID_OPCODE, invalid_opcode);
-    idt_register_isr_handler(EXCEPTION_DEVICE_NOT_AVAILABLE, device_not_available);
-    idt_register_isr_handler(EXCEPTION_DOUBLE_FAULT, double_fault);
-    idt_register_isr_handler(EXCEPTION_INVALID_TSS, invalid_tss);
-    idt_register_isr_handler(EXCEPTION_SEGMENT_NOT_PRESENT, segment_not_present);
-    idt_register_isr_handler(EXCEPTION_STACK_SEGMENT_FAULT, stack_segment_fault);
-    idt_register_isr_handler(EXCEPTION_GENERAL_PROTECTION_FAULT, general_protection_fault);
-    idt_register_isr_handler(EXCEPTION_PAGE_FAULT, page_fault);
-    idt_register_isr_handler(EXCEPTION_RESERVED, reserved);
-    idt_register_isr_handler(EXCEPTION_x87_FP, floating_point_exception);
-    idt_register_isr_handler(EXCEPTION_ALIGNMENT_CHECK, alignment_check);
-    idt_register_isr_handler(EXCEPTION_MACHINE_CHECK, machine_check);
-    idt_register_isr_handler(EXCEPTION_SIMD_FP, simd_floating_point_exception);
-    idt_register_isr_handler(EXCEPTION_VIRTUALIZATION, virtualization_exception);
-    idt_register_isr_handler(EXCEPTION_RESERVED2, reserved2);
-    idt_register_isr_handler(EXCEPTION_SECURITY_EXCEPTION, security_exception);
-    idt_register_isr_handler(EXCEPTION_RESERVED3, reserved3);
+    REGISTER_EXCEPTION_HANDLER(EXCEPTION_DIV_BY_ZERO, exception_divide_by_zero);
+    REGISTER_EXCEPTION_HANDLER(EXCEPTION_DEBUG, exception_debug);
+    REGISTER_EXCEPTION_HANDLER(EXCEPTION_NON_MASKABLE_INT, exception_nmi);
+    REGISTER_EXCEPTION_HANDLER(EXCEPTION_BREAKPOINT, exception_breakpoint);
+    REGISTER_EXCEPTION_HANDLER(EXCEPTION_OVERFLOW, exception_overflow);
+    REGISTER_EXCEPTION_HANDLER(EXCEPTION_BOUND_RANGE_EXCEEDED, exception_bound_range_exceeded);
+    REGISTER_EXCEPTION_HANDLER(EXCEPTION_INVALID_OPCODE, exception_invalid_opcode);
+    REGISTER_EXCEPTION_HANDLER(EXCEPTION_DEVICE_NOT_AVAILABLE, exception_device_not_available);
+    REGISTER_EXCEPTION_HANDLER(EXCEPTION_DOUBLE_FAULT, exception_double_fault);
+    REGISTER_EXCEPTION_HANDLER(EXCEPTION_INVALID_TSS, exception_invalid_tss);
+    REGISTER_EXCEPTION_HANDLER(EXCEPTION_SEGMENT_NOT_PRESENT, exception_segment_not_present);
+    REGISTER_EXCEPTION_HANDLER(EXCEPTION_STACK_SEGMENT_FAULT, exception_stack_segment_fault);
+    REGISTER_EXCEPTION_HANDLER(EXCEPTION_GENERAL_PROTECTION_FAULT, exception_gpe);
+    REGISTER_EXCEPTION_HANDLER(EXCEPTION_PAGE_FAULT, exception_page_fault);
+    REGISTER_EXCEPTION_HANDLER(EXCEPTION_RESERVED, exception_reserved);
+    REGISTER_EXCEPTION_HANDLER(EXCEPTION_x87_FP, exception_fpe);
+    REGISTER_EXCEPTION_HANDLER(EXCEPTION_ALIGNMENT_CHECK, exception_alignment_check);
+    REGISTER_EXCEPTION_HANDLER(EXCEPTION_MACHINE_CHECK, exception_machine_check);
+    REGISTER_EXCEPTION_HANDLER(EXCEPTION_SIMD_FP, exception_simd_fpe);
+    REGISTER_EXCEPTION_HANDLER(EXCEPTION_VIRTUALIZATION, exception_virtualisation);
+    REGISTER_EXCEPTION_HANDLER(EXCEPTION_RESERVED2, exception_reserved2);
+    REGISTER_EXCEPTION_HANDLER(EXCEPTION_SECURITY_EXCEPTION, exception_security);
+    REGISTER_EXCEPTION_HANDLER(EXCEPTION_RESERVED3, exception_reserved3);
 }
