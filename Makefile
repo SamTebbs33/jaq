@@ -46,7 +46,7 @@ include src/arch/$(ARCH)/Makefile
 OBJECT_NAMES = $(patsubst %,kernel/%,$(KERNEL_OBJECT_NAMES)) $(patsubst %,driver/%,$(DRIVER_OBJECT_NAMES)) $(patsubst %,fs/%,$(FS_OBJECT_NAMES)) $(patsubst %,arch/x86/%,$(ARCH_OBJECT_NAMES))
 OBJECTS = $(patsubst %,$(OBJ_DIR)/%.o,$(OBJECT_NAMES))
 
-ifndef VERBOSE
+ifneq ($(VERBOSE), 1)
 .SILENT:
 endif
 
@@ -54,7 +54,7 @@ ifdef EMU_LOG
 EMU_FLAGS += -d int
 endif
 
-ifdef DEBUG
+ifeq ($(DEBUG), 1)
 CC_FLAGS += -g
 AS_FLAGS += --gstabs+
 EMU_FLAGS += -s -S
