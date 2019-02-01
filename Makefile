@@ -51,7 +51,7 @@ ifneq ($(VERBOSE), 1)
 endif
 
 ifdef EMU_LOG
-EMU_FLAGS += -d int
+EMU_FLAGS += -d $(EMU_LOG)
 endif
 
 ifeq ($(DEBUG), 1)
