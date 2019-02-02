@@ -37,3 +37,5 @@ cmake-build-debug/
 CMakeLists\.txt
 build
 qemu\.log
+bochsrc.txt
+bochslog.txt
