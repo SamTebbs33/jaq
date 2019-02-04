@@ -46,4 +46,11 @@ size_t max_size(size_t a, size_t b);
  */
 size_t min_size(size_t a, size_t b);
 
+/**
+ * Calculates the floor of the base 2 logarithm of the integer
+ * @param i The integer to log
+ * @return The floor of the base 2 logarith of i
+ */
+uint32_t log2_floor(uint32_t i);
+
 #endif //JAQ_MATHS_H
