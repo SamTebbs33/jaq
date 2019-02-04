@@ -6,32 +6,27 @@
 #include <paging.h>
 #include <heap.h>
 
-uint32_t placement_address;
+uint32_t pile_start, pile_end, pile_ptr;
 extern heap_t* kernel_heap;
-extern page_directory_t* kernel_directory;
 
-uint32_t _kmalloc(size_t size, bool align) {
-    if(kernel_heap != NULL) {
-        void* addr = heap_alloc(size, kernel_heap);
-        return (uint32_t) addr;
-    } else {
-        // If the address is not already page-aligned
-        if (align && (placement_address & 0xFFFFF000)) {
-            // Align it
-            placement_address &= 0xFFFFF000;
-            placement_address += 0x1000;
-        }
-        uint32_t tmp = placement_address;
-        placement_address += size;
-        return tmp;
+void* _kmalloc(size_t size, bool align) {
+    if(kernel_heap != NULL) return heap_alloc(size, kernel_heap);
+    // If the address is not already page-aligned
+    if (align && !IS_PAGE_ALIGNED(pile_ptr)) {
+        // Align it
+        pile_ptr = ALIGN_UP(pile_ptr);
     }
+    if(pile_ptr >= pile_end || pile_ptr + size >= pile_end) return NULL;
+    uint32_t tmp = pile_ptr;
+    pile_ptr += size;
+    return (void*)tmp;
 }
 
-uint32_t kmalloc(size_t size) {
+void* kmalloc(size_t size) {
     return _kmalloc(size, false);
 }
 
-uint32_t kmalloc_a(size_t size) {
+void* kmalloc_a(size_t size) {
     return _kmalloc(size, true);
 }
 

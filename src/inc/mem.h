@@ -16,16 +16,16 @@
 /**
  * Allocate kernel memory on the kernel heap, or the kernel pile if a heap isn't set up
  * @param size The size of memory to allocate
- * @return The address of the memory allocated or 0 if it failed
+ * @return The pointer to the memory allocated or NULL if it failed
  */
-uint32_t kmalloc(size_t size); // Normal
+void* kmalloc(size_t size); // Normal
 
 /**
  * Allocate kernel memory to a page-aligned address on the kernel heap, or the kernel pile if a heap isn't set up
  * @param size The size of memory to allocate
- * @return The address of the memory allocated or 0 if it failed
+ * @return The pointer to the memory allocated or NULL if it failed
  */
-uint32_t kmalloc_a(size_t size); // Page-aligned
+void* kmalloc_a(size_t size); // Page-aligned
 
 /**
  * Free some kernel memory. Should have been allocated with kmalloc or kmalloc_a.

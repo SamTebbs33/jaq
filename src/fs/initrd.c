@@ -6,6 +6,7 @@
 #include <mem.h>
 #include <string.h>
 #include <fs.h>
+#include <log.h>
 
 initrd_t* initrd;
 fs_node_t* root;
@@ -38,6 +39,7 @@ fs_node_t* initrd_finddir(fs_node_t* node, char* child_name) {
 fs_node_t *initrd_init(uint32_t initrd_addr) {
     start_addr = initrd_addr;
     initrd = (initrd_t *) initrd_addr;
+
     nodes = KMALLOC_N(fs_node_t*, initrd->n_nodes);
     files = (initrd_file_t *) (initrd_addr + sizeof(initrd_t));
     for (uint32_t i = 0; i < initrd->n_nodes; ++i) {

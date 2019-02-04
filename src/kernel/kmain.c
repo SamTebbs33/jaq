@@ -14,8 +14,10 @@
 #include <mem.h>
 #include <framebuffer.h>
 #include <log.h>
+#include <boot_constants.h>
 
 fs_node_t *fs_root;
+extern void* KERNEL_VADDR_END, * KERNEL_VADDR_START, * KERNEL_PHYSADDR_END, * KERNEL_PHYSADDR_START;
 
 void kmain(multiboot_info_t* mb_info, uint32_t mb_magic) {
     ASSERT_EQ_INT("multiboot magic number", mb_magic, MULTIBOOT_BOOTLOADER_MAGIC);
@@ -23,15 +25,17 @@ void kmain(multiboot_info_t* mb_info, uint32_t mb_magic) {
     print_clear();
 
     uint32_t total_mem = mb_info->mem_upper + mb_info->mem_lower;
-    uint32_t initrd_start = *(uint32_t*) mb_info->mods_addr;
-    uint32_t initrd_end = *(uint32_t*) (mb_info->mods_addr + 4);
+    uint32_t initrd_start = *((uint32_t*)mb_info->mods_addr);
+    uint32_t initrd_end = *((uint32_t*)(mb_info->mods_addr + 4));
+    uint32_t initrd_virtual_start = PHYSICAL_TO_VIRTUAL(initrd_start);
+    uint32_t initrd_virtual_end = PHYSICAL_TO_VIRTUAL(initrd_end);
 
     log_info("Init arch\n");
-    arch_init(total_mem, initrd_end, mb_info);
+    arch_init(total_mem, mb_info, (uint32_t) &KERNEL_VADDR_START, (uint32_t) &KERNEL_VADDR_END, (uint32_t) &KERNEL_PHYSADDR_START, (uint32_t) &KERNEL_PHYSADDR_END, initrd_end);
 
     if(mb_info->mods_count == 1) {
-        log_info("Init initrd\n");
-        fs_root = initrd_init(initrd_start);
+        logf(LOG_LEVEL_INFO, "Init initrd from %d to %d\n", initrd_virtual_start, initrd_virtual_end);
+        fs_root = initrd_init(initrd_virtual_start);
         // TODO: Load drivers from initrd
     }
 

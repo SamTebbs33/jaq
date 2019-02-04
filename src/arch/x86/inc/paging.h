@@ -6,33 +6,23 @@
 #define JAQ_PAGING2_H
 
 #include <stdinc.h>
+#include <boot_constants.h>
 
-#define PAGE_SIZE 4096
+#define PAGE_SIZE_4MB 0x400000
+#define PAGE_SIZE_4KB 0x1000
+#define PAGE_SIZE PAGE_SIZE_4MB
 #define PAGE_TABLE_ENTRIES_PER_DIRECTORY 1024
-#define PAGE_ENTRIES_PER_TABLE 1024
-#define PAGES_PER_DIRECTORY (PAGE_TABLE_ENTRIES_PER_DIRECTORY * PAGE_ENTRIES_PER_TABLE)
+#define PAGES_PER_DIRECTORY (PAGE_ENTRIES_PER_TABLE)
+
+#define PAGE_FAULT_PROTECTION (1 << 0)
+#define PAGE_FAULT_WRITE (1 << 1)
+#define PAGE_FAULT_USER (1 << 2)
+#define PAGE_FAULT_RESERVED (1 << 3)
+#define PAGE_FAULT_EXEC (1 << 4)
 
 #define ALIGN_DOWN(addr) ((addr) - ((addr) % PAGE_SIZE))
 #define ALIGN_UP(addr) (ALIGN_DOWN(addr) + PAGE_SIZE)
-#define IS_PAGE_ALIGNED(addr) ((addr | 0xFFFFF000) == 0xFFFFF000)
-
-typedef struct {
-    uint8_t present : 1;
-    uint8_t writable : 1;
-    uint8_t user_level : 1;
-    uint8_t write_through : 1;
-    uint8_t caching_disabled : 1;
-    uint8_t accessed : 1;
-    uint8_t dirty : 1;
-    uint8_t zero : 1;
-    uint8_t global : 1;
-    uint8_t ignored : 3;
-    uint32_t physical_addr : 20; // 4KiB aligned physical address of page
-} page_table_entry_t;
-
-typedef struct {
-    page_table_entry_t entries[PAGE_ENTRIES_PER_TABLE];
-} page_table_t;
+#define IS_PAGE_ALIGNED(addr) ((addr % PAGE_SIZE) == 0)
 
 typedef struct {
     uint8_t present : 1;
@@ -43,68 +33,47 @@ typedef struct {
     uint8_t accessed : 1;
     uint8_t zero : 1;
     uint8_t four_megabyte_pages : 1;
-    uint8_t global : 1;
-    uint8_t ignored : 3;
-    uint32_t table_physical_addr : 20; // 4KiB aligned physical addr of page table
-} page_dir_entry_t;
+    uint8_t ignored : 1;
+    // Free for use by kernel
+    uint8_t available : 3;
+    uint16_t reserved : 10;
+    // Free for use by kernel when present == 0. Could use to store address in swap space
+    uint32_t page_physical_addr : 10;
+} __attribute__((packed)) page_dir_entry_t;
 
 typedef struct {
     page_dir_entry_t entries[PAGE_TABLE_ENTRIES_PER_DIRECTORY];
-    page_table_t* tables[PAGE_TABLE_ENTRIES_PER_DIRECTORY];
-} page_directory_t;
-
-typedef void (*page_dir_entry_callback_t)(page_dir_entry_t* entry, page_table_t* table);
-typedef void (*page_table_entry_callback_t)(page_table_entry_t* entry);
+    // At the end of struct so should be ignored by MMU
+    //page_table_t* tables[PAGE_TABLE_ENTRIES_PER_DIRECTORY];
+} __attribute__((packed)) page_directory_t;
 
 /**
  * Initialise the paging structures
- * @param total_mem The total memory to set up paging for
- * @param initrd_end The end of the initial ramdisk. This is where memory allocation takes place before a heap is set up.
+ * @param mem_kilobytes The total memory, in kilobytes, to set up paging for
+ * @param virtual_start The virtual start of the kernel code in memory
+ * @param virtual_end The virtual end of the kernel code in memory
+ * @param phys_start The physical start of the kernel code in memory
+ * @param phys_end The physical end of the kernel code in memory
+ * @param initrd_end The physical end of the initrd
  */
-void paging_init(uint32_t total_mem, uint32_t initrd_end);
+void paging_init(uint32_t mem_kilobytes, uint32_t virtual_start, uint32_t virtual_end, uint32_t phys_start, uint32_t phys_end, uint32_t initrd_end);
 
 /**
- * Get the page associated with a given memory address
- * @param addr The virtual address
- * @param directory The directory in which to search
- * @return The page
+ * Map a page directory with 4MiB entries from phys_start, phys_end to virtual_start and virtual_end
+ * @param dir The directory to map
+ * @param phys_start The initial physical address to map to
+ * @param phys_end The physical address to map up to
+ * @param virtual_start The initial virtual address to map from
+ * @param virtual_end The virtual address to map up to
  */
-page_table_entry_t *paging_get_page(uint32_t addr, page_directory_t *directory);
+void paging_map_4mb_dir(page_directory_t* dir, uint32_t phys_start, uint32_t phys_end, uint32_t virtual_start, uint32_t virtual_end);
 
 /**
- * Get the page table associated with a given memory address
- * @param addr The virtual address
- * @return The table
+ * Map a page to a 4MiB aligned physical address
+ * @param dir The directory containing the page to map
+ * @param page The page within the directory to map
+ * @param phys_addr The 4MiB aligned physical address
  */
-page_dir_entry_t* paging_get_table(uint32_t addr);
-
-/**
- * Set the current paging directory to be used by the MMU. Causes a TLB flush
- * @param directory The directory
- */
-void paging_set_directory(page_directory_t *directory);
-
-/**
- * Deallocate a page so that it can be allocated some other time. Mark it as non-present
- * @param page The page to free
- */
-void paging_free_page(page_table_entry_t *page);
-
-/**
- * Allocate a page to some physical memory space and mark it as present
- * @param page The page to allocate
- * @return True if allocation succeeded, else false
- */
-bool paging_alloc_page(page_table_entry_t *page);
-
-/**
- * Create a new page directory
- * @param phys_start The start of the physical address space
- * @param phys_end The end of the physical address space
- * @param virtual_start The start of the virtual address space to which to map
- * @param virtual_end The end of the virtual address space to which to map
- * @return The directory created
- */
-page_directory_t* paging_create_directory(uint32_t phys_start, uint32_t phys_end, uint32_t virtual_start, uint32_t virtual_end);
+void paging_map_4mb_page(page_directory_t* dir, uint32_t page, uint32_t phys_addr);
 
 #endif //JAQ_PAGING2_H

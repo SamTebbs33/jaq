@@ -1,47 +1,48 @@
-/* The bootloader will look at this image and start execution at the symbol
-   designated as the entry point. */
 ENTRY(start)
 
-/* Tell where the various sections of the object files will be put in the final
-   kernel image. */
+KERNEL_ADDR_OFFSET = 0xC0000000;
+KERNEL_VADDR_START = 0xC0100000;
+
 SECTIONS
 {
-	/* Begin putting sections at 1 MiB, a conventional place for kernels to be
-	   loaded at by the bootloader. */
-	. = 1M;
 
-	kernel_start = .;
+    . = 0x00100000;
+    KERNEL_PHYSADDR_START = .;
 
-	/* First put the multiboot header, as it is required to be put very early
-	   early in the image or the bootloader won't recognize the file format.
-	   Next we'll put the .text section. */
-	.text BLOCK(4K) : ALIGN(4K)
-	{
-		*(.multiboot)
+    /* The entry symbol and higher-half set up code is placed in lower memory to avoid loading and execution issues */
+    .multiboot.data : {
+        *(.multiboot.data)
+    }
+
+    .multiboot.text : {
+        *(.multiboot.text)
+    }
+
+	/* The kernel will be loaded at 1MB, but will be mapped to 3GB + 1MB  */
+    . += KERNEL_ADDR_OFFSET;
+
+	.text ALIGN(4K) : AT (ADDR (.text) - KERNEL_ADDR_OFFSET) {
 		*(.text)
 	}
 
-	/* Read-only data. */
-	.rodata BLOCK(4K) : ALIGN(4K)
-	{
+	.rodata ALIGN(4K) : AT (ADDR (.rodata) - KERNEL_ADDR_OFFSET) {
 		*(.rodata)
 	}
 
-	/* Read-write data (initialized) */
-	.data BLOCK(4K) : ALIGN(4K)
-	{
+	.data ALIGN(4K) : AT (ADDR (.data) - KERNEL_ADDR_OFFSET) {
 		*(.data)
 	}
 
-	/* Read-write data (uninitialized) and stack */
-	.bss BLOCK(4K) : ALIGN(4K)
-	{
+	.bss ALIGN(4K) : AT (ADDR (.bss) - KERNEL_ADDR_OFFSET) {
 		*(COMMON)
 		*(.bss)
 	}
 
-	/* The compiler may produce other sections, by default it will put them in
-	   a segment with the same name. Simply add stuff here as needed. */
+    /DISCARD/ : {
+        *(.eh_frame);
+        *(.comment*);
+    }
 
-     kernel_end = .;
+    KERNEL_PHYSADDR_END = . - KERNEL_ADDR_OFFSET;
+    KERNEL_VADDR_END = .;
 }

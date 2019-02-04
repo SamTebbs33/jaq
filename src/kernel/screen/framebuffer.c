@@ -6,7 +6,7 @@
 #define CURSOR_CMD_HIGH_BYTE 14
 #define CURSOR_CMD_LOW_BYTE 15
 
-uint16_t* framebuffer = (uint16_t *) 0x000B8000;
+uint16_t* framebuffer = (uint16_t *) 0xC00B8000;
 uint32_t cell_counter = 0;
 
 unsigned char make_colour(unsigned char fg, unsigned char bg) {

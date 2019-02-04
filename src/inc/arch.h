@@ -12,10 +12,14 @@
 /**
  * The arch-specific initialisation function. Should be implemented by the architecture.
  * @param total_mem The total amount of memory available to the machine
- * @param initrd_end The end of the initial ramdisk
  * @param mb_info The pointer to the multiboot info passed by grub
+ * @param virtual_start The virtual start of the kernel code in memory
+ * @param virtual_end The virtual end of the kernel code in memory
+ * @param phys_start The physical start of the kernel code in memory
+ * @param phys_end The physical end of the kernel code in memory
+ * @param initrd_phys_end The physical address of the end of the initrd
  */
-void arch_init(uint32_t total_mem, uint32_t initrd_end, multiboot_info_t* mb_info);
+void arch_init(uint32_t total_mem, multiboot_info_t* mb_info, uint32_t virtual_start, uint32_t virtual_end, uint32_t phys_start, uint32_t phys_end, uint32_t initrd_phys_end);
 
 /**
  * Arch-specific implementation of outputting a byte over a port

@@ -21,16 +21,19 @@ void add_hole(heap_header_t *hole, heap_index_t *index);
 
 heap_index_t* heap_index_create(size_t max_size) {
     heap_index_t* index = (heap_index_t *) kmalloc(sizeof(heap_index_t));
+    ASSERT_NOT_NULL("heap index allocation", index);
     if(index) {
         index->size = 0;
         index->max_size = max_size;
         index->entries = (heap_header_t **) kmalloc(max_size * sizeof(heap_header_t*));
+        ASSERT_NOT_NULL("heap entries allocation", index->entries);
     }
     return index;
 }
 
 heap_t *heap_create(uint32_t start_addr, uint32_t end_addr, bool is_kernel, bool is_writable, uint32_t index_size) {
     heap_t *heap = (heap_t *) kmalloc(sizeof(heap_t));
+    ASSERT_NOT_NULL("heap allocation", heap);
     if(heap) {
         heap->start_addr = start_addr;
         heap->end_addr = end_addr;

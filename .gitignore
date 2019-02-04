@@ -39,3 +39,4 @@ build
 qemu\.log
 bochsrc.txt
 bochslog.txt
+qemu.log
