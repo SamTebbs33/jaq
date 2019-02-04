@@ -31,6 +31,10 @@ void log_warning(char *msg) {
     log(LOG_LEVEL_WARNING, msg);
 }
 
+void log_ch(char ch) {
+    serial_write_len(SERIAL_COM1_PORT, &ch, sizeof(ch));
+}
+
 uint32_t logf_u32_rec(uint32_t u32, bool first, uint32_t count) {
     if(u32 > 0) count = logf_u32_rec(u32 / 10, false, count + 1);
     else if(!first) return count;
@@ -77,7 +81,7 @@ void logf(char *level, const char* restrict format, ...) {
             if (!maxrem) {
                 return;
             }
-            serial_write_len(SERIAL_COM1_PORT, &c, sizeof(c));
+            log_ch(c);
             written++;
         } else if (*format == 's') {
             format++;
@@ -88,6 +92,10 @@ void logf(char *level, const char* restrict format, ...) {
             }
             serial_write_len(SERIAL_COM1_PORT, (char *) str, len);
             written += len;
+        } else if(*format == 'x') {
+            format++;
+            int i = va_arg(parameters, int);
+            written += log_u32_base(i, 16);
         } else if(*format == 'd') {
             format++;
             int i = va_arg(parameters, int);
@@ -115,4 +123,16 @@ void log_len(char *level, char *msg, size_t len) {
 
 void log_debug(char *msg) {
     log(LOG_LEVEL_DEBUG, msg);
+}
+
+int log_u32_base_rec(uint32_t u32, int base, bool first, int count) {
+    if(u32 > 0) log_u32_base_rec(u32 / base, base, false, count + 1);
+    else if(!first) return count;
+    uint8_t digit = (uint8_t) (u32 % base);
+    log_ch((char) (digit <= 9 ? digit + '0' : (digit - 10) + 'A'));
+    return count;
+}
+
+int log_u32_base(uint32_t u32, int base) {
+    return log_u32_base_rec(u32, base, true, 0);
 }

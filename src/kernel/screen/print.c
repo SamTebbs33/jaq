@@ -67,10 +67,14 @@ void printf(const char* restrict format, ...) {
             }
             print_len((char *) str, len);
             written += len;
+        } else if(*format == 'x') {
+            format++;
+            int i = va_arg(parameters, int);
+            written += print_uint_base(i, 16);
         } else if(*format == 'd') {
             format++;
             int i = va_arg(parameters, int);
-            written += print_u32(i);
+            written += print_uint(i);
         } else {
             format = format_begun_at;
             size_t len = strlen(format);
@@ -117,24 +121,20 @@ void print_clear() {
     fb_cursor(0, 0);
 }
 
-void print_u8(uint8_t u8) {
-    print_u32(u8);
-}
-
-void print_u16(uint16_t u16) {
-    print_u32(u16);
-}
-
-uint32_t print_u32_rec(uint32_t u32, bool first, uint32_t count) {
-    if(u32 > 0) print_u32_rec(u32 / 10, false, count + 1);
+int print_uint_base_rec(uint32_t u32, int base, bool first, int count) {
+    if(u32 > 0) print_uint_base_rec(u32 / base, base, false, count + 1);
     else if(!first) return count;
-    uint8_t digit = (uint8_t) (u32 % 10);
-    print_ch((char) (digit + '0'));
+    uint8_t digit = (uint8_t) (u32 % base);
+    print_ch((char) (digit <= 9 ? digit + '0' : (digit - 10) + 'A'));
     return count;
 }
 
-uint32_t print_u32(uint32_t u32) {
-    return print_u32_rec(u32, true, 0);
+int print_uint_base(uint32_t u32, int base) {
+    return print_uint_base_rec(u32, base, true, 0);
+}
+
+int print_uint(uint32_t u32) {
+    return print_uint_base_rec(u32, 10, true, 0);
 }
 
 void print_ch(char ch) {

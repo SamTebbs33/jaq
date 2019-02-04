@@ -37,6 +37,15 @@ void log_len(char* level, char* msg, size_t len);
  * @param ... The arguments, which must correspond to the specifiers in the given format
  */
 void logf(char* level, const char* restrict format, ...);
+
+/**
+ * Log an unsigned int with a certain base
+ * @param u32 The unsigned int to log
+ * @param base The base
+ * @return The number of characters logged
+ */
+int log_u32_base(uint32_t u32, int base);
+
 /**
  * Log at LOG_LEVEL_INFO
  * @param msg The string to log
