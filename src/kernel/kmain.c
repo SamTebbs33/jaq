@@ -36,7 +36,6 @@ void kmain(multiboot_info_t* mb_info, uint32_t mb_magic) {
     if(mb_info->mods_count == 1) {
         logf(LOG_LEVEL_INFO, "Init initrd from %d to %d\n", initrd_virtual_start, initrd_virtual_end);
         fs_root = initrd_init(initrd_virtual_start);
-        // TODO: Load drivers from initrd
     }
 
     log_info("Init devices\n");
