@@ -67,6 +67,10 @@ void printf(const char* restrict format, ...) {
             }
             print_len((char *) str, len);
             written += len;
+        } else if(*format == 'b') {
+            format++;
+            int i = va_arg(parameters, int);
+            written += print_uint_base(i, 2);
         } else if(*format == 'x') {
             format++;
             int i = va_arg(parameters, int);
