@@ -92,6 +92,10 @@ void logf(char *level, const char* restrict format, ...) {
             }
             serial_write_len(SERIAL_COM1_PORT, (char *) str, len);
             written += len;
+        } else if(*format == 'b') {
+            format++;
+            int i = va_arg(parameters, int);
+            written += log_u32_base(i, 2);
         } else if(*format == 'x') {
             format++;
             int i = va_arg(parameters, int);
