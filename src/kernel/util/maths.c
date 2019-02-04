@@ -25,6 +25,7 @@ size_t min_size(size_t a, size_t b) {
     return min_u32(a, b);
 }
 
+// Source: https://stackoverflow.com/questions/11376288/fast-computing-of-log2-for-64-bit-integers
 uint32_t log2_floor(uint32_t n) {
     #define S(k) if (n >= (UINT32_C(1) << k)) { i += k; n >>= k; }
     int i = -(n == 0); S(16); S(8); S(4); S(2); S(1); return i;
