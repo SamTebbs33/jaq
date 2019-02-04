@@ -31,12 +31,11 @@
 # Debug files
 *.dSYM/
 
-\.idea/
+.idea/
 cmake-build-debug/
-\.DS_Store
-CMakeLists\.txt
+.DS_Store
+CMakeLists.txt
 build
-qemu\.log
+qemu.log
 bochsrc.txt
 bochslog.txt
-qemu.log
