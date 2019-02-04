@@ -24,6 +24,8 @@
 #define ALIGN_UP(addr) (ALIGN_DOWN(addr) + PAGE_SIZE)
 #define IS_PAGE_ALIGNED(addr) ((addr % PAGE_SIZE) == 0)
 
+typedef uint32_t physaddr_t;
+
 typedef struct {
     uint8_t present : 1;
     uint8_t writable : 1;
@@ -75,5 +77,17 @@ void paging_map_4mb_dir(page_directory_t* dir, uint32_t phys_start, uint32_t phy
  * @param phys_addr The 4MiB aligned physical address
  */
 void paging_map_4mb_page(page_directory_t* dir, uint32_t page, uint32_t phys_addr);
+
+/**
+ * Allocate a page frame
+ * @return The physical address of the frame allocated, or 0 if there were none free
+ */
+physaddr_t paging_alloc_frame();
+
+/**
+ * Free the frame associated with the address
+ * @param addr The address of the frame to free
+ */
+void paging_free_frame(physaddr_t addr);
 
 #endif //JAQ_PAGING2_H

@@ -11,12 +11,27 @@
 #include <maths.h>
 #include <util.h>
 #include <boot_constants.h>
+#include <stdinc.h>
 
 #define HEAP_INDEX_SIZE 0x20000
+// Frames per bitmap type
+#define FRAMES_PER_BITMAP 32
+#define FRAME_BITMAP_TYPE uint32_t
+#define FRAME_FULL UINT32_MAX
+#define FRAME_FOR(addr) (ALIGN_DOWN(addr) / PAGE_SIZE)
+#define BITMAP_FOR_FRAME(frame) frame_bitmaps[frame / FRAMES_PER_BITMAP]
+#define SET_FRAME(bitmap, offset) (bitmap |= (1 << offset))
+#define CLEAR_FRAME(bitmap, offset) (bitmap &= ~(1 << offset))
+#define BIT_OFFSET(frame) (frame % FRAMES_PER_BITMAP)
+#define NUM_BITMAPS (num_frames_aligned / FRAMES_PER_BITMAP)
+#define FRAME_IS_SET(frame) ((BITMAP_FOR_FRAME(frame) & (1 << BIT_OFFSET(frame))) != 0 ? true : false)
 
 page_directory_t* kernel_directory = NULL;
 heap_t* kernel_heap = NULL;
 extern uint32_t pile_start, pile_end, pile_ptr;
+
+uint32_t num_frames = 0, num_frames_aligned = 0;
+FRAME_BITMAP_TYPE* frame_bitmaps = NULL;
 
 void page_fault_handler(arch_registers_t* registers) {
     uint32_t err_code = registers->err_code;
@@ -29,10 +44,69 @@ void page_fault_handler(arch_registers_t* registers) {
             protection_err ? "protection" : "non-present", write_err ? "write" : "read", user_err ? "user" : "supervisor");
 }
 
+// Mark a frame as allocated
+void paging_set_frame(uint32_t frame) {
+    if(frame < num_frames) SET_FRAME(BITMAP_FOR_FRAME(frame), BIT_OFFSET(frame));
+}
+
+// Mark continuous frames as allocated, from phys_start up to phys_end
+void paging_set_frames(uint32_t phys_start, uint32_t phys_end) {
+    phys_start = ALIGN_DOWN(phys_start);
+    for (uint32_t frame = FRAME_FOR(phys_start); frame < FRAME_FOR(phys_end); ++frame) paging_set_frame(frame);
+}
+
+// Mark a frame as free
+void paging_clear_frame(uint32_t frame) {
+    if(frame < num_frames) CLEAR_FRAME(BITMAP_FOR_FRAME(frame), BIT_OFFSET(frame));
+}
+
+// Mark contiguous frames as free, from phys_start up to phys_end
+void paging_clear_frames(uint32_t phys_start, uint32_t phys_end) {
+    phys_start = ALIGN_DOWN(phys_start);
+    for (uint32_t frame = FRAME_FOR(phys_start); frame < FRAME_FOR(phys_end); ++frame) paging_clear_frame(frame);
+}
+
+int paging_get_free_frame() {
+    for (uint32_t i = 0; i < NUM_BITMAPS; ++i) {
+        FRAME_BITMAP_TYPE bitmap = frame_bitmaps[i];
+        // If at least one bit in the bitmap is clear
+        if(bitmap != FRAME_FULL) {
+            uint32_t frame = 0;
+            // If it's zero then bit 1 is the first one free
+            if(bitmap == 0) frame = 0;
+            else {
+                // The bit corresponding to the free page
+                FRAME_BITMAP_TYPE mask = 0;
+                mask = ~bitmap & (bitmap + 1);
+                // Log in order to get the bit's position in the bitmap
+                frame = log2_floor(mask);
+            }
+            return frame + i * FRAMES_PER_BITMAP;
+        }
+    }
+    return -1;
+}
+
+physaddr_t paging_alloc_frame() {
+    // Search for a free frame
+    int free_frame = paging_get_free_frame();
+    if(free_frame >= 0) {
+        paging_set_frame((uint32_t) free_frame);
+        return (physaddr_t) (free_frame * PAGE_SIZE);
+    }
+    return 0;
+}
+
+void paging_free_frame(physaddr_t addr) {
+    uint32_t frame = FRAME_FOR(addr);
+    if(!FRAME_IS_SET(frame)) PANIC("Attempting to free unallocated frame %d (0x%x)\n", frame, addr)
+    else paging_clear_frame(frame);
+}
+
 void paging_init(uint32_t mem_kilobytes, uint32_t virtual_start, uint32_t virtual_end, uint32_t phys_start, uint32_t phys_end, uint32_t initrd_end) {
     // Align the page size to PAGE_SIZE
     // so we don't make a page table that oversteps the total memory
-    uint32_t mem_kilobytes_aligned = mem_kilobytes - (mem_kilobytes % PAGE_SIZE);
+    uint32_t mem_aligned = ALIGN_UP(mem_kilobytes * 1024);
 
     /*
      * Memory map:
@@ -89,8 +163,34 @@ void paging_init(uint32_t mem_kilobytes, uint32_t virtual_start, uint32_t virtua
     uint32_t dir_physaddr = VIRTUAL_TO_PHYSICAL((uint32_t) kernel_directory);
     asm ("mov %0, %%cr3":: "r"(dir_physaddr));
 
+    /*
+     * Allocate the frame bitmap before setting up the heap, since it doesn't take up much space
+     * and it's best to keep as much of the heap free as possible. In addition it won't be freed
+     * so keeping it in a non-freeable memory area, such as the pile, is fine.
+     */
+
+    // Use the aligned version as we don't want to discard any memory that falls between page boundaries
+    num_frames = mem_aligned / PAGE_SIZE;
+    // Align so as not to lose frames that fall between bitmap boundaries
+    num_frames_aligned = num_frames % FRAMES_PER_BITMAP != 0 ? num_frames - (num_frames % FRAMES_PER_BITMAP) + FRAMES_PER_BITMAP : num_frames;
+    size_t bitmap_size = (size_t) (num_frames_aligned / FRAMES_PER_BITMAP) * sizeof(FRAME_BITMAP_TYPE);
+    frame_bitmaps = kmalloc(bitmap_size);
+    if(frame_bitmaps) {
+        memset(frame_bitmaps, 0, bitmap_size);
+        paging_set_frames(map_phys_start, map_phys_end);
+    }
+
     // Create the kernel heap
     kernel_heap = heap_create(heap_virt_start, heap_virt_end, true, true, HEAP_INDEX_SIZE);
+
+    // If we couldn't allocate it in the pile, try to allocate it in the heap
+    if(!frame_bitmaps) {
+        frame_bitmaps = kmalloc(bitmap_size);
+        if(frame_bitmaps) {
+            memset(frame_bitmaps, 0, bitmap_size);
+            paging_set_frames(map_phys_start, map_phys_end);
+        } else PANIC("Couldn't allocate frame bitmap");
+    }
 }
 
 void paging_map_4mb_page(page_directory_t* dir, uint32_t page, uint32_t phys_addr) {
