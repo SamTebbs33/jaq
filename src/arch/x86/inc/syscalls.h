@@ -5,7 +5,7 @@
 #ifndef JAQ_SYSCALLS_H
 #define JAQ_SYSCALLS_H
 
-#include <arch_types.h>
+#include <arch_defs.h>
 
 #define SYSCALL_NUM_HANDLERS 128
 

@@ -4,7 +4,7 @@
 
 #include <syscalls.h>
 #include <idt.h>
-#include <arch_types.h>
+#include <arch_defs.h>
 #include <print.h>
 #include <util.h>
 

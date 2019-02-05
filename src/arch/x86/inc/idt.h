@@ -6,7 +6,7 @@
 #define JAQ_IDT_H
 
 #include <stdinc.h>
-#include <arch_types.h>
+#include <arch_defs.h>
 
 struct idt_entry {
     unsigned short base_low;

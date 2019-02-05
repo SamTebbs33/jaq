@@ -6,7 +6,7 @@
 #define JAQ_ARCH_H
 
 #include <stdinc.h>
-#include <arch_types.h>
+#include <arch_defs.h>
 #include <multiboot.h>
 
 /**
