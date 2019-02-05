@@ -6,6 +6,7 @@
 #define JAQ_ARCH_TYPES_H
 
 #include <paging.h>
+#include <stdinc.h>
 
 /**
  * The x86 registers saved on interrupt
@@ -26,5 +27,11 @@ typedef void (*arch_interrupt_handler_t) (arch_registers_t*);
 #define ARCH_INTERRUPT_TIMER 32
 #define ARCH_INTERRUPT_KEYBOARD 33
 #define ARCH_PAGE_SIZE PAGE_SIZE
+
+#define ARCH_SYSCALL(syscall) {\
+    uint32_t s = syscall;\
+    asm("mov %0, %%eax":: "r"(s));\
+    asm("int $128");\
+}
 
 #endif //JAQ_ARCH_TYPES_H

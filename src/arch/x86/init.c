@@ -6,6 +6,7 @@
 #include <paging.h>
 #include <gdt.h>
 #include <idt.h>
+#include <syscalls.h>
 
 extern void* kernel_stack;
 
@@ -13,4 +14,5 @@ void arch_init(uint32_t total_mem, multiboot_info_t* mb_info, uint32_t virtual_s
     gdt_init((uint32_t) &kernel_stack, 0x28);
     idt_init();
     paging_init(total_mem, virtual_start, virtual_end, phys_start, phys_end, initrd_end);
+    syscalls_init();
 }

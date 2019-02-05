@@ -43,7 +43,7 @@ extern void isr28();
 extern void isr29();
 extern void isr30();
 extern void isr31();
-extern void isr127();
+extern void isr128();
 
 extern void irq0();
 extern void irq1();
@@ -118,7 +118,7 @@ void irq_handler(arch_registers_t* r) {
 }
 
 void isr_handler(arch_registers_t* r) {
-    if (r->int_no == 8 || r->int_no >= 32) {
+    if (r->int_no != 128 && (r->int_no == 8 || r->int_no >= 32)) {
         while(1) { asm volatile ("hlt"); }
     }
     // We don't want to be interrupted while in an ISR handler
@@ -172,6 +172,7 @@ void idt_init() {
     idt_set_gate(29, (uint32_t)isr29, 0x08, 0x8E);
     idt_set_gate(30, (uint32_t)isr30, 0x08, 0x8E);
     idt_set_gate(31, (uint32_t)isr31, 0x08, 0x8E);
+    idt_set_gate(128, (uint32_t)isr128, 0x08, 0x8E);
 
     idt_remap_pic();
     // Make IDT point to basic ISR handlers
