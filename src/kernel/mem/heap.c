@@ -2,9 +2,9 @@
 // Created by Samuel Tebbs on 16/04/2018.
 //
 
-#include <heap.h>
-#include <mem.h>
-#include <util.h>
+#include <mem/heap.h>
+#include <mem/mem.h>
+#include <util/util.h>
 #include <arch.h>
 
 bool is_page_aligned(uint32_t addr);

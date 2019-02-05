@@ -2,9 +2,9 @@
 // Created by Samuel Tebbs on 13/04/2018.
 //
 
-#include <mem.h>
+#include <mem/mem.h>
 #include <paging.h>
-#include <heap.h>
+#include <mem/heap.h>
 
 uint32_t pile_start, pile_end, pile_ptr;
 extern heap_t* kernel_heap;

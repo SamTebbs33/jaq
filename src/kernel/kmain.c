@@ -2,19 +2,19 @@
 // Created by Samuel Tebbs on 12/04/2018.
 //
 
-#include <print.h>
+#include <screen/print.h>
 #include <arch.h>
-#include <keyboard.h>
-#include <timer.h>
-#include <serial.h>
-#include <initrd.h>
+#include <driver/keyboard.h>
+#include <driver/timer.h>
+#include <driver/serial.h>
+#include <fs/initrd.h>
 #include <multiboot.h>
-#include <maths.h>
-#include <util.h>
-#include <mem.h>
-#include <framebuffer.h>
-#include <log.h>
-#include <boot_constants.h>
+#include <util/maths.h>
+#include <util/util.h>
+#include <mem/mem.h>
+#include <screen/framebuffer.h>
+#include <log/log.h>
+#include <boot_defs.h>
 
 fs_node_t *fs_root;
 extern void* KERNEL_VADDR_END, * KERNEL_VADDR_START, * KERNEL_PHYSADDR_END, * KERNEL_PHYSADDR_START;

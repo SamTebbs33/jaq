@@ -5,10 +5,10 @@
 #ifndef JAQ_UTIL_H
 #define JAQ_UTIL_H
 
-#include <string.h>
+#include <util/string.h>
 #include <stdinc.h>
 #include <stdarg.h>
-#include <log.h>
+#include <log/log.h>
 
 #define PANIC(str, ...) { logf(LOG_LEVEL_DEBUG, "PANIC @ %s:%d: " str, __FILE__, __LINE__ __VA_OPT__(,) __VA_ARGS__); while(1); }
 #define ASSERT_EQ_INT(name, val, expected) { if(val != expected) PANIC(name " assertion failed, got %d but expected %d", val, expected); }

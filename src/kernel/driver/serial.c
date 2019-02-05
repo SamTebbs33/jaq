@@ -2,8 +2,8 @@
 // Created by Samuel Tebbs on 20/04/2018.
 //
 
-#include <serial.h>
-#include <util.h>
+#include <driver/serial.h>
+#include <util/util.h>
 #include <arch.h>
 
 #define SERIAL_PORT_LCR (uint16_t) 3

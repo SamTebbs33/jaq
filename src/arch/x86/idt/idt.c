@@ -3,8 +3,8 @@
 //
 
 #include <idt.h>
-#include <string.h>
-#include <util.h>
+#include <util/string.h>
+#include <util/util.h>
 #include <exceptions.h>
 #include <arch.h>
 

@@ -6,7 +6,7 @@
 #define JAQ_PAGING2_H
 
 #include <stdinc.h>
-#include <boot_constants.h>
+#include <boot_defs.h>
 
 #define PAGE_SIZE_4MB 0x400000
 #define PAGE_SIZE_4KB 0x1000

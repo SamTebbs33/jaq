@@ -4,10 +4,10 @@
 
 #include <printf.h>
 #include <stdlib.h>
-#include <string.h>
+#include <util/string.h>
 #include <stdio.h>
 
-#include <initrd.h>
+#include <fs/initrd.h>
 
 uint32_t write_header(char *filename, FILE *file, uint32_t offset, FILE *output_file);
 

@@ -5,8 +5,8 @@
 #include <syscalls.h>
 #include <idt.h>
 #include <arch_defs.h>
-#include <print.h>
-#include <util.h>
+#include <screen/print.h>
+#include <util/util.h>
 
 syscall_handler_t handlers[SYSCALL_NUM_HANDLERS];
 

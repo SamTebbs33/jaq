@@ -2,10 +2,10 @@
 // Created by Samuel Tebbs on 12/04/2018.
 //
 
-#include <timer.h>
+#include <driver/timer.h>
 #include <arch.h>
-#include <util.h>
-#include <print.h>
+#include <util/util.h>
+#include <screen/print.h>
 
 void on_tick(arch_registers_t* registers) {
 }

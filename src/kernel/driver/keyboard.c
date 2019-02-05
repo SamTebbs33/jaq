@@ -2,12 +2,12 @@
 // Created by Samuel Tebbs on 12/04/2018.
 //
 
-#include <keyboard.h>
-#include <print.h>
+#include <driver/keyboard.h>
+#include <screen/print.h>
 #include <arch.h>
-#include <fs.h>
-#include <log.h>
-#include <string.h>
+#include <fs/fs.h>
+#include <log/log.h>
+#include <util/string.h>
 
 #define KEYBOARD_PORT 0x60
 

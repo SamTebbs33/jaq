@@ -43,7 +43,7 @@ ARCH ?= $(shell arch)
 
 include src/arch/$(ARCH)/Makefile
 
-OBJECT_NAMES = $(patsubst %,kernel/%,$(KERNEL_OBJECT_NAMES)) $(patsubst %,driver/%,$(DRIVER_OBJECT_NAMES)) $(patsubst %,fs/%,$(FS_OBJECT_NAMES)) $(patsubst %,arch/x86/%,$(ARCH_OBJECT_NAMES))
+OBJECT_NAMES = $(patsubst %,kernel/%,$(KERNEL_OBJECT_NAMES)) $(patsubst %,kernel/driver/%,$(DRIVER_OBJECT_NAMES)) $(patsubst %,kernel/fs/%,$(FS_OBJECT_NAMES)) $(patsubst %,arch/x86/%,$(ARCH_OBJECT_NAMES))
 OBJECTS = $(patsubst %,$(OBJ_DIR)/%.o,$(OBJECT_NAMES))
 
 ifneq ($(VERBOSE), 1)

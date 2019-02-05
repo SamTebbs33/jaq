@@ -4,13 +4,13 @@
 
 #include <idt.h>
 #include <paging.h>
-#include <mem.h>
-#include <string.h>
-#include <log.h>
-#include <heap.h>
-#include <maths.h>
-#include <util.h>
-#include <boot_constants.h>
+#include <mem/mem.h>
+#include <util/string.h>
+#include <log/log.h>
+#include <mem/heap.h>
+#include <util/maths.h>
+#include <util/util.h>
+#include <boot_defs.h>
 #include <stdinc.h>
 
 #define HEAP_INDEX_SIZE 0x20000

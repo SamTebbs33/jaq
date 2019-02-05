@@ -1,4 +1,4 @@
-#include <framebuffer.h>
+#include <screen/framebuffer.h>
 #include <arch.h>
 
 #define CURSOR_CMD_PORT 0x3D4

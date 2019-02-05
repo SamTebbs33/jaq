@@ -2,11 +2,11 @@
 // Created by Samuel Tebbs on 17/04/2018.
 //
 
-#include <initrd.h>
-#include <mem.h>
-#include <string.h>
-#include <fs.h>
-#include <log.h>
+#include <fs/initrd.h>
+#include <mem/mem.h>
+#include <util/string.h>
+#include <fs/fs.h>
+#include <log/log.h>
 
 initrd_t* initrd;
 fs_node_t* root;
