@@ -3,6 +3,7 @@
 //
 
 #include <util/string.h>
+#include <mem/mem.h>
 
 char* strtok_end = NULL;
 
@@ -25,7 +26,6 @@ size_t strlen(const char *str) {
     return s - str - 1;
 }
 
-// ------------------------------------------------------------------------------------------------
 char *strcpy(char *dst, const char *src) {
     char c;
     char *p = dst;
@@ -39,7 +39,6 @@ char *strcpy(char *dst, const char *src) {
     return dst;
 }
 
-// ------------------------------------------------------------------------------------------------
 char *strncpy(char *dst, const char *src, size_t n) {
     size_t i;
 
@@ -56,7 +55,6 @@ char *strncpy(char *dst, const char *src, size_t n) {
     return dst;
 }
 
-// ------------------------------------------------------------------------------------------------
 int strcmp(const char *s1, const char *s2) {
     while (*s1 == *s2)
     {
@@ -104,3 +102,9 @@ int strrchr(char* str, char ch) {
     return -1;
 }
 
+char *strdup(char *str) {
+    size_t len = strlen(str) + 1;
+    char* dup = kmalloc(len * sizeof(char));
+    if(dup) memcpy(dup, str, len);
+    return dup;
+}

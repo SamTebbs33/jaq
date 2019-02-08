@@ -17,5 +17,6 @@ int strcmp(const char *s1, const char *s2);
 char* strtok(char* str, char* delim);
 int strchr(char* str, char ch);
 int strrchr(char* str, char ch);
+char* strdup(char* str);
 
 #endif //JAQ_STRING_H
