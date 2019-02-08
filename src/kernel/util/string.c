@@ -3,6 +3,9 @@
 //
 
 #include <util/string.h>
+#include <mem/mem.h>
+
+char* strtok_end = NULL;
 
 void* memset(void *buff, char value, size_t len) {
     for (size_t i = 0; i < len; i++) ((char*)buff)[i] = value;
@@ -23,7 +26,6 @@ size_t strlen(const char *str) {
     return s - str - 1;
 }
 
-// ------------------------------------------------------------------------------------------------
 char *strcpy(char *dst, const char *src) {
     char c;
     char *p = dst;
@@ -37,7 +39,6 @@ char *strcpy(char *dst, const char *src) {
     return dst;
 }
 
-// ------------------------------------------------------------------------------------------------
 char *strncpy(char *dst, const char *src, size_t n) {
     size_t i;
 
@@ -54,7 +55,6 @@ char *strncpy(char *dst, const char *src, size_t n) {
     return dst;
 }
 
-// ------------------------------------------------------------------------------------------------
 int strcmp(const char *s1, const char *s2) {
     while (*s1 == *s2)
     {
@@ -68,4 +68,44 @@ int strcmp(const char *s1, const char *s2) {
     }
 
     return *s1 - *s2;
+}
+
+char* strtok(char* str, char* delim) {
+    if(!str) {
+        if(strtok_end) str = strtok_end;
+        else return NULL;
+    }
+
+    char* str_start = str;
+    char ch;
+    while((ch = *str)) {
+        if(strchr(delim, ch) >= 0) {
+            *str = '\0';
+            strtok_end = ++str;
+            return str_start;
+        }
+        str++;
+    }
+
+    return NULL;
+}
+
+int strchr(char* str, char ch) {
+    char ch2;
+    for (int i = 0; (ch2 = str[i]); ++i) if(ch2 == ch) return i;
+    return -1;
+}
+
+int strrchr(char* str, char ch) {
+    char ch2;
+    size_t len = strlen(str);
+    for (int i = (int) (len - 1); (ch2 = str[i]); --i) if(ch2 == ch) return i;
+    return -1;
+}
+
+char *strdup(char *str) {
+    size_t len = strlen(str) + 1;
+    char* dup = kmalloc(len * sizeof(char));
+    if(dup) memcpy(dup, str, len);
+    return dup;
 }
