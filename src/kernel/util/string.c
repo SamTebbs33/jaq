@@ -98,7 +98,7 @@ int strchr(char* str, char ch) {
 int strrchr(char* str, char ch) {
     char ch2;
     size_t len = strlen(str);
-    for (int i = (int) ((uint32_t)str + len - 1); (ch2 = str[i]); --i) if(ch2 == ch) return i;
+    for (int i = (int) (len - 1); (ch2 = str[i]); --i) if(ch2 == ch) return i;
     return -1;
 }
 
