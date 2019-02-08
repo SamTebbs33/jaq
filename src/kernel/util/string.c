@@ -69,3 +69,17 @@ int strcmp(const char *s1, const char *s2) {
 
     return *s1 - *s2;
 }
+
+int strchr(char* str, char ch) {
+    char ch2;
+    for (int i = 0; (ch2 = str[i]); ++i) if(ch2 == ch) return i;
+    return -1;
+}
+
+int strrchr(char* str, char ch) {
+    char ch2;
+    size_t len = strlen(str);
+    for (int i = (int) ((uint32_t)str + len - 1); (ch2 = str[i]); --i) if(ch2 == ch) return i;
+    return -1;
+}
+
