@@ -4,6 +4,8 @@
 
 #include <util/string.h>
 
+char* strtok_end = NULL;
+
 void* memset(void *buff, char value, size_t len) {
     for (size_t i = 0; i < len; i++) ((char*)buff)[i] = value;
     return buff;
@@ -68,6 +70,25 @@ int strcmp(const char *s1, const char *s2) {
     }
 
     return *s1 - *s2;
+}
+
+char* strtok(char* str, char* delim) {
+    if(!str) {
+        if(strtok_end) str = strtok_end;
+        else return NULL;
+    }
+
+    char* str_start = str;
+    char ch;
+    while((ch = *str)) {
+        if(strchr(delim, ch) >= 0) {
+            *str = '\0';
+            strtok_end = ++str;
+            return str_start;
+        }
+    }
+
+    return str_start;
 }
 
 int strchr(char* str, char ch) {
