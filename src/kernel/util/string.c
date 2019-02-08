@@ -84,9 +84,10 @@ char* strtok(char* str, char* delim) {
             strtok_end = ++str;
             return str_start;
         }
+        str++;
     }
 
-    return str_start;
+    return NULL;
 }
 
 int strchr(char* str, char ch) {
