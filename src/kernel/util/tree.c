@@ -37,3 +37,7 @@ void *tree_get(tree_t *tree, uint32_t child) {
     return ((tree_t*)linkedlist_get(tree->children, child))->ptr;
 }
 
+size_t tree_size(tree_t *tree) {
+    return linkedlist_size(tree->children);
+}
+
