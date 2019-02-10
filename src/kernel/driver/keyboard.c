@@ -133,7 +133,7 @@ bool parse_keymap(char* buff) {
 }
 
 bool load_keymap(char* path) {
-    fs_node_t* file = fs_finddir(fs_root, path);
+    fs_node_t* file = fs_walk_path(path);
     if(file) {
         // Limit keymap files to 512 bytes, for now
         char buff[512];
@@ -144,6 +144,6 @@ bool load_keymap(char* path) {
 
 void keyboard_init() {
     memset(keymap, 0, 256 * 3);
-    load_keymap("initrd/keymaps/macbook_en_GB.txt");
+    load_keymap("/initrd/keymaps/macbook_en_GB.txt");
     arch_register_interrupt_handler(ARCH_INTERRUPT_KEYBOARD, on_key);
 }

@@ -33,9 +33,11 @@ void kmain(multiboot_info_t* mb_info, uint32_t mb_magic) {
     log_info("Initialising arch (" ARCH ")\n");
     arch_init(total_mem, mb_info, (uint32_t) &KERNEL_VADDR_START, (uint32_t) &KERNEL_VADDR_END, (uint32_t) &KERNEL_PHYSADDR_START, (uint32_t) &KERNEL_PHYSADDR_END, initrd_end);
 
+
+    log_info("Initialising filesytem\n");
+    fs_init();
     if(mb_info->mods_count == 1) {
-        logf(LOG_LEVEL_INFO, "Init initrd from %d to %d\n", initrd_virtual_start, initrd_virtual_end);
-        fs_root = initrd_init(initrd_virtual_start);
+        initrd_init(initrd_virtual_start);
     }
 
     log_info("Initialising devices\n");
