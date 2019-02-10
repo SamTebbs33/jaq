@@ -6,8 +6,17 @@
 #include <arch.h>
 #include <util/util.h>
 #include <screen/print.h>
+#include <driver/keyboard.h>
+#include <fs/fs.h>
+#include <fs/devfs.h>
 
 void on_tick(arch_registers_t* registers) {
+    char key_buff[KEYBOARD_BUFF_SIZE + 1];
+    size_t len = fs_read(stdin, key_buff, KEYBOARD_BUFF_SIZE, 0);
+    if(len > 0) {
+        key_buff[len] = '\0';
+        print(key_buff);
+    }
 }
 
 void timer_init(uint32_t frequency) {

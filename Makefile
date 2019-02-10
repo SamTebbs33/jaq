@@ -18,7 +18,7 @@ OBJ_DIR = $(BUILD_DIR)/obj
 
 KERNEL_OBJECT_NAMES = kmain screen/framebuffer screen/print mem/mem mem/heap util/string util/maths util/linkedlist util/tree log/log
 DRIVER_OBJECT_NAMES = keyboard timer serial
-FS_OBJECT_NAMES = initrd fs
+FS_OBJECT_NAMES = initrd fs devfs
 
 KERNEL_OUTPUT = $(BUILD_DIR)/iso/boot/kernel.elf
 ISO_OUTPUT = $(BUILD_DIR)/os.iso

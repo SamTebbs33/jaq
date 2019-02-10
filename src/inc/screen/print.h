@@ -7,10 +7,6 @@
 
 #include <stdinc.h>
 
-#define PRINT_NEWLINE '\n'
-#define PRINT_TAB '\t'
-#define PRINT_TAB_SIZE 4
-
 void printf(const char* restrict format, ...);
 void print_ch(char ch);
 void print(char* buff);

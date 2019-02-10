@@ -8,6 +8,7 @@
 #include <util/tree.h>
 #include <util/util.h>
 #include <screen/print.h>
+#include <fs/devfs.h>
 
 tree_t* fs_tree, * current_fs_tree;
 fs_node_t* fs_root;
@@ -129,4 +130,5 @@ tree_t *fs_walk_tree(char *path) {
 void fs_init() {
     fs_root = fs_make_dir_node("/", 0, FS_FLAGS_DIR, 0, 0, NULL, NULL, NULL, NULL, 0, 0);
     fs_tree = tree_create(fs_root);
+    devfs_init();
 }

@@ -8,6 +8,7 @@
 #include <fs/fs.h>
 #include <log/log.h>
 #include <util/string.h>
+#include <util/maths.h>
 
 #define KEYBOARD_PORT 0x60
 
@@ -47,6 +48,8 @@ struct key_mapping mapping[] = {
  */
 char keymap[256][3];
 int modifier = 0;
+char key_buff[KEYBOARD_BUFF_SIZE];
+uint32_t key_buff_pos = 0;
 
 void on_key(arch_registers_t* registers) {
     uint8_t scan_code = arch_inb(KEYBOARD_PORT);
@@ -63,7 +66,7 @@ void on_key(arch_registers_t* registers) {
             modifier = 0;
             break;
         default:
-            if(ascii >= ' ' && ascii <= '~') PRINT_CH(ascii);
+            if(ascii >= ' ' && ascii <= '~' && key_buff_pos < KEYBOARD_BUFF_SIZE) key_buff[key_buff_pos++] = ascii;
     }
 }
 
@@ -146,4 +149,12 @@ void keyboard_init() {
     memset(keymap, 0, 256 * 3);
     load_keymap("/initrd/keymaps/macbook_en_GB.txt");
     arch_register_interrupt_handler(ARCH_INTERRUPT_KEYBOARD, on_key);
+}
+
+size_t keyboard_read_buffer(char *buff, size_t len, size_t offset) {
+    len = min_size(len, key_buff_pos);
+    memcpy(buff + offset, key_buff, len);
+    memcpy(key_buff, key_buff + key_buff_pos, key_buff_pos);
+    key_buff_pos = 0;
+    return len;
 }

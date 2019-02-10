@@ -7,9 +7,9 @@
 #include <screen/framebuffer.h>
 #include <util/maths.h>
 #include <util/string.h>
+#include <fs/fs.h>
 
-char fg = FB_WHITE, bg = FB_BLACK;
-unsigned int row = 0, column = 0;
+extern fs_node_t* stdout;
 
 void print_scroll(uint32_t rows) {
     fb_scroll(rows);
@@ -19,7 +19,6 @@ void print(char* str) {
     char ch;
     while((ch = *str++)) {
         print_ch(ch);
-        if(row >= FB_ROWS) return;
     }
 }
 
@@ -98,31 +97,8 @@ void print_len(char *buff, size_t len) {
     char ch;
     for (unsigned int i = 0; i < len && (ch = buff[i]); ++i) {
         // Return if we're at the end of the screen
-        if(row >= FB_ROWS) return;
         print_ch(ch);
     }
-}
-
-void print_bg(char arg) {
-    bg = arg;
-}
-
-void print_fg(char arg) {
-    fg = arg;
-}
-
-void print_at(unsigned int r, unsigned int c) {
-    row = min_u32(r, FB_ROWS);
-    if(c > FB_COLUMNS) {
-        column = 0;
-        row = min_u32(row + 1, FB_ROWS);
-    } else column = c;
-    fb_cursor(r, c);
-}
-
-void print_clear() {
-    fb_clear(fg, bg);
-    fb_cursor(0, 0);
 }
 
 int print_uint_base_rec(uint32_t u32, int base, bool first, int count) {
@@ -142,15 +118,5 @@ int print_uint(uint32_t u32) {
 }
 
 void print_ch(char ch) {
-    if(ch == PRINT_NEWLINE) print_at(row + 1, 0);
-    else if(ch == PRINT_TAB) print_at(row, column + PRINT_TAB_SIZE);
-    else {
-        fb_putc(ch, fg, bg);
-        column++;
-        if (column >= FB_COLUMNS) {
-            column = 0;
-            row++;
-        }
-        fb_cursor(row, column);
-    }
+    fs_write(stdout, &ch, 1, 0);
 }

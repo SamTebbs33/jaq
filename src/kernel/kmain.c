@@ -22,7 +22,6 @@ extern void* KERNEL_VADDR_END, * KERNEL_VADDR_START, * KERNEL_PHYSADDR_END, * KE
 void kmain(multiboot_info_t* mb_info, uint32_t mb_magic) {
     ASSERT_EQ_INT("multiboot magic number", mb_magic, MULTIBOOT_BOOTLOADER_MAGIC);
     serial_init(SERIAL_COM1_PORT, 38400, false, 8, true, false, 0);
-    print_clear();
 
     uint32_t total_mem = mb_info->mem_upper + mb_info->mem_lower;
     uint32_t initrd_start = *((uint32_t*)mb_info->mods_addr);
@@ -47,7 +46,6 @@ void kmain(multiboot_info_t* mb_info, uint32_t mb_magic) {
     log_info("Done!\n");
 
     uint32_t fake_total_ram = total_mem - (total_mem % 1024) + 1024;
-    print_clear();
     printf("JaqOS on " ARCH ", %d MB available\n> ", fake_total_ram / 1024);
 
     // Runs forever to make sure interrupts are handled
