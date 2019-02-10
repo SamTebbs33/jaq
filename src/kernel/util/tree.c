@@ -34,6 +34,13 @@ bool tree_remove(tree_t *tree, uint32_t child) {
 }
 
 void *tree_get(tree_t *tree, uint32_t child) {
-    return ((tree_t*)linkedlist_get(tree->children, child))->ptr;
+    return tree_get_child(tree, child)->ptr;
 }
 
+size_t tree_size(tree_t *tree) {
+    return linkedlist_size(tree->children);
+}
+
+tree_t *tree_get_child(tree_t *tree, uint32_t child) {
+    return linkedlist_get(tree->children, child);
+}
