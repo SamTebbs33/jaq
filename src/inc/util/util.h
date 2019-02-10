@@ -15,5 +15,6 @@
 #define ASSERT_EQ_STR(name, val, expected) { if(strcmp(val, expected) != 0) PANIC(name " assertion failed, got %s but expected %s", val, expected); }
 #define ASSERT_PAGE_ALIGNED(name, val) { if(!IS_PAGE_ALIGNED(val)) PANIC(name " assertion failed, got %d", val); }
 #define ASSERT_NOT_NULL(name, ptr) { if(!(ptr)) PANIC(name "assertion failed, got %d, expected not null", ptr); }
+#define ASSERT(name, val) { if(!(val)) PANIC(name "assertion failed, got false, expected true"); }
 
 #endif //JAQ_UTIL_H

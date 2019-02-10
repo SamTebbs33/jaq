@@ -30,7 +30,7 @@ void kmain(multiboot_info_t* mb_info, uint32_t mb_magic) {
     uint32_t initrd_virtual_start = PHYSICAL_TO_VIRTUAL(initrd_start);
     uint32_t initrd_virtual_end = PHYSICAL_TO_VIRTUAL(initrd_end);
 
-    log_info("Init arch\n");
+    log_info("Initialising arch (" ARCH ")\n");
     arch_init(total_mem, mb_info, (uint32_t) &KERNEL_VADDR_START, (uint32_t) &KERNEL_VADDR_END, (uint32_t) &KERNEL_PHYSADDR_START, (uint32_t) &KERNEL_PHYSADDR_END, initrd_end);
 
     if(mb_info->mods_count == 1) {
@@ -38,10 +38,8 @@ void kmain(multiboot_info_t* mb_info, uint32_t mb_magic) {
         fs_root = initrd_init(initrd_virtual_start);
     }
 
-    log_info("Init devices\n");
+    log_info("Initialising devices\n");
     keyboard_init();
-
-    log_info("Init timer\n");
     timer_init(10);
 
     log_info("Done!\n");
