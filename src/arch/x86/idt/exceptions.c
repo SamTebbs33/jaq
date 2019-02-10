@@ -4,7 +4,7 @@
 
 #include <idt.h>
 #include <exceptions.h>
-#include <util/util.h>
+#include <lib/util.h>
 
 #define EXCEPTION_HANDLER(name, string) void name(arch_registers_t* registers) {\
     PANIC(string ": %d\n", registers->err_code);\

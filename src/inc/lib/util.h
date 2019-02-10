@@ -5,7 +5,7 @@
 #ifndef JAQ_UTIL_H
 #define JAQ_UTIL_H
 
-#include <util/string.h>
+#include <lib/string.h>
 #include <stdinc.h>
 #include <stdarg.h>
 #include <log/log.h>

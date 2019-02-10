@@ -5,7 +5,7 @@
 #include <fs/devfs.h>
 #include <fs/fs.h>
 #include <screen/framebuffer.h>
-#include <util/maths.h>
+#include <lib/maths.h>
 #include <driver/serial.h>
 #include <driver/keyboard.h>
 

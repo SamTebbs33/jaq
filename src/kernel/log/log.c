@@ -6,7 +6,7 @@
 #include <stdinc.h>
 #include <log/log.h>
 #include <driver/serial.h>
-#include <util/string.h>
+#include <lib/string.h>
 
 void print_level(char* level) {
     serial_write_str(SERIAL_COM1_PORT, "[");

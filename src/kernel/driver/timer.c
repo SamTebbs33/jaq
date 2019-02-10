@@ -4,7 +4,7 @@
 
 #include <driver/timer.h>
 #include <arch.h>
-#include <util/util.h>
+#include <lib/util.h>
 #include <screen/print.h>
 #include <driver/keyboard.h>
 #include <fs/fs.h>

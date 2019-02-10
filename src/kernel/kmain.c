@@ -9,8 +9,8 @@
 #include <driver/serial.h>
 #include <fs/initrd.h>
 #include <multiboot.h>
-#include <util/maths.h>
-#include <util/util.h>
+#include <lib/maths.h>
+#include <lib/util.h>
 #include <mem/mem.h>
 #include <screen/framebuffer.h>
 #include <log/log.h>

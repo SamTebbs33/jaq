@@ -3,7 +3,7 @@
 //
 
 #include <driver/serial.h>
-#include <util/util.h>
+#include <lib/util.h>
 #include <arch.h>
 
 #define SERIAL_PORT_LCR (uint16_t) 3

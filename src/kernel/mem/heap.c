@@ -4,7 +4,7 @@
 
 #include <mem/heap.h>
 #include <mem/mem.h>
-#include <util/util.h>
+#include <lib/util.h>
 #include <arch.h>
 
 bool is_page_aligned(uint32_t addr);

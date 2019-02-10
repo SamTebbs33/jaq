@@ -4,9 +4,9 @@
 
 #include <fs/fs.h>
 #include <mem/mem.h>
-#include <util/string.h>
-#include <util/tree.h>
-#include <util/util.h>
+#include <lib/string.h>
+#include <lib/tree.h>
+#include <lib/util.h>
 #include <screen/print.h>
 #include <fs/devfs.h>
 

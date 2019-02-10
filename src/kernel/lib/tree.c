@@ -2,7 +2,7 @@
 // Created by sam on 09/02/19.
 //
 
-#include <util/tree.h>
+#include <lib/tree.h>
 #include <mem/mem.h>
 
 tree_t *tree_create(void *ptr) {

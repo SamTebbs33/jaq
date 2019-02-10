@@ -4,7 +4,7 @@
 
 #include <fs/initrd.h>
 #include <mem/mem.h>
-#include <util/string.h>
+#include <lib/string.h>
 #include <fs/fs.h>
 #include <log/log.h>
 

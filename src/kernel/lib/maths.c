@@ -2,8 +2,8 @@
 // Created by Samuel Tebbs on 18/04/2018.
 //
 
-#include <util/util.h>
-#include <util/maths.h>
+#include <lib/util.h>
+#include <lib/maths.h>
 
 int8_t sign_i32(int32_t i) {
     return (int8_t) (i < 0 ? -1 : (i == 0 ? 0 : 1));

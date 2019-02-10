@@ -4,7 +4,7 @@
 
 #include <printf.h>
 #include <stdlib.h>
-#include <util/string.h>
+#include <lib/string.h>
 #include <stdio.h>
 
 #include <fs/initrd.h>

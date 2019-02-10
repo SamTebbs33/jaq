@@ -5,8 +5,8 @@
 #include <stdarg.h>
 #include <screen/print.h>
 #include <screen/framebuffer.h>
-#include <util/maths.h>
-#include <util/string.h>
+#include <lib/maths.h>
+#include <lib/string.h>
 #include <fs/fs.h>
 
 extern fs_node_t* stdout;

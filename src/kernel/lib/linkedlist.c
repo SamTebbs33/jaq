@@ -2,7 +2,7 @@
 // Created by sam on 09/02/19.
 //
 
-#include <util/linkedlist.h>
+#include <lib/linkedlist.h>
 #include <mem/mem.h>
 
 linkedlist_node_t *make_node(void *ptr, linkedlist_node_t *prev, linkedlist_node_t *next);

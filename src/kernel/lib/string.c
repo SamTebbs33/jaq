@@ -2,7 +2,7 @@
 // Created by Samuel Tebbs on 17/04/2018.
 //
 
-#include <util/string.h>
+#include <lib/string.h>
 #include <mem/mem.h>
 
 char* strtok_end = NULL;

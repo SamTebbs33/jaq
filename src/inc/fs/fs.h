@@ -6,7 +6,7 @@
 #define JAQ_FS_H
 
 #include <stdinc.h>
-#include <util/tree.h>
+#include <lib/tree.h>
 
 #define FS_FILENAME_MAX 128
 

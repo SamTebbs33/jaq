@@ -5,11 +5,11 @@
 #include <idt.h>
 #include <paging.h>
 #include <mem/mem.h>
-#include <util/string.h>
+#include <lib/string.h>
 #include <log/log.h>
 #include <mem/heap.h>
-#include <util/maths.h>
-#include <util/util.h>
+#include <lib/maths.h>
+#include <lib/util.h>
 #include <boot_defs.h>
 #include <stdinc.h>
 

@@ -7,8 +7,8 @@
 #include <arch.h>
 #include <fs/fs.h>
 #include <log/log.h>
-#include <util/string.h>
-#include <util/maths.h>
+#include <lib/string.h>
+#include <lib/maths.h>
 
 #define KEYBOARD_PORT 0x60
 
