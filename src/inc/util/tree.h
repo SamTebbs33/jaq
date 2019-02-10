@@ -20,6 +20,8 @@ bool tree_remove(tree_t* tree, uint32_t child);
 
 void* tree_get(tree_t* tree, uint32_t child);
 
+tree_t* tree_get_child(tree_t* tree, uint32_t child);
+
 size_t tree_size(tree_t* tree);
 
 #endif //JAQ_TREE_H
