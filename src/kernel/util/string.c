@@ -71,23 +71,7 @@ int strcmp(const char *s1, const char *s2) {
 }
 
 char* strtok(char* str, char* delim) {
-    if(!str) {
-        if(strtok_end) str = strtok_end;
-        else return NULL;
-    }
-
-    char* str_start = str;
-    char ch;
-    while((ch = *str)) {
-        if(strchr(delim, ch) >= 0) {
-            *str = '\0';
-            strtok_end = ++str;
-            return str_start;
-        }
-        str++;
-    }
-
-    return NULL;
+    return strtok_r(str, delim, &strtok_end);
 }
 
 int strchr(char* str, char ch) {
@@ -108,4 +92,30 @@ char *strdup(char *str) {
     char* dup = kmalloc(len * sizeof(char));
     if(dup) memcpy(dup, str, len);
     return dup;
+}
+
+char *strcat(char *dest, const char *str) {
+    size_t len = strlen(dest);
+    return strcpy(dest + len, str);
+}
+
+char *strtok_r(char *str, char *delim, char **save) {
+    if(!str) {
+        if(*save) str = *save;
+        else return NULL;
+    }
+
+    char* str_start = str;
+    char ch;
+    while((ch = *str)) {
+        if(strchr(delim, ch) >= 0) {
+            *str = '\0';
+            *save = ++str;
+            return str_start;
+        }
+        str++;
+    }
+
+    *save = NULL;
+    return strcmp(str_start, "") == 0 ? NULL : str_start;
 }
