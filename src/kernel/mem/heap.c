@@ -100,15 +100,13 @@ void heap_free(void *ptr, heap_t *heap) {
         heap_header_t* header = (heap_header_t *) (ptr_addr - sizeof(heap_header_t));
         if(header && header->magic == HEAP_MAGIC) {
             header->is_hole = true;
-            join_right(header, heap);
+            //join_right(header, heap);
             // If this hole wasn't incorporated into the left one, then add it to the hole index
-            if(!join_left(header, heap)) add_hole(header, heap->hole_index);
+            //if(!join_left(header, heap)) add_hole(header, heap->hole_index);
             // The memory taken up by the block is released
             heap->occupied -= header->size + sizeof(heap_header_t) + sizeof(heap_footer_t);
-            return;
         }
-    }
-    PANIC("Freeing unallocated memory");
+    } else PANIC("Freeing unallocated memory");
 }
 
 void add_hole(heap_header_t *hole, heap_index_t *index) {
