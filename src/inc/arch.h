@@ -61,4 +61,16 @@ void arch_acknowledge_irq(int32_t irq);
  */
 void arch_set_page_directory(page_directory_t* page_dir);
 
+/**
+ * Restore the saved state into the CPU, including the instruction pointer
+ * @param regs The saved state to restore
+ */
+void arch_restore_state(arch_registers_t* regs);
+
+/**
+ * Restore the stack pointer from the saved state
+ * @param regs The saved state
+ */
+void arch_restore_stack(arch_registers_t* regs);
+
 #endif //JAQ_ARCH_H
