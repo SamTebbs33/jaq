@@ -55,4 +55,10 @@ void arch_switch_task(arch_cpu_state_t* current, arch_cpu_state_t* next);
 
 void arch_acknowledge_irq(int32_t irq);
 
+/**
+ * Sets the current page directory
+ * @param page_dir The page directory to change to
+ */
+void arch_set_page_directory(page_directory_t* page_dir);
+
 #endif //JAQ_ARCH_H
