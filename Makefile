@@ -61,41 +61,42 @@ EMU_FLAGS += -s -S
 endif
 
 $(OBJ_DIR)/%.o: src/%.c
-	$(info -> Compiling $<)
+	$(info > $(CC) $< -> $@)
 	$(eval P := $(shell dirname $@))
 	mkdir -p $(P)
 	$(CC) $(CC_FLAGS) -c $< -o $@
 
 $(OBJ_DIR)/%.o: src/%.s
-	$(info -> Assembling $<)
+	$(info > $(AS) $< -> $@)
 	$(eval P := $(shell dirname $@))
 	mkdir -p $(P)
 	$(AS) $(AS_FLAGS) $< -o $@
 
 $(KERNEL_OUTPUT): $(OBJECTS) $(LINK_SCRIPT)
-	$(info -> Linking objects)
+	$(info > $(LD) objects)
 	mkdir -p $(shell dirname $(KERNEL_OUTPUT))
 	$(LD) -T $(LINK_SCRIPT) $(LD_FLAGS) $(OBJECTS) -o $(KERNEL_OUTPUT)
 
 $(INITRD_OUTPUT): $(INITRD_FILES) $(MKRD_OUTPUT)
-	$(info -> Building initrd)
+	$(info > $(MKRD_OUTPUT) $(INITRD_FILES) -> $@)
 	mkdir -p $(MODULES_OUTPUT)
 	./$(MKRD_OUTPUT) $(INITRD_OUTPUT) $(INITRD_FILES)
 
 $(ISO_OUTPUT): $(KERNEL_OUTPUT) check-multiboot $(INITRD_OUTPUT) $(GRUB_FILES)
-	$(info -> Building .iso)
+	$(info > $(MKISO) $@)
 	mkdir -p $(BUILD_DIR)/iso/boot/grub
 	cp $(GRUB_FILES) $(BUILD_DIR)/iso/boot/grub/
 	$(MKISO) -o $(ISO_OUTPUT) $(BUILD_DIR)/iso 2> /dev/null
 
 $(MKRD_OUTPUT): $(MKRD_SRC)
-	$(info -> Compiling $<)
+	$(info > gcc $< -> $@)
 	gcc -std=gnu99 -Isrc/inc $(MKRD_SRC) -o $(MKRD_OUTPUT)
 
 check-multiboot:
 
 ifeq ($(CHECK_MULTIBOOT),1)
 check-multiboot:
+	$(info > $(GRUBFILE))
 	$(GRUBFILE) $(GRUBFILE_FLAGS) $(KERNEL_OUTPUT)
 endif
 
