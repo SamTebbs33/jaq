@@ -65,4 +65,6 @@ void multitasking_block(process_t* process);
  */
 void multitasking_unblock(process_t* process);
 
+void multitasking_exit_process();
+
 #endif //JAQ_MULTITASKING_H
