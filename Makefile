@@ -86,7 +86,7 @@ $(ISO_OUTPUT): $(KERNEL_OUTPUT) check-multiboot $(INITRD_OUTPUT) $(GRUB_FILES)
 	$(info -> Building .iso)
 	mkdir -p $(BUILD_DIR)/iso/boot/grub
 	cp $(GRUB_FILES) $(BUILD_DIR)/iso/boot/grub/
-	$(MKISO) -o $(ISO_OUTPUT) $(BUILD_DIR)/iso
+	$(MKISO) -o $(ISO_OUTPUT) $(BUILD_DIR)/iso 2> /dev/null
 
 $(MKRD_OUTPUT): $(MKRD_SRC)
 	$(info -> Compiling $<)
