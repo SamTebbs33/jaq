@@ -25,16 +25,16 @@ extern void* KERNEL_VADDR_END, * KERNEL_VADDR_START, * KERNEL_PHYSADDR_END, * KE
 extern void* kernel_stack, * kernel_stack_end;
 
 void init_task() {
-    logf(LOG_LEVEL_DEBUG, "init_task");
+    logf(LOG_LEVEL_DEBUG, "init_task\n");
 }
 
 void task_2() {
-    logf(LOG_LEVEL_DEBUG, "task_2");
+    logf(LOG_LEVEL_DEBUG, "task_2\n");
     //multitasking_yield();
 }
 
 void task_3() {
-    logf(LOG_LEVEL_DEBUG, "task_3");
+    logf(LOG_LEVEL_DEBUG, "task_3\n");
     multitasking_yield();
 }
 
@@ -77,7 +77,7 @@ void kmain(multiboot_info_t* mb_info, uint32_t mb_magic) {
 
     logf(LOG_LEVEL_DEBUG, "pre yield\n");
     multitasking_yield();
-    logf(LOG_LEVEL_DEBUG, "post yield");
+    logf(LOG_LEVEL_DEBUG, "post yield\n");
 
     log_info("Done\n");
 
