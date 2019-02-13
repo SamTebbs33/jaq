@@ -67,9 +67,9 @@ void kmain(multiboot_info_t* mb_info, uint32_t mb_magic) {
 
     process_t* init = multitasking_create_init_process((void*)&kernel_stack, (uint32_t)&kernel_stack_end - (uint32_t)&kernel_stack, init_task);
     process_t* proc2 = process_create("proc2", kmalloc(sizeof(arch_cpu_state_t)), NULL, kmalloc(1024), 1024, KERNEL);
-    ARCH_INIT_PROCESS_STATE(proc2, (uint32_t)task_2, (uint32_t)multitasking_exit_process);
+    ARCH_INIT_PROCESS_STATE(proc2, task_2, multitasking_exit_process);
     process_t* proc3 = process_create("proc3", kmalloc(sizeof(arch_cpu_state_t)), NULL, kmalloc(1024), 1024, KERNEL);
-    ARCH_INIT_PROCESS_STATE(proc3, (uint32_t)task_3, (uint32_t)multitasking_exit_process);
+    ARCH_INIT_PROCESS_STATE(proc3, task_3, multitasking_exit_process);
 
     logf(LOG_LEVEL_DEBUG, "Scheduling\n");
     multitasking_schedule(proc2);
