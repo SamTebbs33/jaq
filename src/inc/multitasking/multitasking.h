@@ -37,6 +37,13 @@ void multitasking_schedule(process_t* process);
 void multitasking_init_process_state(process_t *process, void (*entry_function)(void));
 
 /**
+ * Initialise a process' state so that it is ready to be switched to
+ * @param process The process to initialise
+ * @param entry_function The function to run when the task is switched to for the first time
+ */
+void multitasking_init_process_state(process_t *process, void (*entry_function)(void));
+
+/**
  * Switch from the current process if there is one ready. If there are no ready processes then
  * no switching will occur
  */
