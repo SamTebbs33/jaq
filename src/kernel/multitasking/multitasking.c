@@ -148,3 +148,7 @@ void multitasking_unblock(process_t *process) {
         multitasking_schedule(process);
     }
 }
+
+void multitasking_sleep(uint32_t milliseconds) {
+
+}
