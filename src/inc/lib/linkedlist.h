@@ -21,6 +21,8 @@ linkedlist_t* linkedlist_create();
 
 bool linkedlist_add(linkedlist_t *list, void *ptr);
 
+bool linkedlist_insert(linkedlist_t *list, void *ptr, uint32_t i);
+
 void* linkedlist_get(linkedlist_t* list, uint32_t i);
 
 size_t linkedlist_size(linkedlist_t* list);
