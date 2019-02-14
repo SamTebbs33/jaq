@@ -15,6 +15,7 @@
 #include <screen/framebuffer.h>
 #include <log/log.h>
 #include <boot_defs.h>
+#include <lib/sorted_linkedlist.h>
 
 fs_node_t *fs_root;
 extern void* KERNEL_VADDR_END, * KERNEL_VADDR_START, * KERNEL_PHYSADDR_END, * KERNEL_PHYSADDR_START;
@@ -42,7 +43,7 @@ void kmain(multiboot_info_t* mb_info, uint32_t mb_magic) {
     log_info("Initialising devices\n");
     keyboard_init();
     timer_init(10);
-
+    
     log_info("Done!\n");
 
     uint32_t fake_total_ram = total_mem - (total_mem % 1024) + 1024;

@@ -16,7 +16,7 @@ DEBUGGER_FLAGS ?= -ex "symbol-file $(KERNEL_OUTPUT)" -ex "target remote localhos
 BUILD_DIR ?= build
 OBJ_DIR = $(BUILD_DIR)/obj
 
-KERNEL_OBJECT_NAMES = kmain screen/framebuffer screen/print mem/mem mem/heap lib/string lib/maths lib/linkedlist lib/tree log/log
+KERNEL_OBJECT_NAMES = kmain screen/framebuffer screen/print mem/mem mem/heap lib/string lib/maths lib/linkedlist lib/tree log/log lib/sorted_linkedlist
 DRIVER_OBJECT_NAMES = keyboard timer serial
 FS_OBJECT_NAMES = initrd fs devfs
 
