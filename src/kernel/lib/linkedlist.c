@@ -56,6 +56,30 @@ bool linkedlist_remove(linkedlist_t *list, uint32_t i) {
     return true;
 }
 
+bool linkedlist_insert(linkedlist_t *list, void *ptr, uint32_t i) {
+    if(linkedlist_size(list) >= UINT32_MAX || i > linkedlist_size(list))
+        return false;
+    linkedlist_node_t* node = make_node(ptr, NULL, NULL);
+    if(!node) return false;
+    if(i == 0) {
+        node->next = list->head;
+        list->head->prev = node;
+        list->head = node;
+    } else if (i == linkedlist_size(list)) {
+        list->tail->next = node;
+        node->prev = list->tail;
+        list->tail = node;
+    } else {
+        linkedlist_node_t* prev_node = get_node(list, i - 1), * next_node = prev_node->next;
+        prev_node->next = node;
+        node->prev = prev_node;
+        next_node->prev = node;
+        node->next = prev_node;
+    }
+    list->size++;
+    return 0;
+}
+
 linkedlist_node_t *make_node(void *ptr, linkedlist_node_t *prev, linkedlist_node_t *next) {
     linkedlist_node_t* node = kmalloc(sizeof(linkedlist_node_t));
     if(node) {
