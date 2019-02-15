@@ -65,11 +65,8 @@ bool linkedlist_insert(linkedlist_t *list, void *ptr, uint32_t i) {
         node->next = list->head;
         list->head->prev = node;
         list->head = node;
-    } else if (i == linkedlist_size(list)) {
-        list->tail->next = node;
-        node->prev = list->tail;
-        list->tail = node;
-    } else {
+    } else if (i == linkedlist_size(list)) linkedlist_add(list, ptr);
+    else {
         linkedlist_node_t* prev_node = get_node(list, i - 1), * next_node = prev_node->next;
         prev_node->next = node;
         node->prev = prev_node;
