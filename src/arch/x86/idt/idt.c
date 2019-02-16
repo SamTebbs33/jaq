@@ -65,6 +65,26 @@ extern void irq15();
 static arch_interrupt_handler_t irq_handlers[16] = { NULL };
 static arch_interrupt_handler_t isr_handlers[32] = { NULL };
 
+void arch_save_state(arch_cpu_state_t* state, arch_cpu_state_t* old_state) {
+    state->eax = old_state->eax;
+    state->fs = old_state->fs;
+    state->cs = old_state->cs;
+    state->ds = old_state->ds;
+    state->ebp = old_state->ebp;
+    state->ebx = old_state->ebx;
+    state->ecx = old_state->ecx;
+    state->edi = old_state->edi;
+    state->edx = old_state->edx;
+    state->eflags = old_state->eflags;
+    state->eip = old_state->eip;
+    state->es = old_state->es;
+    state->esi = old_state->esi;
+    state->esp = old_state->esp;
+    state->gs = old_state->gs;
+    state->ss = old_state->ss;
+    state->useresp = state->useresp;
+}
+
 void idt_set_gate(uint8_t num, uint32_t base, uint16_t sel, uint8_t flags) {
     idt[num].base_low =		(base & 0xFFFF);
     idt[num].base_high =	(base >> 16) & 0xFFFF;
@@ -104,20 +124,24 @@ void idt_remap_pic() {
     arch_outb(0xA1, 0x0);
 }
 
-void irq_handler(arch_registers_t* r) {
+void irq_handler(arch_cpu_state_t* r) {
     // We don't want to be interrupted while in an IRQ handler
     IRQ_OFF;
     // IRQs are mapped to be >= 32
     int32_t interrupt = r->int_no - 32;
     if (interrupt <= 15 && interrupt >= 0 && irq_handlers[interrupt]) irq_handlers[interrupt](r);
-    // Acknowledge the slave if it's coming from the slave
-    if (interrupt >= 12) arch_outb(0xA0, 0x20);
-    // Acknowledge the master
-    arch_outb(0x20, 0x20);
+    else arch_acknowledge_irq(interrupt);
     IRQ_ON;
 }
 
-void isr_handler(arch_registers_t* r) {
+void arch_acknowledge_irq(int32_t irq) {
+    // Acknowledge the slave if it's coming from the slave
+    if (irq >= 12) arch_outb(0xA0, 0x20);
+    // Acknowledge the master
+    arch_outb(0x20, 0x20);
+}
+
+void isr_handler(arch_cpu_state_t* r) {
     if (r->int_no != 128 && (r->int_no == 8 || r->int_no >= 32)) {
         while(1) { asm volatile ("hlt"); }
     }

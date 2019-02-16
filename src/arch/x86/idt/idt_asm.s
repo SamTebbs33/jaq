@@ -88,7 +88,7 @@ isr_common:
 	mov %ax, %fs
 	mov %ax, %gs
 	mov %esp, %eax
-	push %eax
+	push %eax # This points to the cpu_state saved on the stack, which C pops off as an arch_cpu_state_t*
 	call isr_handler
 	pop %eax
 	pop %gs
@@ -112,7 +112,7 @@ irq_common:
 	mov %ax, %fs
 	mov %ax, %gs
 	mov %esp, %eax
-	push %eax
+	push %eax # This points to the cpu_state saved on the stack, which C pops off as an arch_cpu_state_t*
 	call irq_handler
 	pop %eax
 	pop %gs

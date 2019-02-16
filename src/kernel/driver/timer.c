@@ -10,15 +10,6 @@
 #include <fs/fs.h>
 #include <fs/devfs.h>
 
-void on_tick(arch_registers_t* registers) {
-    char key_buff[KEYBOARD_BUFF_SIZE + 1];
-    size_t len = fs_read(stdin, key_buff, KEYBOARD_BUFF_SIZE, 0);
-    if(len > 0) {
-        key_buff[len] = '\0';
-        print(key_buff);
-    }
-}
-
 void timer_init(uint32_t frequency) {
     uint32_t divisor = 1193180 / frequency;
 
@@ -32,6 +23,4 @@ void timer_init(uint32_t frequency) {
     // Send the frequency divisor.
     arch_outb(0x40, low);
     arch_outb(0x40, high);
-
-    arch_register_interrupt_handler(ARCH_INTERRUPT_TIMER, on_tick);
 }

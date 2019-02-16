@@ -10,7 +10,7 @@
 
 syscall_handler_t handlers[SYSCALL_NUM_HANDLERS];
 
-void handle_syscall(arch_registers_t* regs) {
+void handle_syscall(arch_cpu_state_t* regs) {
     uint32_t syscall = regs->eax;
     if(handlers[syscall]) handlers[syscall](regs);
 }
