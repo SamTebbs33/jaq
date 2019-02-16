@@ -6,7 +6,7 @@ GRUBFILE = grub-file
 EMU = qemu-system-i386
 DEBUGGER = gdb
 
-CC_FLAGS ?= -DARCH=\"$(ARCH)\" -std=gnu99 -Isrc/inc -ffreestanding -Wall -Wextra -Werror -Wno-unused-parameter -Wno-unused-variable -lgcc -O0 $(EXTRA_CC_FLAGS)
+CC_FLAGS ?= -std=gnu99 -Isrc/inc -ffreestanding -Wall -Wextra -Werror -Wno-unused-parameter -Wno-unused-variable -lgcc -O0 $(EXTRA_CC_FLAGS)
 AS_FLAGS ?= $(EXTRA_AS_FLAGS)
 LD_FLAGS ?= -ffreestanding -O2 -nostdlib -lgcc $(EXTRA_LD_FLAGS)
 EMU_FLAGS ?= -cdrom $(ISO_OUTPUT) -boot d -serial stdio $(EXTRA_EMU_FLAGS)
@@ -16,7 +16,7 @@ DEBUGGER_FLAGS ?= -ex "symbol-file $(KERNEL_OUTPUT)" -ex "target remote localhos
 BUILD_DIR ?= build
 OBJ_DIR = $(BUILD_DIR)/obj
 
-KERNEL_OBJECT_NAMES = kmain screen/framebuffer screen/print mem/mem mem/heap lib/string lib/maths lib/linkedlist lib/tree log/log lib/sorted_linkedlist
+KERNEL_OBJECT_NAMES = kmain screen/framebuffer screen/print mem/mem mem/heap lib/string lib/maths lib/linkedlist lib/tree log/log lib/queue lib/sorted_linkedlist multitasking/multitasking multitasking/process
 DRIVER_OBJECT_NAMES = keyboard timer serial
 FS_OBJECT_NAMES = initrd fs devfs
 

@@ -116,10 +116,11 @@ tss_flush:
     ltr %ax
     ret
 
-
 .section .bss
 .align 16
 
+.global kernel_stack
+.global kernel_stack_end
 kernel_stack:
     .fill 16384
 kernel_stack_end:

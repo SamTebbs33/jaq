@@ -51,7 +51,7 @@ int modifier = 0;
 char key_buff[KEYBOARD_BUFF_SIZE];
 uint32_t key_buff_pos = 0;
 
-void on_key(arch_registers_t* registers) {
+void on_key(arch_cpu_state_t* registers) {
     uint8_t scan_code = arch_inb(KEYBOARD_PORT);
     char ascii = keymap[scan_code][modifier];
     switch (ascii) {
@@ -68,6 +68,7 @@ void on_key(arch_registers_t* registers) {
         default:
             if(ascii >= ' ' && ascii <= '~' && key_buff_pos < KEYBOARD_BUFF_SIZE) key_buff[key_buff_pos++] = ascii;
     }
+    arch_acknowledge_irq(ARCH_INTERRUPT_KEYBOARD);
 }
 
 bool is_digit(char ch) {
