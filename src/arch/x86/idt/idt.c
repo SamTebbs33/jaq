@@ -82,7 +82,7 @@ void arch_save_state(arch_cpu_state_t* state, arch_cpu_state_t* old_state) {
     state->esp = old_state->esp;
     state->gs = old_state->gs;
     state->ss = old_state->ss;
-    state->useresp = state->useresp;
+    state->useresp = old_state->useresp;
 }
 
 void idt_set_gate(uint8_t num, uint32_t base, uint16_t sel, uint8_t flags) {
