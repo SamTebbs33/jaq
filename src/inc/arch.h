@@ -55,4 +55,6 @@ void arch_switch_task(arch_cpu_state_t* current, arch_cpu_state_t* next);
 
 void arch_acknowledge_irq(int32_t irq);
 
+void arch_init_process_state(process_t* process, void (*entry_function)(void), void (*exit_function)(void));
+
 #endif //JAQ_ARCH_H
