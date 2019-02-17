@@ -7,16 +7,58 @@
 
 #include <stdinc.h>
 
-#define GDT_NUM_ENTRIES 6
+#define GDT_NUM_ENTRIES 4
+
+#define GDT_TYPE_TSS 0
+#define GDT_TYPE_CODE 1
+#define GDT_TYPE_DATA 1
+
+#define GDT_LEVEL_KERNEL 0
+#define GDT_LEVEL_USER 3
+
+#define GDT_CODE_READABLE 1
+#define GDT_CODE_NOT_READABLE 0
+#define GDT_DATA_WRITABLE 1
+#define GDT_DATA_NOT_WRITABLE 0
+#define GDT_TSS_READWRITE 0
+#define GDT_TSS_DIRCONF 0
+
+#define GDT_CONF_ANY_LEVEL 1
+#define GDT_CONF_THIS_LEVEL 0
+
+#define GDT_DIR_UP 0
+#define GDT_DIR_DOWN 1
+
+#define GDT_SIZE_32BIT 1
+#define GDT_SIZE_16BIT 0
+
+#define GDT_GRANULARITY_BYTE 0
+#define GDT_GRANULARITY_4KB 1
+
+#define GDT_TSS_SEGMENT 0x20
+#define GDT_CODE_SEGMENT 0x10
+#define GDT_DATA_SEGMENT 0x18
+#define GDT_CODE_SEGMENT_KERNEL (GDT_CODE_SEGMENT | GDT_LEVEL_KERNEL)
+#define GDT_CODE_SEMGENT_USER (GDT_CODE_SEGMENT | GDT_LEVEL_USER)
+#define GDT_DATA_SEMGENT_KERNEL (GDT_DATA_SEGMENT | GDT_LEVEL_KERNEL)
+#define GDT_DATA_SEMGENT_USER (GDT_DATA_SEGMENT | GDT_LEVEL_USER)
 
 struct gdt_entry
 {
-    uint16_t limit_low;           // The lower 16 bits of the limit.
-    uint16_t base_low;            // The lower 16 bits of the base.
-    uint8_t  base_middle;         // The next 8 bits of the base.
-    uint8_t  access;              // Access flags, determine what ring this segment can be used in.
-    uint8_t  granularity;
-    uint8_t  base_high;           // The last 8 bits of the base.
+    uint16_t limit_low;
+    uint32_t base_low : 24;
+    uint8_t accessed : 1;
+    uint8_t read_write : 1;
+    uint8_t dir_conf : 1;
+    uint8_t code : 1;
+    uint8_t type : 1;
+    uint8_t level : 2;
+    uint8_t present : 1;
+    uint8_t limit_high : 4;
+    uint8_t always_0 : 2;
+    uint8_t size : 1;
+    uint8_t granularity : 1;
+    uint8_t base_high;
 } __attribute__((packed));
 typedef struct gdt_entry gdt_entry_t;
 
@@ -89,13 +131,7 @@ void gdt_init(uint32_t kernel_stack_vaddr, uint16_t segment_selector);
  * @param access The access flag. See spec for details
  * @param granularity The granularity flag. See spec for details
  */
-void gdt_set_entry(uint32_t idx, uint32_t base, uint32_t limit, uint8_t access, uint8_t granularity);
-
-/**
- * Set the flags of the corresponding GDT but tailored for a TSS entry
- * @param idx The index into the GDT
- * @param tss_vaddr The virtual address that the entry applies to
- */
-void gdt_set_tss_entry(uint32_t idx, uint32_t tss_vaddr);
+void gdt_set_entry(uint32_t idx, uint32_t base, uint32_t limit, uint8_t read_write, uint8_t dir_conf, uint8_t code,
+                   uint8_t type, uint8_t level, uint8_t size, uint8_t granularity, uint8_t present, uint8_t accessed);
 
 #endif //JAQ_GDT_H
