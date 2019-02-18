@@ -10,6 +10,10 @@ void arch_init_process_state(process_t* process, void (*entry_function)(void), v
     uint32_t* process_kernel_stack = (uint32_t*)process->kernel_stack;
     memset(state, 0, sizeof(arch_cpu_state_t));
 
+    if (process->level == USER) {
+        state->useresp = (uint32_t)process->user_stack;
+    }
+
     state->ebp = (uint32_t)process_kernel_stack;
     state->esp = (uint32_t)process_kernel_stack + process->kernel_stack_size - 4*5;
     process_kernel_stack[process->kernel_stack_size/4 - 5] = state->edi;
