@@ -58,12 +58,12 @@ void multitasking_init(void* kernel_stack, uint32_t kernel_stack_size) {
     terminated_queue = queue_create();
 
     // Create the init process
-    init_process = current_process = process_create("init", kmalloc(sizeof(arch_cpu_state_t)), kernel_stack, kernel_stack_size, KERNEL);
+    init_process = current_process = process_create("init", kmalloc(sizeof(arch_cpu_state_t)), kernel_stack, kernel_stack_size, NULL, 0, KERNEL);
     // The init process just carries on from when it was created so we don't set an entry point
     multitasking_init_process_state(current_process, 0);
 
     // Create the cleaner process
-    cleaner_process = process_create("cleaner", kmalloc(sizeof(arch_cpu_state_t)), kmalloc(1024), 1024, KERNEL);
+    cleaner_process = process_create("cleaner", kmalloc(sizeof(arch_cpu_state_t)), kmalloc(1024), 1024, kmalloc(1024), 1024, USER);
     multitasking_init_process_state(cleaner_process, cleaner);
     multitasking_schedule(cleaner_process);
 
@@ -113,7 +113,14 @@ void switch_to_next() {
         next_process->state = RUNNING;
         process_t *tmp = current_process;
         current_process = next_process;
-        arch_switch_task(tmp->cpu_state, current_process->cpu_state);
+        if(next_process->level == KERNEL) {
+		log_debug("Switching to kernel task\n");
+		arch_switch_task(tmp->cpu_state, current_process->cpu_state);
+	}
+        else {
+		log_debug("Switching to user task\n");
+		arch_switch_user_task(tmp->cpu_state, current_process->cpu_state);
+	}
     }
 }
 
