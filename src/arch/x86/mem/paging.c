@@ -203,7 +203,7 @@ void paging_map_4mb_page(page_directory_t* dir, uint32_t page, uint32_t phys_add
     dir_entry->four_megabyte_pages = 1;
     dir_entry->available = 0;
     dir_entry->present = 1;
-    dir_entry->user_level = 0;
+    dir_entry->user_level = 1;
     dir_entry->writable = 1;
     dir_entry->write_through = 1;
     ASSERT_PAGE_ALIGNED("table physical alignment", phys_addr);

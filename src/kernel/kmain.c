@@ -36,7 +36,7 @@ void kmain(multiboot_info_t* mb_info, uint32_t mb_magic) {
     uint32_t initrd_virtual_end = PHYSICAL_TO_VIRTUAL(initrd_end);
 
     log_info("Initialising arch (" ARCH ")\n");
-    arch_init(total_mem, mb_info, (uint32_t) &KERNEL_VADDR_START, (uint32_t) &KERNEL_VADDR_END, (uint32_t) &KERNEL_PHYSADDR_START, (uint32_t) &KERNEL_PHYSADDR_END, initrd_end);
+    arch_init(total_mem, mb_info, kernel_stack, kernel_stack_size, (uint32_t) &KERNEL_VADDR_START, (uint32_t) &KERNEL_VADDR_END, (uint32_t) &KERNEL_PHYSADDR_START, (uint32_t) &KERNEL_PHYSADDR_END, initrd_end);
 
     log_info("Initialising filesytem\n");
     fs_init();
@@ -46,7 +46,7 @@ void kmain(multiboot_info_t* mb_info, uint32_t mb_magic) {
 
     log_info("Initialising devices\n");
     keyboard_init();
-    timer_init(TIMER_FREQUENCY);
+    //timer_init(TIMER_FREQUENCY);
 
     log_info("Initialising multitasking\n");
     multitasking_init((void *) &kernel_stack, kernel_stack_size);
@@ -55,6 +55,8 @@ void kmain(multiboot_info_t* mb_info, uint32_t mb_magic) {
 
     uint32_t fake_total_ram = total_mem - (total_mem % 1024) + 1024;
     printf("JaqOS on " ARCH ", %d MB available\n> ", fake_total_ram / 1024);
+
+    multitasking_yield();
 
     // Runs forever to make sure interrupts are handled
     while (true);

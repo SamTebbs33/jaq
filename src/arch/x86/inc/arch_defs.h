@@ -25,6 +25,7 @@ typedef struct arch_cpu_state arch_cpu_state_t;
  * An x86 interrupt handler
  */
 typedef void (*arch_interrupt_handler_t) (arch_cpu_state_t*);
+typedef arch_interrupt_handler_t arch_syscall_handler_t;
 
 #define ARCH_INTERRUPT_TIMER 32
 #define ARCH_INTERRUPT_KEYBOARD 33

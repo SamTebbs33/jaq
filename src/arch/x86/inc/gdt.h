@@ -121,7 +121,7 @@ typedef struct tss_entry tss_t;
  * @param kernel_stack_vaddr The virtual address of the kernel stack. Gets inserted into the TSS
  * @param segment_selector The kernel segment selector. Gets inserted into the TSS
  */
-void gdt_init(uint32_t kernel_stack_vaddr, uint16_t segment_selector);
+void gdt_init(uint32_t kernel_stack_vaddr, uint32_t kernel_stack_size, uint16_t segment_selector);
 
 /**
  * Set the flags of the corresponding GDT entry

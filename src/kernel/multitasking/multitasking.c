@@ -19,6 +19,7 @@ uint32_t tick_counter = 0;
 uint32_t milliseconds_counter = 0;
 
 process_t* init_process = NULL, * cleaner_process = NULL;
+extern void (*arch_user_test)(void);
 
 void on_tick(arch_cpu_state_t* regs) {
     tick_counter++;
@@ -35,6 +36,7 @@ int compare_sleeping_processes(void* p1, void* p2) {
 }
 
 void cleaner() {
+    ARCH_SYSCALL(0x1);
     while (true) {
         if(queue_size(terminated_queue) > 0) {
             process_t* proc = queue_dequeue(terminated_queue);
@@ -49,6 +51,10 @@ void multitasking_exit_process() {
     current_process->state = TERMINATED;
     queue_enqueue(terminated_queue, current_process);
     multitasking_yield();
+}
+
+void test_handler(arch_cpu_state_t* state) {
+    log_debug("test syscall\n");
 }
 
 void multitasking_init(void* kernel_stack, uint32_t kernel_stack_size) {
@@ -67,7 +73,9 @@ void multitasking_init(void* kernel_stack, uint32_t kernel_stack_size) {
     multitasking_init_process_state(cleaner_process, cleaner);
     multitasking_schedule(cleaner_process);
 
-    arch_register_interrupt_handler(ARCH_INTERRUPT_TIMER, on_tick);
+    arch_register_syscall(0x1, test_handler);
+
+    //arch_register_interrupt_handler(ARCH_INTERRUPT_TIMER, on_tick);
 }
 
 void multitasking_init_process_state(process_t *process, void (*entry_function)(void)) {
