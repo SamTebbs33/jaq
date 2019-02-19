@@ -20,7 +20,7 @@
  * @param phys_end The physical end of the kernel code in memory
  * @param initrd_phys_end The physical address of the end of the initrd
  */
-void arch_init(uint32_t total_mem, multiboot_info_t* mb_info, uint32_t virtual_start, uint32_t virtual_end, uint32_t phys_start, uint32_t phys_end, uint32_t initrd_phys_end);
+void arch_init(uint32_t total_mem, multiboot_info_t* mb_info, void* kernel_stack, uint32_t kernel_stack_size, uint32_t virtual_start, uint32_t virtual_end, uint32_t phys_start, uint32_t phys_end, uint32_t initrd_phys_end);
 
 /**
  * Arch-specific implementation of outputting a byte over a port
@@ -58,5 +58,7 @@ void arch_switch_user_task(arch_cpu_state_t* current, arch_cpu_state_t* next);
 void arch_acknowledge_irq(int32_t irq);
 
 void arch_init_process_state(process_t* process, void (*entry_function)(void), void (*exit_function)(void));
+
+void arch_register_syscall(uint32_t syscall, arch_syscall_handler_t handler);
 
 #endif //JAQ_ARCH_H

@@ -90,7 +90,7 @@ void idt_set_gate(uint8_t num, uint32_t base, uint16_t sel, uint8_t flags) {
     idt[num].base_high =	(base >> 16) & 0xFFFF;
     idt[num].sel =			sel;
     idt[num].zero =			0;
-    idt[num].flags =		flags | 0x60;
+    idt[num].flags =		flags;
 }
 
 void idt_register_isr_handler(int isr, arch_interrupt_handler_t handler) {
@@ -196,7 +196,7 @@ void idt_init() {
     idt_set_gate(29, (uint32_t)isr29, 0x08, 0x8E);
     idt_set_gate(30, (uint32_t)isr30, 0x08, 0x8E);
     idt_set_gate(31, (uint32_t)isr31, 0x08, 0x8E);
-    idt_set_gate(128, (uint32_t)isr128, 0x08, 0x8E);
+    idt_set_gate(128, (uint32_t)isr128, 0x08, 0xEE);
 
     idt_remap_pic();
     // Make IDT point to basic ISR handlers

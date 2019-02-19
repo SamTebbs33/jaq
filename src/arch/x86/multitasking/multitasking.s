@@ -54,7 +54,7 @@ arch_switch_user_task:
     mov %esp, 28(%edi)
     # Restore the stack pointer from the next proc's state from arch_cpu_state_t.esp
     mov 28(%esi), %esp
-	mov %esp, (tss + 4)
+    mov %esp, (tss + 4)
 	# Save next_proc.useresp
 	mov 68(%esi), %ebx
 	mov %ebx, (useresp)
@@ -79,7 +79,7 @@ arch_switch_user_task:
 	# User stack pointer
 	pushl (useresp)
 	# EFLAGS with interrupts re-enabled
-	pushf
+	pushfl
 	orl $0x200, (%esp)
 	# User code segment
 	pushl $0x1B

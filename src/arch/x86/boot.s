@@ -111,7 +111,7 @@ idt_flush:
 
 .global tss_flush
 tss_flush:
-    mov $KERNEL_TSS_SEGMENT, %ax
+    mov $0x28, %ax
     ltr %ax
     ret
 
