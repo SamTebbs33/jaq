@@ -75,7 +75,7 @@ void multitasking_init(void* kernel_stack, uint32_t kernel_stack_size) {
 
     arch_register_syscall(0x1, test_handler);
 
-    //arch_register_interrupt_handler(ARCH_INTERRUPT_TIMER, on_tick);
+    arch_register_interrupt_handler(ARCH_INTERRUPT_TIMER, on_tick);
 }
 
 void multitasking_init_process_state(process_t *process, void (*entry_function)(void)) {
