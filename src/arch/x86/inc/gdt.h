@@ -55,7 +55,8 @@ struct gdt_entry
     uint8_t level : 2;
     uint8_t present : 1;
     uint8_t limit_high : 4;
-    uint8_t always_0 : 2;
+    uint8_t available : 1;
+    uint8_t always_0 : 1;
     uint8_t size : 1;
     uint8_t granularity : 1;
     uint8_t base_high;
@@ -132,6 +133,6 @@ void gdt_init(uint32_t kernel_stack_vaddr, uint32_t kernel_stack_size, uint16_t 
  * @param granularity The granularity flag. See spec for details
  */
 void gdt_set_entry(uint32_t idx, uint32_t base, uint32_t limit, uint8_t read_write, uint8_t dir_conf, uint8_t code,
-                   uint8_t type, uint8_t level, uint8_t size, uint8_t granularity, uint8_t present, uint8_t accessed);
+                   uint8_t type, uint8_t level, uint8_t size, uint8_t granularity, uint8_t present, uint8_t accessed, uint8_t available);
 
 #endif //JAQ_GDT_H
