@@ -11,7 +11,7 @@ void arch_init_process_state(process_t* process, void (*entry_function)(void), v
     memset(state, 0, sizeof(arch_cpu_state_t));
 
     if (process->level == USER) {
-        state->useresp = (uint32_t)process->user_stack;
+        state->useresp = (uint32_t)process->user_stack + process->user_stack_size;
     }
 
     state->ebp = (uint32_t)process_kernel_stack;
