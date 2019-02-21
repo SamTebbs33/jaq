@@ -53,10 +53,6 @@ void multitasking_exit_process() {
     multitasking_yield();
 }
 
-void test_handler(arch_cpu_state_t* state) {
-    log_debug("test syscall\n");
-}
-
 void multitasking_init(void* kernel_stack, uint32_t kernel_stack_size) {
     process_queue = queue_create();
     sleeping_processes = linkedlist_create();
@@ -72,8 +68,6 @@ void multitasking_init(void* kernel_stack, uint32_t kernel_stack_size) {
     cleaner_process = process_create("cleaner", kmalloc(sizeof(arch_cpu_state_t)), kmalloc(1024), 1024, kmalloc(1024), 1024, USER);
     multitasking_init_process_state(cleaner_process, cleaner);
     multitasking_schedule(cleaner_process);
-
-    arch_register_syscall(0x1, test_handler);
 
     arch_register_interrupt_handler(ARCH_INTERRUPT_TIMER, on_tick);
 }
