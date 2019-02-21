@@ -65,24 +65,19 @@ typedef struct gdt_entry gdt_entry_t;
 
 struct gdt_pointer
 {
-    uint16_t limit;               // The upper 16 bits of all selector limits.
-    uint32_t base;                // The address of the first gdt_entry_t struct.
+    uint16_t limit;
+    uint32_t base;
 } __attribute__((packed));
 typedef struct gdt_pointer gdt_pointer_t;
 
 struct tss_entry {
-    uint16_t prev_task_link;
-    uint16_t reserved;
+    uint32_t prev_tss;
     uint32_t esp0;
-    uint16_t ss0;
-    uint16_t reserved0;
+    uint32_t ss0;
     uint32_t esp1;
-    uint16_t ss1;
-    uint16_t reserved1;
+    uint32_t ss1;
     uint32_t esp2;
-    uint16_t ss2;
-    uint16_t reserved2;
-
+    uint32_t ss2;
     uint32_t cr3;
     uint32_t eip;
     uint32_t eflags;
@@ -94,26 +89,15 @@ struct tss_entry {
     uint32_t ebp;
     uint32_t esi;
     uint32_t edi;
-
-    uint16_t es;
-    uint16_t reserved3;
-    uint16_t cs;
-    uint16_t reserved4;
-    uint16_t ss;
-    uint16_t reserved5;
-    uint16_t ds;
-    uint16_t reserved6;
-    uint16_t fs;
-    uint16_t reserved7;
-    uint16_t gs;
-    uint16_t reserved8;
-
-    uint16_t ldt_ss;
-    uint16_t reserved9;
-
-    uint16_t debug_and_reserved; /* The lowest bit is for debug */
-    uint16_t io_map_base;
-
+    uint32_t es;
+    uint32_t cs;
+    uint32_t ss;
+    uint32_t ds;
+    uint32_t fs;
+    uint32_t gs;
+    uint32_t ldt;
+    uint16_t trap;
+    uint16_t iomap_base;
 } __attribute__((packed));
 typedef struct tss_entry tss_t;
 
