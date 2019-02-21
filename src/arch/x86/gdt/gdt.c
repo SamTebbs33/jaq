@@ -28,7 +28,7 @@ void gdt_init(uint32_t kernel_stack_vaddr, uint32_t kernel_stack_size, uint16_t 
     // User data segment
     gdt_set_entry(4, 0, 0xFFFFFFFF, GDT_DATA_WRITABLE, GDT_DIR_UP, 0, GDT_TYPE_DATA, GDT_LEVEL_USER, GDT_SIZE_32BIT, GDT_GRANULARITY_4KB, 1, 0, 1);
     // TSS
-    gdt_set_entry(5, (uint32_t)&tss, (uint32_t)&tss + sizeof(tss), GDT_TSS_READWRITE, GDT_TSS_DIRCONF, 1, GDT_TYPE_TSS, GDT_LEVEL_USER, GDT_SIZE_16BIT, GDT_GRANULARITY_BYTE, 1, 1, 0);
+    gdt_set_entry(5, (uint32_t)&tss, (uint32_t)&tss + sizeof(tss), GDT_TSS_READWRITE, GDT_TSS_DIRCONF, 1, GDT_TYPE_TSS, GDT_LEVEL_KERNEL, GDT_SIZE_16BIT, GDT_GRANULARITY_BYTE, 1, 1, 0);
 
     // Set the TSS to initially point to kernel stack and segment
     memset(&tss, 0, sizeof(tss));
