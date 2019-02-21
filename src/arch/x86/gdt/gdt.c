@@ -46,7 +46,7 @@ void gdt_set_entry(uint32_t idx, uint32_t base, uint32_t limit, uint8_t read_wri
                    uint8_t type, uint8_t level, uint8_t size, uint8_t granularity, uint8_t present, uint8_t accessed, uint8_t available) {
     gdt_entry_t* entry = &gdt[idx];
     entry->limit_low = (uint16_t) (limit & 0xFFFF);
-    entry->base_low = base & 0xFFFF;
+    entry->base_low = base & 0xFFFFFF;
     entry->accessed = accessed;
     entry->read_write = read_write;
     entry->dir_conf = dir_conf;
@@ -58,6 +58,6 @@ void gdt_set_entry(uint32_t idx, uint32_t base, uint32_t limit, uint8_t read_wri
     entry->always_0 = 0;
     entry->size = size;
     entry->granularity = granularity;
-    entry->base_high = (base >> 24) & 0xFFFF;
+    entry->base_high = (base >> 24) & 0xFF;
 }
 
