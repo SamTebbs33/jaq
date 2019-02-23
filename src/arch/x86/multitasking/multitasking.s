@@ -2,6 +2,20 @@
 useresp:
     .long 0
 
+.global arch_restore_cpu_state
+arch_restore_cpu_state:
+    # Get the state to restore
+    pop %eax
+    # Restore the general purpose registers
+    mov 20(%eax), %edi
+    mov 24(%eax), %esi
+    mov 28(%eax), %ebp
+    mov 36(%eax), %ebx
+    mov 40(%eax), %edx
+    mov 44(%eax), %ecx
+    mov 48(%eax), %eax
+    ret
+
 # void arch_switch_to_kernel_task(arch_cpu_state_t* current, arch_cpu_state_t* next)
 .global arch_switch_to_kernel_task
 arch_switch_to_kernel_task:
@@ -50,30 +64,29 @@ arch_switch_to_user_task:
     mov 20(%esp), %edi
     # Get the next proc's state
     mov 24(%esp), %esi
+    # Get the next proc's user state
+    mov 28(%esp), %edx
     # Changes to arch_cpu_state_t may require adjustments to the offset here
     # Save the stack pointer into the current proc's state at arch_cpu_state_t.esp
     mov %esp, 28(%edi)
     # Restore the stack pointer from the next proc's state from arch_cpu_state_t.esp
     mov 28(%esi), %esp
+    # From now on we are using the next proc's kernel stack
     mov %esp, (tss + 4)
     # Save next_proc.useresp
     mov 68(%esi), %ebx
     mov %ebx, (useresp)
-    # From now on we are using the next proc's stack
 
-    # Push user data segment
+    # Set user data segment
     mov $0x23, %ebx
     mov %ebx, %ds
     mov %ebx, %es
     mov %ebx, %fs
     mov %ebx, %gs
 
-    # Pop off saved values from next proc's stack
-    # The other general purpose registers are popped by the C calling convention
-    pop %edi
-    pop %ebp
-    pop %esi
-    pop %ebx
+    # Restore user cpu state, we shouldn't touch any registers after this
+    push %edx
+    call arch_restore_cpu_state
 
     # User data segment
     pushl $0x23
