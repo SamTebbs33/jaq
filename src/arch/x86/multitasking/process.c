@@ -5,6 +5,10 @@
 #include <multitasking/process.h>
 #include <lib/util.h>
 
+void arch_copy_cpu_state(arch_cpu_state_t* dest, arch_cpu_state_t* src) {
+    memcpy(dest, src, sizeof(arch_cpu_state_t));
+}
+
 void arch_init_process_state(process_t* process, void (*entry_function)(void), void (*exit_function)(void)) {
     arch_cpu_state_t* kernel_state = process->kernel_state;
     arch_cpu_state_t* user_state = process->user_state;
