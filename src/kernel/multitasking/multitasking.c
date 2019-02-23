@@ -89,7 +89,6 @@ int compare_sleeping_processes(void* p1, void* p2) {
 }
 
 void cleaner() {
-    ARCH_SYSCALL(0x1);
     while (true) {
         if(queue_size(terminated_queue) > 0) {
             process_t* proc = queue_dequeue(terminated_queue);
