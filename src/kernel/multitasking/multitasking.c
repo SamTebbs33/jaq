@@ -11,6 +11,7 @@
 #include <mem/mem.h>
 #include <log/log.h>
 #include <lib/sorted_linkedlist.h>
+#include <syscalls.h>
 
 queue_t* process_queue = NULL, * unblocked_queue = NULL, * terminated_queue = NULL;
 linkedlist_t* sleeping_processes = NULL;
@@ -71,6 +72,11 @@ void switch_to_next(bool reschedule_current) {
     }
 }
 
+void on_exit_syscall(arch_cpu_state_t* state) {
+    if(current_process->level == USER) arch_copy_cpu_state(current_process->user_state, state);
+    multitasking_exit_process();
+}
+
 void on_tick(arch_cpu_state_t* state) {
     arch_acknowledge_irq(ARCH_INTERRUPT_TIMER);
     tick_counter++;
@@ -102,7 +108,7 @@ void cleaner() {
 void multitasking_exit_process() {
     current_process->process_state = TERMINATED;
     queue_enqueue(terminated_queue, current_process);
-    multitasking_yield();
+    switch_to_next(false);
 }
 
 void multitasking_init(void* kernel_stack, uint32_t kernel_stack_size) {
@@ -122,6 +128,7 @@ void multitasking_init(void* kernel_stack, uint32_t kernel_stack_size) {
     multitasking_schedule(cleaner_process);
 
     arch_register_interrupt_handler(ARCH_INTERRUPT_TIMER, on_tick);
+    arch_register_syscall(SYSCALL_PROC_EXIT, on_exit_syscall);
 }
 
 void multitasking_init_process_state(process_t *process, void (*entry_function)(void)) {
