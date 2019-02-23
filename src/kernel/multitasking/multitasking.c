@@ -133,9 +133,8 @@ void multitasking_schedule(process_t *process) {
 }
 
 void multitasking_yield() {
-    multitasking_schedule(current_process);
-    current_process->process_state = READY;
-    switch_to_next();
+    if (current_process->level == KERNEL) arch_save_cpu_state(current_process->kernel_state);
+    switch_to_next(true);
 }
 
 void multitasking_sleep(uint32_t milliseconds) {
