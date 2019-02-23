@@ -87,8 +87,8 @@ arch_switch_to_user_task:
     mov 28(%esi), %esp
     # From now on we are using the next proc's kernel stack
     mov %esp, (tss + 4)
-    # Save next_proc.useresp
-    mov 68(%esi), %ebx
+    # Save user.esp
+    mov 28(%edx), %ebx
     mov %ebx, (useresp)
 
     # Set user data segment
