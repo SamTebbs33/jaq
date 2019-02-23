@@ -21,10 +21,13 @@ uint32_t milliseconds_counter = 0;
 process_t* init_process = NULL, * cleaner_process = NULL;
 extern void (*arch_user_test)(void);
 
-void on_tick(arch_cpu_state_t* regs) {
+void on_tick(arch_cpu_state_t* state) {
     tick_counter++;
     arch_acknowledge_irq(ARCH_INTERRUPT_TIMER);
     if(tick_counter >= MULTITASKING_TICKS_PER_SLICE) {
+        // Copy the interrupted state into the appropriate process state
+        if (current_process->level == USER) arch_copy_cpu_state(current_process->user_state, state);
+        else arch_copy_cpu_state(current_process->kernel_state, state);
         multitasking_yield();
         tick_counter = 0;
     }
