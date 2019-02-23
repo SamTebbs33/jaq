@@ -17,6 +17,27 @@ arch_restore_cpu_state:
     mov 48(%eax), %eax
     ret
 
+# void arch_save_cpu_state(arch_cpu_state_t* state)
+.global arch_save_cpu_state
+arch_save_cpu_state:
+    push %ecx
+    # Get state to save into
+    mov 4(%esp), %ecx
+    # Save general purpose registers
+    mov %eax, 48(%ecx)
+    mov %edx, 40(%ecx)
+    mov %ebx, 36(%ecx)
+    mov %ebp, 28(%ecx)
+    mov %esi, 24(%ecx)
+    mov %edi, 20(%ecx)
+    # Pop off ecx into state
+    pop 44(%ecx)
+    # Save stack pointer
+    mov %esp, 32(%ecx)
+    # Clear argument
+    add %esp, 4
+    ret
+
 # void arch_switch_to_kernel_task(arch_cpu_state_t* current, arch_cpu_state_t* next)
 .global arch_switch_to_kernel_task
 arch_switch_to_kernel_task:
