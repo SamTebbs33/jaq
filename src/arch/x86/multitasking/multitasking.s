@@ -2,9 +2,9 @@
 useresp:
     .long 0
 
-# void arch_switch_task(arch_cpu_state_t* current, arch_cpu_state_t* next)
-.global arch_switch_task
-arch_switch_task:
+# void arch_switch_to_kernel_task(arch_cpu_state_t* current, arch_cpu_state_t* next)
+.global arch_switch_to_kernel_task
+arch_switch_to_kernel_task:
     # Disable interrupts to avoid being interrupted mid-switch
     cli
     # Push current values so that they are popped off when we switch back to the current task
@@ -35,8 +35,9 @@ arch_switch_task:
     # Return to return address stored at start of next proc's stack
     ret
 
-.global arch_switch_user_task
-arch_switch_user_task:
+# void arch_switch_to_user_task(arch_cpu_state_t* current, arch_cpu_state_t* next, arch_cpu_state_t* next_user)
+.global arch_switch_to_user_task
+arch_switch_to_user_task:
     # Disable interrupts to avoid being interrupted mid-switch
     cli
     # Push current values so that they are popped off when we switch back to the current task

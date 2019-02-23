@@ -51,9 +51,9 @@ void arch_register_interrupt_handler(int interrupt, arch_interrupt_handler_t han
  */
 void arch_set_page_directory(page_directory_t* page_dir);
 
-void arch_switch_task(arch_cpu_state_t* current, arch_cpu_state_t* next);
+void arch_switch_to_kernel_task(arch_cpu_state_t* current, arch_cpu_state_t* next);
 
-void arch_switch_user_task(arch_cpu_state_t* current, arch_cpu_state_t* next);
+void arch_switch_to_user_task(arch_cpu_state_t* current, arch_cpu_state_t* next, arch_cpu_state_t* user_state);
 
 void arch_acknowledge_irq(int32_t irq);
 
