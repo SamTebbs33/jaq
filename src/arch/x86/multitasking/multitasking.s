@@ -2,6 +2,7 @@
 useresp:
     .long 0
 
+# void arch_restore_cpu_state(arch_cpu_state_t* state)
 .global arch_restore_cpu_state
 arch_restore_cpu_state:
     # Get the state to restore
