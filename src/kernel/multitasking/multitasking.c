@@ -72,16 +72,16 @@ void switch_to_next(bool reschedule_current) {
 }
 
 void on_tick(arch_cpu_state_t* state) {
-    tick_counter++;
     arch_acknowledge_irq(ARCH_INTERRUPT_TIMER);
+    tick_counter++;
+    milliseconds_counter += MULTITASKING_TICK_TIME;
     if(tick_counter >= MULTITASKING_TICKS_PER_SLICE) {
         // Copy the interrupted state into the appropriate process state
         if (current_process->level == USER) arch_copy_cpu_state(current_process->user_state, state);
         else arch_copy_cpu_state(current_process->kernel_state, state);
-        multitasking_yield();
         tick_counter = 0;
+        switch_to_next(true);
     }
-    milliseconds_counter += MULTITASKING_TICK_TIME;
 }
 
 int compare_sleeping_processes(void* p1, void* p2) {
@@ -147,14 +147,14 @@ void multitasking_sleep(uint32_t milliseconds) {
         sorted_linkedlist_add(sleeping_processes, sp, compare_sleeping_processes);
         // Setting it to sleeping state will get it cut from the process queue if it's ever at the front
         current_process->process_state = SLEEPING;
-        switch_to_next();
+        switch_to_next(false);
     }
 }
 
 void multitasking_block(process_t *process) {
     process->process_state = BLOCKED;
     if(process->process_state == RUNNING || current_process == process) {
-        switch_to_next();
+        switch_to_next(false);
     }
 }
 
