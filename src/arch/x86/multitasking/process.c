@@ -14,9 +14,9 @@ void arch_init_process_state(process_t* process, void (*entry_function)(void), v
     arch_cpu_state_t* user_state = process->user_state;
     uint32_t* process_kernel_stack = (uint32_t*)process->kernel_stack;
     memset(kernel_state, 0, sizeof(arch_cpu_state_t));
-    memset(user_state, 0, sizeof(arch_cpu_state_t));
 
     if (process->level == USER) {
+        memset(user_state, 0, sizeof(arch_cpu_state_t));
         kernel_state->useresp = (uint32_t)process->user_stack + process->user_stack_size - 4*5;
         user_state->esp = kernel_state->useresp;
         uint32_t* user_stack = process->user_stack;

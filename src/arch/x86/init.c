@@ -6,7 +6,7 @@
 #include <paging.h>
 #include <gdt.h>
 #include <idt.h>
-#include <syscalls.h>
+#include <syscalls/syscalls.h>
 
 extern void* kernel_stack;
 

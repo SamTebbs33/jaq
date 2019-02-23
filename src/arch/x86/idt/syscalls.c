@@ -2,7 +2,7 @@
 // Created by sam on 05/02/19.
 //
 
-#include <syscalls.h>
+#include <syscalls/syscalls.h>
 #include <idt.h>
 #include <arch_defs.h>
 #include <screen/print.h>
