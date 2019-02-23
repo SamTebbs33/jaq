@@ -17,17 +17,18 @@ typedef enum process_state {
 
 typedef struct process {
     char* name;
-    arch_cpu_state_t* cpu_state;
+    arch_cpu_state_t* kernel_state;
+    arch_cpu_state_t* user_state;
     page_directory_t* page_directory;
     void* kernel_stack;
     uint32_t kernel_stack_size;
-	void* user_stack;
-	uint32_t user_stack_size;
+    void* user_stack;
+    uint32_t user_stack_size;
     process_level_t level;
-    process_state_t state;
+    process_state_t process_state;
 } process_t;
 
-process_t *process_create(char *name, arch_cpu_state_t *cpu_state, void *kernel_stack,
+process_t *process_create(char *name, arch_cpu_state_t *kernel_state, arch_cpu_state_t* user_state, void *kernel_stack,
                           uint32_t kernel_stack_size, void* user_stack, uint32_t user_stack_size, process_level_t level);
 
 void process_free(process_t* process);
