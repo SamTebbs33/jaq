@@ -6,7 +6,7 @@ useresp:
 .global arch_restore_cpu_state
 arch_restore_cpu_state:
     # Get the state to restore
-    pop %eax
+    mov 4(%esp), %eax
     # Restore the general purpose registers
     mov 20(%eax), %edi
     mov 24(%eax), %esi
@@ -22,7 +22,7 @@ arch_restore_cpu_state:
 arch_save_cpu_state:
     push %ecx
     # Get state to save into
-    mov 4(%esp), %ecx
+    mov 8(%esp), %ecx
     # Save general purpose registers
     mov %eax, 48(%ecx)
     mov %edx, 40(%ecx)
@@ -35,7 +35,6 @@ arch_save_cpu_state:
     # Save stack pointer
     mov %esp, 32(%ecx)
     # Clear argument
-    add %esp, 4
     ret
 
 # void arch_switch_to_kernel_task(arch_cpu_state_t* current, arch_cpu_state_t* next)
@@ -43,16 +42,10 @@ arch_save_cpu_state:
 arch_switch_to_kernel_task:
     # Disable interrupts to avoid being interrupted mid-switch
     cli
-    # Push current values so that they are popped off when we switch back to the current task
-    # The other general purpose registers are pushed by the C calling convention
-    push %ebx
-    push %esi
-    push %ebp
-    push %edi
     # Get the current proc's state
-    mov 20(%esp), %edi
+    mov 4(%esp), %edi
     # Get the next proc's state
-    mov 24(%esp), %esi
+    mov 8(%esp), %esi
     # Changes to arch_cpu_state_t may require adjustments to the offset here
     # Save the stack pointer into the current proc's state at arch_cpu_state_t.esp
     mov %esp, 28(%edi)
@@ -63,6 +56,7 @@ arch_switch_to_kernel_task:
     # Restore kernel cpu state, we shouldn't touch any registers after this
     push %esi
     call arch_restore_cpu_state
+    add $4, %esp
 
     # Re-enable interrupts
     sti
@@ -75,11 +69,11 @@ arch_switch_to_user_task:
     # Disable interrupts to avoid being interrupted mid-switch
     cli
     # Get the current proc's state
-    mov 20(%esp), %edi
+    mov 4(%esp), %edi
     # Get the next proc's state
-    mov 24(%esp), %esi
+    mov 8(%esp), %esi
     # Get the next proc's user state
-    mov 28(%esp), %edx
+    mov 12(%esp), %edx
     # Changes to arch_cpu_state_t may require adjustments to the offset here
     # Save the stack pointer into the current proc's state at arch_cpu_state_t.esp
     mov %esp, 28(%edi)
@@ -101,6 +95,7 @@ arch_switch_to_user_task:
     # Restore user cpu state, we shouldn't touch any registers after this
     push %edx
     call arch_restore_cpu_state
+    add $4, %esp
 
     # User data segment
     pushl $0x23
