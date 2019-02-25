@@ -2,11 +2,9 @@
 useresp:
     .long 0
 
-# void arch_restore_cpu_state(arch_cpu_state_t* state)
+# void arch_restore_cpu_state(arch_cpu_state_t* state) with state in eax
 .global arch_restore_cpu_state
 arch_restore_cpu_state:
-    # Get the state to restore
-    mov 4(%esp), %eax
     # Restore the general purpose registers
     mov 20(%eax), %edi
     mov 24(%eax), %esi
@@ -45,20 +43,18 @@ arch_switch_to_kernel_task:
     # Get the current proc's state
     mov 4(%esp), %edi
     # Get the next proc's state
-    mov 8(%esp), %esi
+    mov 8(%esp), %eax
     # Push the current proc's eip as it is popped by ret later on
     push 56(%edi)
     # Changes to arch_cpu_state_t may require adjustments to the offset here
     # Save the stack pointer into the current proc's state at arch_cpu_state_t.esp
     mov %esp, 28(%edi)
     # Restore the stack pointer from the next proc's state from arch_cpu_state_t.esp
-    mov 28(%esi), %esp
+    mov 28(%eax), %esp
     # From now on we are using the next proc's stack
 
     # Restore kernel cpu state, we shouldn't touch any registers after this
-    push %esi
     call arch_restore_cpu_state
-    add $4, %esp
 
     # Re-enable interrupts
     sti
@@ -75,7 +71,7 @@ arch_switch_to_user_task:
     # Get the next proc's state
     mov 8(%esp), %esi
     # Get the next proc's user state
-    mov 12(%esp), %edx
+    mov 12(%esp), %eax
     # Changes to arch_cpu_state_t may require adjustments to the offset here
     # Save the stack pointer into the current proc's state at arch_cpu_state_t.esp
     mov %esp, 28(%edi)
@@ -84,7 +80,7 @@ arch_switch_to_user_task:
     # From now on we are using the next proc's kernel stack
     mov %esp, (tss + 4)
     # Save user.esp
-    mov 28(%edx), %ebx
+    mov 28(%eax), %ebx
     mov %ebx, (useresp)
 
     # Set user data segment
@@ -95,9 +91,7 @@ arch_switch_to_user_task:
     mov %ebx, %gs
 
     # Restore user cpu state, we shouldn't touch any registers after this
-    push %edx
     call arch_restore_cpu_state
-    add $4, %esp
 
     # User data segment
     pushl $0x23
