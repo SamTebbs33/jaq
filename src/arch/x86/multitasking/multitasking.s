@@ -6,13 +6,13 @@ useresp:
 .global arch_restore_cpu_state
 arch_restore_cpu_state:
     # Restore the general purpose registers
-    mov 20(%eax), %edi
-    mov 24(%eax), %esi
-    mov 28(%eax), %ebp
-    mov 36(%eax), %ebx
-    mov 40(%eax), %edx
-    mov 44(%eax), %ecx
-    mov 48(%eax), %eax
+    mov 16(%eax), %edi
+    mov 20(%eax), %esi
+    mov 24(%eax), %ebp
+    mov 32(%eax), %ebx
+    mov 36(%eax), %edx
+    mov 40(%eax), %ecx
+    mov 44(%eax), %eax
     ret
 
 # void arch_save_cpu_state(arch_cpu_state_t* state)
@@ -22,16 +22,16 @@ arch_save_cpu_state:
     # Get state to save into
     mov 8(%esp), %ecx
     # Save general purpose registers
-    mov %eax, 48(%ecx)
-    mov %edx, 40(%ecx)
-    mov %ebx, 36(%ecx)
-    mov %ebp, 28(%ecx)
-    mov %esi, 24(%ecx)
-    mov %edi, 20(%ecx)
+    mov %eax, 44(%ecx)
+    mov %edx, 36(%ecx)
+    mov %ebx, 32(%ecx)
+    mov %ebp, 24(%ecx)
+    mov %esi, 20(%ecx)
+    mov %edi, 16(%ecx)
     # Pop off ecx into state
-    pop 44(%ecx)
+    pop 40(%ecx)
     # Save stack pointer
-    mov %esp, 32(%ecx)
+    mov %esp, 28(%ecx)
     # Clear argument
     ret
 
