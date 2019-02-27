@@ -44,8 +44,8 @@ arch_switch_to_kernel_task:
     mov 4(%esp), %edi
     # Get the next proc's state
     mov 8(%esp), %eax
-    # Push the current proc's eip as it is popped by ret later on
-    push 56(%edi)
+    # Push the return address as it is popped by ret later on
+    push (%esp)
     # Changes to arch_cpu_state_t may require adjustments to the offset here
     # Save the stack pointer into the current proc's state at arch_cpu_state_t.esp
     mov %esp, 28(%edi)
