@@ -51,6 +51,7 @@ arch_switch_to_kernel_task:
     mov %esp, 28(%edi)
     # Restore the stack pointer from the next proc's state from arch_cpu_state_t.esp
     mov 28(%eax), %esp
+    mov %esp, (tss + 4)
     # From now on we are using the next proc's stack
 
     # Restore kernel cpu state, we shouldn't touch any registers after this
