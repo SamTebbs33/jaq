@@ -83,13 +83,6 @@ arch_switch_to_user_task:
     mov 28(%eax), %ebx
     mov %ebx, (useresp)
 
-    # Set user data segment
-    mov $0x23, %ebx
-    mov %ebx, %ds
-    mov %ebx, %es
-    mov %ebx, %fs
-    mov %ebx, %gs
-
     # Restore user cpu state, we shouldn't touch any registers after this
     call arch_restore_cpu_state
 
