@@ -23,8 +23,11 @@ process_t *process_create(char *name, arch_cpu_state_t *kernel_state, arch_cpu_s
 
 void process_free(process_t *process) {
     kfree(process->kernel_state);
-    kfree(process->user_state);
     kfree(process->kernel_stack);
+    if (process->level == USER) {
+        kfree(process->user_state);
+        kfree(process->user_stack);
+    }
     kfree(process->name);
 }
 
