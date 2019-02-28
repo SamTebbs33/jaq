@@ -62,10 +62,10 @@ void switch_to_next(bool reschedule_current) {
         process_t *tmp = current_process;
         current_process = next_process;
         if(next_process->level == KERNEL) {
-                log_debug("Switching to kernel task\n");
+                logf(LOG_LEVEL_DEBUG, "Switching to kernel task %s\n", next_process->name);
                 arch_switch_to_kernel_task(tmp->kernel_state, current_process->kernel_state);
         } else if(next_process->level == USER) {
-                log_debug("Switching to user task\n");
+                logf(LOG_LEVEL_DEBUG, "Switching to user task %s\n", next_process->name);
                 arch_switch_to_user_task(tmp->kernel_state, current_process->kernel_state, current_process->user_state);
         }
     }
