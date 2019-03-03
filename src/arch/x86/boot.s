@@ -4,11 +4,9 @@
 .set FLAGS, (ALIGNMENT | MEM_INFO)
 .set CHECKSUM, -(MAGIC + FLAGS)
 
-#include "inc/boot_constants.h"
-
-.set KERNEL_CODE_SEGSEL, 0x8
-.set KERNEL_DATA_SEGSEL, 0x10
-.set TSS_SEGSEL, 0x28
+.set KERNEL_CODE_SEGMENT, 0x8
+.set KERNEL_DATA_SEGMENT, 0x10
+.set KERNEL_TSS_SEGMENT, 0x28
 .set KERNEL_ADDR_OFFSET, 0xC0000000
 .set KERNEL_PAGE_NUMBER, KERNEL_ADDR_OFFSET >> 22
 # One for kernel code, one for temporary allocation space and 5 for the heap. Each covers 4MiB
@@ -88,7 +86,7 @@ gdt_flush:
     mov 4(%esp), %eax
     lgdt (%eax)
 
-    mov $KERNEL_DATA_SEGSEL, %ax
+    mov $KERNEL_DATA_SEGMENT, %ax
     mov %ax, %ds
     mov %ax, %es
     mov %ax, %fs
@@ -100,7 +98,7 @@ gdt_flush:
     or $0x1, %al
     mov %eax, %cr0
 
-    jmp $KERNEL_CODE_SEGSEL,$flush
+    jmp $KERNEL_CODE_SEGMENT,$flush
 flush:
     ret
 
@@ -112,7 +110,7 @@ idt_flush:
 
 .global tss_flush
 tss_flush:
-    mov $TSS_SEGSEL, %ax
+    mov $KERNEL_TSS_SEGMENT, %ax
     ltr %ax
     ret
 
