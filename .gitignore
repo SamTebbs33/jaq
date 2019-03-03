@@ -39,3 +39,5 @@ build
 qemu.log
 bochsrc.txt
 bochslog.txt
+.syntastic_c_config
+compile_commands.json
