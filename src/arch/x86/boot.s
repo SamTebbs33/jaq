@@ -70,6 +70,7 @@ start_higher_half:
 
 	# Set up the stack
     mov $kernel_stack_end, %esp
+    mov %esp, %ebp
 
     # Push magic number from bootloader
     push %eax
