@@ -46,7 +46,7 @@ void kmain(multiboot_info_t* mb_info, uint32_t mb_magic) {
 
     log_info("Initialising devices\n");
     keyboard_init();
-    //timer_init(TIMER_FREQUENCY);
+    timer_init(TIMER_FREQUENCY);
 
     log_info("Initialising multitasking\n");
     multitasking_init((void *) &kernel_stack, kernel_stack_size);

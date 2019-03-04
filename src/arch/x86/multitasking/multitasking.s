@@ -48,7 +48,7 @@ arch_switch_to_kernel_task:
     mov %ebp, 24(%edi)
     # Restore the stack pointer from the next proc's state from arch_cpu_state_t.esp
     mov 28(%eax), %esp
-    mov 24(%edi), %ebp
+    mov 24(%eax), %ebp
     mov %esp, (tss + 4)
     # From now on we are using the next proc's stack
 
