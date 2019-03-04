@@ -74,8 +74,10 @@ arch_switch_to_user_task:
     # Changes to arch_cpu_state_t may require adjustments to the offset here
     # Save the stack pointer into the current proc's state at arch_cpu_state_t.esp
     mov %esp, 28(%edi)
+    mov %ebp, 24(%edi)
     # Restore the stack pointer from the next proc's state from arch_cpu_state_t.esp
     mov 28(%esi), %esp
+    mov 24(%esi), %ebp
     # From now on we are using the next proc's kernel stack
     mov %esp, (tss + 4)
     # Save user.esp
