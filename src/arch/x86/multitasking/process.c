@@ -6,7 +6,13 @@
 #include <lib/util.h>
 
 void arch_copy_cpu_state(arch_cpu_state_t* dest, arch_cpu_state_t* src) {
-    memcpy(dest, src, sizeof(arch_cpu_state_t));
+    dest->edi = src->edi;
+    dest->esi = src->esi;
+    dest->ebx = src->ebx;
+    dest->ebp = src->ebp;
+    dest->edx = src->edx;
+    dest->ecx = src->ecx;
+    dest->eax = src->eax;
 }
 
 void arch_init_process_state(process_t* process, void (*entry_function)(void), void (*exit_function)(void)) {
