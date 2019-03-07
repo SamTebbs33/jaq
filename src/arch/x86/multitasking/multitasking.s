@@ -18,9 +18,14 @@ arch_restore_cpu_state:
 # void arch_save_cpu_state(arch_cpu_state_t* state)
 .global arch_save_cpu_state
 arch_save_cpu_state:
+    # Save caller ebp
+    push %ebp
+    # Use local frame
+    mov %esp, %ebp
+    # Save ecx
     push %ecx
-    # Get state to save into
-    mov 8(%esp), %ecx
+    # Get state to save into from the arguments. This is the 4th entry on the stack
+    mov 12(%esp), %ecx
     # Save general purpose registers
     mov %eax, 44(%ecx)
     mov %edx, 36(%ecx)
@@ -30,7 +35,10 @@ arch_save_cpu_state:
     mov %edi, 16(%ecx)
     # Pop off ecx into state
     pop 40(%ecx)
-    # Clear argument
+    # Clear local variables
+    mov %ebp, %esp
+    # Restore caller's ebp
+    pop %ebp
     ret
 
 # void arch_switch_to_kernel_task(arch_cpu_state_t* current, arch_cpu_state_t* next)
