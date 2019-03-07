@@ -98,8 +98,7 @@ arch_switch_to_user_task:
     # User stack pointer
     pushl (useresp)
     # EFLAGS with interrupts re-enabled
-    pushfl
-    orl $0x200, (%esp)
+    pushl $0x202
     # User code segment
     pushl $0x1B
     # Address to jump to, put on kernel stack by process initialiser
