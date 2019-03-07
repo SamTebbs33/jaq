@@ -25,14 +25,14 @@ void arch_init_process_state(process_t* process, void (*entry_function)(void), v
         memset(user_state, 0, sizeof(arch_cpu_state_t));
         kernel_state->useresp = (uint32_t)process->user_stack + process->user_stack_size - 4;
         user_state->esp = kernel_state->useresp;
-        user_state->ebp = user_state->esp + 4;
+        user_state->ebp = user_state->esp - 4;
         uint32_t* user_stack = process->user_stack;
         user_stack[process->user_stack_size/4 - 1] = (uint32_t)entry_function;
         user_stack[process->user_stack_size/4] = (uint32_t)exit_function;
     }
 
     kernel_state->esp = (uint32_t)process_kernel_stack + process->kernel_stack_size - 4;
-    kernel_state->ebp = kernel_state->esp + 4;
+    kernel_state->ebp = kernel_state->esp - 4;
     process_kernel_stack[process->kernel_stack_size/4 - 1] = (uint32_t)entry_function;
     process_kernel_stack[process->kernel_stack_size/4] = (uint32_t)exit_function;
 }
