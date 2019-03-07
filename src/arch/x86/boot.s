@@ -66,11 +66,11 @@ start:
 
 start_higher_half:
     # Unmap the identity mapping of the first 4MB
-	invlpg (0)
+    invlpg (0)
 
 	# Set up the stack
     mov $kernel_stack_end, %esp
-    mov %esp, %ebp
+    xor %ebp, %ebp
 
     # Push magic number from bootloader
     push %eax
