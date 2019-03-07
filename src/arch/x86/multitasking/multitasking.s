@@ -8,7 +8,6 @@ arch_restore_cpu_state:
     # Restore the general purpose registers
     mov 16(%eax), %edi
     mov 20(%eax), %esi
-    mov 24(%eax), %ebp
     mov 32(%eax), %ebx
     mov 36(%eax), %edx
     mov 40(%eax), %ecx
@@ -30,7 +29,6 @@ arch_save_cpu_state:
     mov %eax, 44(%ecx)
     mov %edx, 36(%ecx)
     mov %ebx, 32(%ecx)
-    mov %ebp, 24(%ecx)
     mov %esi, 20(%ecx)
     mov %edi, 16(%ecx)
     # Pop off ecx into state
