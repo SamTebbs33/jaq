@@ -20,6 +20,7 @@ int strchr(char* str, char ch);
 int strrchr(char* str, char ch);
 int strstr(char* str, char* substr);
 char* strdup(char* str);
+char* strndup(char* str, size_t n);
 char* strcat(char* dest, const char* str);
 
 #endif //JAQ_STRING_H
