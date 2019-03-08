@@ -103,9 +103,16 @@ int strstr(char* str, char* substr) {
 }
 
 char *strdup(char *str) {
-    size_t len = strlen(str) + 1;
+    return strndup(str, strlen(str));
+}
+
+char* strndup(char* str, size_t n) {
+    size_t len = n + 1;
     char* dup = kmalloc(len * sizeof(char));
-    if(dup) memcpy(dup, str, len);
+    if(dup) {
+        memcpy(dup, str, n);
+        dup[n] = '\0';
+    }
     return dup;
 }
 
