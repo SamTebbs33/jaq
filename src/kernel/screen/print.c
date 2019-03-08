@@ -16,10 +16,7 @@ void print_scroll(uint32_t rows) {
 }
 
 void print(char* str) {
-    char ch;
-    while((ch = *str++)) {
-        print_ch(ch);
-    }
+    printf("%s", str);
 }
 
 // Source: https://wiki.osdev.org/Meaty_Skeleton
@@ -94,11 +91,7 @@ void printf(const char* restrict format, ...) {
 }
 
 void print_len(char *buff, size_t len) {
-    char ch;
-    for (unsigned int i = 0; i < len && (ch = buff[i]); ++i) {
-        // Return if we're at the end of the screen
-        print_ch(ch);
-    }
+    fs_write(stdout, buff, len, 0);
 }
 
 int print_uint_base_rec(uint32_t u32, int base, bool first, int count) {
