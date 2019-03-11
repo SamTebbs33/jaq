@@ -20,6 +20,49 @@ uint32_t milliseconds_counter = 0;
 
 process_t* init_process = NULL, * cleaner_process = NULL;
 
+bool process_can_run(process_t* proc) {
+    return proc->state != SLEEPING && proc->state != BLOCKED && proc->state != TERMINATED;
+}
+
+process_t *get_next_from_queue(queue_t *queue) {
+    process_t* head = queue_dequeue(queue);
+    // Cut off processes that aren't ready to run yet
+    while (!process_can_run(head) && queue_size(queue) > 0) head = queue_dequeue(queue);
+    return head;
+}
+
+void switch_to_next(bool reschedule_current) {
+    if (reschedule_current) {
+        multitasking_schedule(current_process);
+        current_process->state = READY;
+    }
+    process_t* next_process = NULL;
+    // Check the list of sleeping processes
+    if(linkedlist_size(sleeping_processes) > 0) {
+        //log_debug("More than 0 sleeping processes\n");
+        sleeping_process_t* sp = linkedlist_get(sleeping_processes, 0);
+        // If the first process in the list is ready to be woken up
+        if(sp->wake_time <= milliseconds_counter) {
+            //log_debug("Ready to wake first one\n");
+            next_process = sp->process;
+            next_process->state = READY;
+            // Remove it from the list and free the wrapper struct
+            linkedlist_remove(sleeping_processes, 0);
+            kfree(sp);
+        }
+    }
+    // Check the queue of unblocked processes
+    if(!next_process && queue_size(unblocked_queue) > 0) next_process = get_next_from_queue(unblocked_queue);
+    // Check the queue of ready processes
+    if(!next_process && queue_size(process_queue) > 0) next_process = get_next_from_queue(process_queue);
+    if(next_process && process_can_run(next_process)) {
+        next_process->state = RUNNING;
+        process_t *tmp = current_process;
+        current_process = next_process;
+        arch_switch_task(tmp->cpu_state, current_process->cpu_state);
+    }
+}
+
 void on_tick(arch_cpu_state_t* regs) {
     tick_counter++;
     arch_acknowledge_irq(ARCH_INTERRUPT_TIMER);
@@ -78,53 +121,13 @@ void multitasking_schedule(process_t *process) {
     if(process->state != TERMINATED) queue_enqueue(process_queue, process);
 }
 
-bool process_can_run(process_t* proc) {
-    return proc->state != SLEEPING && proc->state != BLOCKED && proc->state != TERMINATED;
-}
-
-process_t *get_next_from_queue(queue_t *queue) {
-    process_t* head = queue_dequeue(queue);
-    // Cut off processes that aren't ready to run yet
-    while (!process_can_run(head) && queue_size(queue) > 0) head = queue_dequeue(queue);
-    return head;
-}
-
-void switch_to_next() {
-    process_t* next_process = NULL;
-    // Check the list of sleeping processes
-    if(linkedlist_size(sleeping_processes) > 0) {
-        //log_debug("More than 0 sleeping processes\n");
-        sleeping_process_t* sp = linkedlist_get(sleeping_processes, 0);
-        // If the first process in the list is ready to be woken up
-        if(sp->wake_time <= milliseconds_counter) {
-            //log_debug("Ready to wake first one\n");
-            next_process = sp->process;
-            next_process->state = READY;
-            // Remove it from the list and free the wrapper struct
-            linkedlist_remove(sleeping_processes, 0);
-            kfree(sp);
-        }
-    }
-    // Check the queue of unblocked processes
-    if(!next_process && queue_size(unblocked_queue) > 0) next_process = get_next_from_queue(unblocked_queue);
-    // Check the queue of ready processes
-    if(!next_process && queue_size(process_queue) > 0) next_process = get_next_from_queue(process_queue);
-    if(next_process && process_can_run(next_process)) {
-        next_process->state = RUNNING;
-        process_t *tmp = current_process;
-        current_process = next_process;
-        logf(LOG_LEVEL_DEBUG, "Switching to kernel task %s\n", next_process->name);
-        arch_switch_task(tmp->cpu_state, current_process->cpu_state);
-    }
-}
-
 void multitasking_yield() {
     ARCH_SAVE_RET_ADDR(current_process->cpu_state);
     arch_save_cpu_state(current_process->cpu_state);
     log_debug("yielding\n");
     multitasking_schedule(current_process);
     current_process->state = READY;
-    switch_to_next();
+    switch_to_next(true);
 }
 
 void multitasking_sleep(uint32_t milliseconds) {
@@ -135,14 +138,14 @@ void multitasking_sleep(uint32_t milliseconds) {
         sorted_linkedlist_add(sleeping_processes, sp, compare_sleeping_processes);
         // Setting it to sleeping state will get it cut from the process queue if it's ever at the front
         current_process->state = SLEEPING;
-        switch_to_next();
+        switch_to_next(false);
     }
 }
 
 void multitasking_block(process_t *process) {
     process->state = BLOCKED;
     if(process->state == RUNNING || current_process == process) {
-        switch_to_next();
+        switch_to_next(false);
     }
 }
 
