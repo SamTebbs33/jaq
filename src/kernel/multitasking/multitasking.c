@@ -71,7 +71,7 @@ void multitasking_init(void* kernel_stack, uint32_t kernel_stack_size) {
 }
 
 void multitasking_init_process_state(process_t *process, void (*entry_function)(void)) {
-    ARCH_INIT_PROCESS_STATE(process, entry_function, multitasking_exit_process);
+    arch_init_process_state(process, entry_function, multitasking_exit_process);
 }
 
 void multitasking_schedule(process_t *process) {

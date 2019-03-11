@@ -79,4 +79,12 @@ void arch_restore_cpu_state(arch_cpu_state_t* state);
  */
 void arch_restore_stack(arch_cpu_state_t* regs);
 
+/**
+ * Initialise a process so that it can be switched to
+ * @param process The process to initialise
+ * @param entry_function The process' entry point
+ * @param exit_function The process' exit point, i.e. where it should jump to when returning from the entry point
+ */
+void arch_init_process_state(process_t* process, void (*entry_function)(void), void (*exit_function)(void));
+
 #endif //JAQ_ARCH_H
