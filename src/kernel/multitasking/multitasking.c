@@ -40,8 +40,8 @@ void cleaner() {
             process_t* proc = queue_dequeue(terminated_queue);
             process_free(proc);
             kfree(proc);
-            multitasking_sleep(100);
         }
+        multitasking_sleep(100);
     }
 }
 
