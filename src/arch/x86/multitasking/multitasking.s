@@ -35,9 +35,9 @@ arch_switch_task:
     # Disable interrupts to avoid being interrupted mid-switch
     cli
     # Get the current proc's state
-    mov 20(%esp), %edi
+    mov 4(%esp), %edi
     # Get the next proc's state
-    mov 24(%esp), %esi
+    mov 8(%esp), %esi
     # Changes to arch_cpu_state_t may require adjustments to the offset here
     # Save the stack pointer into the current proc's state at arch_cpu_state_t.esp
     mov %esp, 28(%edi)
