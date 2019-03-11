@@ -5,7 +5,7 @@ arch_save_cpu_state:
     push %eax
     push %eax
     # State to store into
-    mov 8(%esp), %eax
+    mov 12(%esp), %eax
     mov %edi, 16(%eax)
     mov %esi, 20(%eax)
     mov %ebx, 32(%eax)
