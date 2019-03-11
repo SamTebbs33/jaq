@@ -119,6 +119,7 @@ void switch_to_next() {
 }
 
 void multitasking_yield() {
+    ARCH_SAVE_RET_ADDR(current_process->cpu_state);
     arch_save_cpu_state(current_process->cpu_state);
     multitasking_schedule(current_process);
     current_process->state = READY;

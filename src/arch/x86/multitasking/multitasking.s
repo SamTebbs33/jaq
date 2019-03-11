@@ -46,11 +46,15 @@ arch_switch_task:
     mov 28(%esi), %esp
     mov 24(%esi), %ebp
     # From now on we are using the next proc's stack
+    
+    # Overwrite return address with current proc's saved eip
+    mov 56(%esi), %eax
+    mov %eax, (%esp)
 
     push %esi
     call arch_restore_cpu_state
     add $4, %esp
     # Re-enable interrupts
     sti
-    # Return to return address stored at start of next proc's stack
+    # Return to address saved in proc's eip
     ret

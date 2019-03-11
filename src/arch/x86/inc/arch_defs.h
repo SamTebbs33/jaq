@@ -52,4 +52,8 @@ typedef void (*arch_interrupt_handler_t) (arch_cpu_state_t*);
     process_kernel_stack[process->kernel_stack_size/4] = (uint32_t)exit_function;\
 }
 
+#define ARCH_SAVE_RET_ADDR(state) {\
+	asm("mov 4(%%ebp), %0": "=r"((state)->eip));\
+}
+
 #endif //JAQ_ARCH_TYPES_H
