@@ -1,6 +1,8 @@
 .extern tss
 useresp:
     .long 0
+usereip:
+    .long 0
 
 # void arch_restore_cpu_state(arch_cpu_state_t* state) with state in eax
 .global arch_restore_cpu_state
@@ -91,6 +93,9 @@ arch_switch_to_user_task:
     # Save user.esp
     mov 28(%eax), %ebx
     mov %ebx, (useresp)
+    # Save user.eip
+    mov 56(%eax), %ebx
+    mov %ebx, (usereip)
 
     # Restore user cpu state, we shouldn't touch any registers after this
     call arch_restore_cpu_state
@@ -103,8 +108,8 @@ arch_switch_to_user_task:
     pushl $0x202
     # User code segment
     pushl $0x1B
-    # Address to jump to, put on kernel stack by process initialiser
-    push 16(%esp)
+    # Address to jump to
+    push (usereip)
 
     iret
 

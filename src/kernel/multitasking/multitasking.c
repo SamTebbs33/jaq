@@ -122,7 +122,7 @@ void multitasking_init(void* kernel_stack, uint32_t kernel_stack_size) {
     multitasking_init_process_state(current_process, 0);
 
     // Create the cleaner process
-    cleaner_process = process_create("cleaner", kmalloc(sizeof(arch_cpu_state_t)), NULL, kmalloc(1024), 1024, NULL, 0, KERNEL);
+    cleaner_process = process_create("cleaner", kmalloc(sizeof(arch_cpu_state_t)), kmalloc(sizeof(arch_cpu_state_t)), kmalloc(1024), 1024, kmalloc(1024), 1024, USER);
     multitasking_init_process_state(cleaner_process, cleaner);
     multitasking_schedule(cleaner_process);
 
