@@ -13,6 +13,7 @@ void arch_copy_cpu_state(arch_cpu_state_t* dest, arch_cpu_state_t* src) {
     dest->edx = src->edx;
     dest->ecx = src->ecx;
     dest->eax = src->eax;
+    dest->eip = src->eip;
 }
 
 void arch_init_process_state(process_t* process, void (*entry_function)(void), void (*exit_function)(void)) {
@@ -23,11 +24,11 @@ void arch_init_process_state(process_t* process, void (*entry_function)(void), v
 
     if (process->level == USER) {
         memset(user_state, 0, sizeof(arch_cpu_state_t));
-        kernel_state->useresp = (uint32_t)process->user_stack + process->user_stack_size - 4;
+        kernel_state->useresp = (uint32_t)process->user_stack + process->user_stack_size;
         user_state->esp = kernel_state->useresp;
         user_state->ebp = user_state->esp - 4;
         uint32_t* user_stack = process->user_stack;
-        user_stack[process->user_stack_size/4 - 1] = (uint32_t)entry_function;
+        user_state->eip = (uint32_t)entry_function;
         user_stack[process->user_stack_size/4] = (uint32_t)exit_function;
     }
 
