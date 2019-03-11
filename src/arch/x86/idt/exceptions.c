@@ -4,9 +4,9 @@
 
 #include <idt.h>
 #include <exceptions.h>
-#include <util/util.h>
+#include <lib/util.h>
 
-#define EXCEPTION_HANDLER(name, string) void name(arch_registers_t* registers) {\
+#define EXCEPTION_HANDLER(name, string) void name(arch_cpu_state_t* registers) {\
     PANIC(string ": %d\n", registers->err_code);\
 }
 #define REGISTER_EXCEPTION_HANDLER(isr, name) idt_register_isr_handler(isr, name)

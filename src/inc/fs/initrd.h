@@ -32,6 +32,6 @@ typedef struct {
  * @param initrd_addr The address at which the ramdisk starts
  * @return An fs_node representing the ramdisk or NULL if initialisation failed
  */
-fs_node_t* initrd_init(uint32_t initrd_addr);
+void initrd_init(uint32_t initrd_addr);
 
 #endif //JAQ_INITRD_H

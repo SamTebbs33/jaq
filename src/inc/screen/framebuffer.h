@@ -28,6 +28,13 @@
 #define FB_ROWS 25
 #define FB_CELLS FB_COLUMNS * FB_ROWS
 
+#define PRINT_NEWLINE '\n'
+#define PRINT_TAB '\t'
+#define PRINT_TAB_SIZE 4
+
+extern char fb_fg, fb_bg;
+extern unsigned int fb_row, fb_column;
+
 /**
  * Put a character at the cursor and advance the cursor along by one
  * @param ch The character

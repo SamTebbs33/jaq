@@ -7,6 +7,8 @@
 
 #include <stdinc.h>
 
+#define TIMER_FREQUENCY 100
+
 /**
  * Initialise the timer
  * @param frequency The frequency to set it to

@@ -2,7 +2,7 @@
 // Created by Samuel Tebbs on 12/04/2018.
 //
 
-#include <util/util.h>
+#include <lib/util.h>
 
 void arch_outb(uint16_t port, uint8_t val) {
     asm volatile ("outb %0, %1" : : "a"(val), "Nd"(port));

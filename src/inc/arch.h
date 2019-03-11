@@ -8,6 +8,7 @@
 #include <stdinc.h>
 #include <arch_defs.h>
 #include <multiboot.h>
+#include <multitasking/process.h>
 
 /**
  * The arch-specific initialisation function. Should be implemented by the architecture.
@@ -43,4 +44,15 @@ uint8_t arch_inb(uint16_t port);
  * @param handler
  */
 void arch_register_interrupt_handler(int interrupt, arch_interrupt_handler_t handler);
+
+/**
+ * Sets the current page directory
+ * @param page_dir The page directory to change to
+ */
+void arch_set_page_directory(page_directory_t* page_dir);
+
+void arch_switch_task(arch_cpu_state_t* current, arch_cpu_state_t* next);
+
+void arch_acknowledge_irq(int32_t irq);
+
 #endif //JAQ_ARCH_H

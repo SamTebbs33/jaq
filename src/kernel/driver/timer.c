@@ -4,11 +4,11 @@
 
 #include <driver/timer.h>
 #include <arch.h>
-#include <util/util.h>
+#include <lib/util.h>
 #include <screen/print.h>
-
-void on_tick(arch_registers_t* registers) {
-}
+#include <driver/keyboard.h>
+#include <fs/fs.h>
+#include <fs/devfs.h>
 
 void timer_init(uint32_t frequency) {
     uint32_t divisor = 1193180 / frequency;
@@ -23,6 +23,4 @@ void timer_init(uint32_t frequency) {
     // Send the frequency divisor.
     arch_outb(0x40, low);
     arch_outb(0x40, high);
-
-    arch_register_interrupt_handler(ARCH_INTERRUPT_TIMER, on_tick);
 }

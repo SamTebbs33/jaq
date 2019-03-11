@@ -4,7 +4,7 @@
 
 #include <fs/initrd.h>
 #include <mem/mem.h>
-#include <util/string.h>
+#include <lib/string.h>
 #include <fs/fs.h>
 #include <log/log.h>
 
@@ -36,16 +36,38 @@ fs_node_t* initrd_finddir(fs_node_t* node, char* child_name) {
     return NULL;
 }
 
-fs_node_t *initrd_init(uint32_t initrd_addr) {
+void initrd_init(uint32_t initrd_addr) {
     start_addr = initrd_addr;
     initrd = (initrd_t *) initrd_addr;
-
+    fs_create_file(fs_make_dir_node("initrd", 0, FS_FLAGS_DIR, 0, 0, NULL, NULL, initrd_finddir, initrd_readdir, 0, 0), "/");
     nodes = KMALLOC_N(fs_node_t*, initrd->n_nodes);
     files = (initrd_file_t *) (initrd_addr + sizeof(initrd_t));
+    // This loop goes through the initrd's files, creating any parent directories needed, and adds them to the VFS
     for (uint32_t i = 0; i < initrd->n_nodes; ++i) {
-        nodes[i] = fs_make_node(files[i].name, FS_PERMS_OWNER(FS_PERMS_READ | FS_PERMS_EXECUTE), 0, 0, 0, initrd_read, NULL, NULL, NULL, NULL, NULL, files[i].length, i);
+        char* path = files[i].name;
+        char* path_dup = strdup(path);
+        char* strtok_save = NULL;
+        char* tok = strtok_r(path_dup, FS_PATH_SEP_STR, &strtok_save);
+        // The path to the file being processed
+        char path_buff[INITRD_FILENAME_MAX] = "";
+        // The path to the file's parent, so we know what dir to create the file under
+        char parent_buff[INITRD_FILENAME_MAX] = "";
+        while(tok) {
+            strcat(path_buff, "/");
+            strcat(parent_buff, "/");
+            strcat(path_buff, tok);
+            bool is_file = strlen(path_buff) >= strlen(path);
+            // If the file/directory doesn't exist then create it
+            if(!fs_walk_path(path_buff)) {
+                fs_node_t* node = is_file ? fs_make_file_node(tok, 0, 0, 0, 0, initrd_read, NULL, NULL, NULL, files[i].length, i) : fs_make_dir_node(tok, 0, 0, 0, 0, NULL, NULL, NULL, NULL, 0, 0);
+                // If it is a file then add to the array of files that can be read from
+                if(is_file) nodes[i] = node;
+                // Add it to the VFS hierarchy
+                fs_create_file(node, parent_buff);
+            }
+            strcat(parent_buff, tok);
+            tok = strtok_r(NULL, FS_PATH_SEP_STR, &strtok_save);
+        }
+        kfree(path_dup);
     }
-
-    root = fs_make_node("initrd", FS_PERMS_OWNER(FS_PERMS_READ | FS_PERMS_EXECUTE) | FS_PERMS_GROUP(FS_PERMS_READ) | FS_PERMS_ALL(FS_PERMS_READ), FS_FLAGS_DIR, 0, 0, NULL, NULL, NULL, NULL, initrd_finddir, initrd_readdir, 0, 0);
-    return root;
 }

@@ -6,7 +6,7 @@ GRUBFILE = grub-file
 EMU = qemu-system-i386
 DEBUGGER = gdb
 
-CC_FLAGS ?= -DARCH=\"$(ARCH)\" -std=gnu99 -Isrc/inc -ffreestanding -Wall -Wextra -Werror -Wno-unused-parameter -Wno-unused-variable -lgcc -O0 $(EXTRA_CC_FLAGS)
+CC_FLAGS ?= -std=gnu99 -Isrc/inc -ffreestanding -Wall -Wextra -Werror -Wno-unused-parameter -Wno-unused-variable -lgcc -O0 $(EXTRA_CC_FLAGS)
 AS_FLAGS ?= $(EXTRA_AS_FLAGS)
 LD_FLAGS ?= -ffreestanding -O2 -nostdlib -lgcc $(EXTRA_LD_FLAGS)
 EMU_FLAGS ?= -cdrom $(ISO_OUTPUT) -boot d -serial stdio $(EXTRA_EMU_FLAGS)
@@ -16,9 +16,9 @@ DEBUGGER_FLAGS ?= -ex "symbol-file $(KERNEL_OUTPUT)" -ex "target remote localhos
 BUILD_DIR ?= build
 OBJ_DIR = $(BUILD_DIR)/obj
 
-KERNEL_OBJECT_NAMES = kmain screen/framebuffer screen/print mem/mem mem/heap util/string util/maths log/log
+KERNEL_OBJECT_NAMES = kmain screen/framebuffer screen/print mem/mem mem/heap lib/string lib/maths lib/linkedlist lib/tree log/log lib/queue lib/sorted_linkedlist multitasking/multitasking multitasking/process
 DRIVER_OBJECT_NAMES = keyboard timer serial
-FS_OBJECT_NAMES = initrd fs
+FS_OBJECT_NAMES = initrd fs devfs
 
 KERNEL_OUTPUT = $(BUILD_DIR)/iso/boot/kernel.elf
 ISO_OUTPUT = $(BUILD_DIR)/os.iso
@@ -61,41 +61,42 @@ EMU_FLAGS += -s -S
 endif
 
 $(OBJ_DIR)/%.o: src/%.c
-	$(info -> Compiling $<)
+	$(info > $(CC) $< -> $@)
 	$(eval P := $(shell dirname $@))
 	mkdir -p $(P)
 	$(CC) $(CC_FLAGS) -c $< -o $@
 
 $(OBJ_DIR)/%.o: src/%.s
-	$(info -> Assembling $<)
+	$(info > $(AS) $< -> $@)
 	$(eval P := $(shell dirname $@))
 	mkdir -p $(P)
 	$(AS) $(AS_FLAGS) $< -o $@
 
 $(KERNEL_OUTPUT): $(OBJECTS) $(LINK_SCRIPT)
-	$(info -> Linking objects)
+	$(info > $(LD) objects)
 	mkdir -p $(shell dirname $(KERNEL_OUTPUT))
 	$(LD) -T $(LINK_SCRIPT) $(LD_FLAGS) $(OBJECTS) -o $(KERNEL_OUTPUT)
 
 $(INITRD_OUTPUT): $(INITRD_FILES) $(MKRD_OUTPUT)
-	$(info -> Building initrd)
+	$(info > $(MKRD_OUTPUT) $(INITRD_FILES) -> $@)
 	mkdir -p $(MODULES_OUTPUT)
 	./$(MKRD_OUTPUT) $(INITRD_OUTPUT) $(INITRD_FILES)
 
 $(ISO_OUTPUT): $(KERNEL_OUTPUT) check-multiboot $(INITRD_OUTPUT) $(GRUB_FILES)
-	$(info -> Building .iso)
+	$(info > $(MKISO) $@)
 	mkdir -p $(BUILD_DIR)/iso/boot/grub
 	cp $(GRUB_FILES) $(BUILD_DIR)/iso/boot/grub/
-	$(MKISO) -o $(ISO_OUTPUT) $(BUILD_DIR)/iso
+	$(MKISO) -o $(ISO_OUTPUT) $(BUILD_DIR)/iso 2> /dev/null
 
 $(MKRD_OUTPUT): $(MKRD_SRC)
-	$(info -> Compiling $<)
+	$(info > gcc $< -> $@)
 	gcc -std=gnu99 -Isrc/inc $(MKRD_SRC) -o $(MKRD_OUTPUT)
 
 check-multiboot:
 
 ifeq ($(CHECK_MULTIBOOT),1)
 check-multiboot:
+	$(info > $(GRUBFILE))
 	$(GRUBFILE) $(GRUBFILE_FLAGS) $(KERNEL_OUTPUT)
 endif
 

@@ -5,13 +5,14 @@
 #include <idt.h>
 #include <paging.h>
 #include <mem/mem.h>
-#include <util/string.h>
+#include <lib/string.h>
 #include <log/log.h>
 #include <mem/heap.h>
-#include <util/maths.h>
-#include <util/util.h>
+#include <lib/maths.h>
+#include <lib/util.h>
 #include <boot_defs.h>
 #include <stdinc.h>
+#include <arch.h>
 
 #define HEAP_INDEX_SIZE 0x20000
 // Frames per bitmap type
@@ -33,7 +34,7 @@ extern uint32_t pile_start, pile_end, pile_ptr;
 uint32_t num_frames = 0, num_frames_aligned = 0;
 FRAME_BITMAP_TYPE* frame_bitmaps = NULL;
 
-void page_fault_handler(arch_registers_t* registers) {
+void page_fault_handler(arch_cpu_state_t* registers) {
     uint32_t err_code = registers->err_code;
     bool protection_err = (bool)(err_code & PAGE_FAULT_PROTECTION), write_err = (bool)(err_code & PAGE_FAULT_WRITE),
         user_err = (bool)(err_code & PAGE_FAULT_USER), reserved_err = (bool)(err_code & PAGE_FAULT_RESERVED),
@@ -161,7 +162,7 @@ void paging_init(uint32_t mem_kilobytes, uint32_t virtual_start, uint32_t virtua
 
     // Set directory
     uint32_t dir_physaddr = VIRTUAL_TO_PHYSICAL((uint32_t) kernel_directory);
-    asm ("mov %0, %%cr3":: "r"(dir_physaddr));
+    arch_set_page_directory((page_directory_t *) dir_physaddr);
 
     /*
      * Allocate the frame bitmap before setting up the heap, since it doesn't take up much space
@@ -191,6 +192,10 @@ void paging_init(uint32_t mem_kilobytes, uint32_t virtual_start, uint32_t virtua
             paging_set_frames(map_phys_start, map_phys_end);
         } else PANIC("Couldn't allocate frame bitmap");
     }
+}
+
+void arch_set_page_directory(page_directory_t* page_dir) {
+    asm ("mov %0, %%cr3":: "r"((physaddr_t)page_dir));
 }
 
 void paging_map_4mb_page(page_directory_t* dir, uint32_t page, uint32_t phys_addr) {

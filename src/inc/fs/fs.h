@@ -6,17 +6,22 @@
 #define JAQ_FS_H
 
 #include <stdinc.h>
+#include <lib/tree.h>
 
 #define FS_FILENAME_MAX 128
 
 #define FS_PERMS_EXECUTE 0x1
 #define FS_PERMS_WRITE 0x2
 #define FS_PERMS_READ 0x4
+#define FS_PERMS_RWX (FS_PERMS_READ | FS_PERMS_WRITE | FS_PERMS_EXECUTE)
 #define FS_PERMS_ALL(perm) perm
-#define FS_PERMS_GROUP(perm) perm << 3
-#define FS_PERMS_OWNER(perm) perm << 6
+#define FS_PERMS_GROUP(perm) (perm << 3)
+#define FS_PERMS_OWNER(perm) (perm << 6)
 
 #define FS_FLAGS_DIR 0x1
+
+#define FS_PATH_SEP '/'
+#define FS_PATH_SEP_STR "/"
 
 typedef uint16_t fs_node_perms_t;
 typedef uint8_t fs_node_flags_t;
@@ -40,26 +45,32 @@ typedef struct fs_node {
 
     fs_node_perms_t perms;
     fs_node_flags_t flags;
-
     fs_node_user_t user;
     fs_node_group_t group;
 
-    fs_node_read_t read;
-    fs_node_write_t write;
     fs_node_open_t open;
     fs_node_close_t close;
-    fs_node_finddir_t finddir;
-    fs_node_readdir_t readdir;
+
+    union {
+        struct {
+            fs_node_finddir_t finddir;
+            fs_node_readdir_t readdir;
+        };
+        struct {
+            fs_node_read_t read;
+            fs_node_write_t write;
+            uint32_t seek;
+        };
+    };
 
     size_t len;
     uint32_t impl; // Implementation-specific
-    uint32_t seek;
 } fs_node_t;
 
 extern fs_node_t* fs_root;
 
 /**
- * Create a filesystem node with certain flags and functions associated with it
+ * Create a filesystem node that represents a file, with certain flags and functions associated with it
  * @param name
  * @param perms
  * @param flags
@@ -69,14 +80,30 @@ extern fs_node_t* fs_root;
  * @param write
  * @param open
  * @param close
- * @param finddir
- * @param readdir
  * @param len
- * @param impl Don't remember what this is for, will update when I do...
+ * @param impl
  * @return
  */
-fs_node_t* fs_make_node(char* name, fs_node_perms_t perms, fs_node_flags_t flags, fs_node_user_t user, fs_node_group_t group,
-    fs_node_read_t read, fs_node_write_t write, fs_node_open_t open, fs_node_close_t close, fs_node_finddir_t finddir, fs_node_readdir_t readdir, size_t len, uint32_t impl);
+fs_node_t* fs_make_file_node(char* name, fs_node_perms_t perms, fs_node_flags_t flags, fs_node_user_t user, fs_node_group_t group,
+    fs_node_read_t read, fs_node_write_t write, fs_node_open_t open, fs_node_close_t close, size_t len, uint32_t impl);
+
+/**
+ * Create a filesystem node that represents a directory, with certain flags and functions associated with it
+ * @param name
+ * @param perms
+ * @param flags
+ * @param user
+ * @param group
+ * @param read
+ * @param write
+ * @param open
+ * @param close
+ * @param len
+ * @param impl
+ * @return
+ */
+fs_node_t* fs_make_dir_node(char* name, fs_node_perms_t perms, fs_node_flags_t flags, fs_node_user_t user, fs_node_group_t group,
+    fs_node_open_t open, fs_node_close_t close, fs_node_finddir_t finddir, fs_node_readdir_t readdir, size_t len, uint32_t impl);
 
 /**
  * Read from an fs_node into a buffer. This will invoke the node's `read` function if given
@@ -110,14 +137,14 @@ size_t fs_write(fs_node_t* node, void* buff, size_t len, size_t offset);
  *  "a+": Create the node if it didn't exist, and open for writing from the end and reading from the start
  * @return True if opening succeeded else false
  */
-bool fs_open(fs_node_t* node, char* mode);
+bool fs_open(fs_node_t *node, char *mode);
 
 /**
  * Close a node. Implementation-defined behaviour
  * @param node The node to close
  * @return True if closing succeeded, else false
  */
-bool fs_close(fs_node_t* node);
+bool fs_close(fs_node_t *node);
 
 /**
  * Find the entries within a directory.
@@ -134,5 +161,15 @@ fs_node_t* fs_readdir(fs_node_t* node, uint32_t idx);
  * @return The node or NULL if it doesn't exist
  */
 fs_node_t* fs_finddir(fs_node_t* node, char* child_name);
+
+bool fs_create_file(fs_node_t* node, char* parent_path);
+
+fs_node_t* fs_walk_path(char* path);
+
+tree_t* fs_walk_tree(char* path);
+
+bool fs_is_dir(fs_node_t *node);
+
+void fs_init();
 
 #endif //JAQ_FS_H
