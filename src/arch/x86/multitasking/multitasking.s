@@ -1,3 +1,22 @@
+# void arch_save_cpu_state(arch_cpu_state_t* state)
+.global arch_save_cpu_state
+arch_save_cpu_state:
+    # Save twice
+    push %eax
+    push %eax
+    # State to store into
+    mov 8(%esp), %eax
+    mov %edi, 16(%eax)
+    mov %esi, 20(%eax)
+    mov %ebx, 32(%eax)
+    mov %edx, 36(%eax)
+    mov %ecx, 40(%eax)
+    # Save pushed eax into state
+    pop 44(%eax)
+    # Restore eax to what caller expects it to be
+    pop %eax
+    ret
+
 # void arch_switch_task(arch_cpu_state_t* current, arch_cpu_state_t* next)
 .global arch_switch_task
 arch_switch_task:

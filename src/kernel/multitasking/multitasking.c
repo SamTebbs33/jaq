@@ -113,11 +113,13 @@ void switch_to_next() {
         next_process->state = RUNNING;
         process_t *tmp = current_process;
         current_process = next_process;
+        logf(LOG_LEVEL_DEBUG, "Switching to kernel task %s\n", next_process->name);
         arch_switch_task(tmp->cpu_state, current_process->cpu_state);
     }
 }
 
 void multitasking_yield() {
+    arch_save_cpu_state(current_process->cpu_state);
     multitasking_schedule(current_process);
     current_process->state = READY;
     switch_to_next();

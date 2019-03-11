@@ -62,10 +62,10 @@ void arch_acknowledge_irq(int32_t irq);
 void arch_set_page_directory(page_directory_t* page_dir);
 
 /**
- * Restore the saved state into the CPU, including the instruction pointer
- * @param regs The saved state to restore
+ * Save the current cpu state, excluding stack variables and the program counter
+ * @param state The state into which to save
  */
-void arch_restore_state(arch_cpu_state_t regs);
+void arch_save_cpu_state(arch_cpu_state_t* state);
 
 /**
  * Restore the stack pointer from the saved state
