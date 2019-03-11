@@ -17,17 +17,23 @@ arch_save_cpu_state:
     pop %eax
     ret
 
+# void arch_restore_cpu_state(arch_cpu_state_t* state)
+.global arch_restore_cpu_state
+arch_restore_cpu_state:
+    mov 4(%esp), %eax
+    mov 16(%eax), %edi
+    mov 20(%eax), %esi
+    mov 32(%eax), %ebx
+    mov 36(%eax), %edx
+    mov 40(%eax), %ecx
+    mov 44(%eax), %eax
+    ret
+
 # void arch_switch_task(arch_cpu_state_t* current, arch_cpu_state_t* next)
 .global arch_switch_task
 arch_switch_task:
     # Disable interrupts to avoid being interrupted mid-switch
     cli
-    # Push current values so that they are popped off when we switch back to the current task
-    # The other general purpose registers are pushed by the C calling convention
-    push %ebx
-    push %esi
-    push %ebp
-    push %edi
     # Get the current proc's state
     mov 20(%esp), %edi
     # Get the next proc's state
@@ -39,12 +45,9 @@ arch_switch_task:
     mov 28(%esi), %esp
     # From now on we are using the next proc's stack
 
-    # Pop off saved values from next proc's stack
-    # The other general purpose registers are popped by the C calling convention
-    pop %edi
-    pop %ebp
-    pop %esi
-    pop %ebx
+    push %esi
+    call arch_restore_cpu_state
+    add $4, %esp
     # Re-enable interrupts
     sti
     # Return to return address stored at start of next proc's stack

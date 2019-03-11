@@ -68,6 +68,12 @@ void arch_set_page_directory(page_directory_t* page_dir);
 void arch_save_cpu_state(arch_cpu_state_t* state);
 
 /**
+ * Restore the cpu state into the cpu, excluding stack variables and the program counter
+ * @param state The state to restore
+ */
+void arch_restore_cpu_state(arch_cpu_state_t* state);
+
+/**
  * Restore the stack pointer from the saved state
  * @param regs The saved state
  */
