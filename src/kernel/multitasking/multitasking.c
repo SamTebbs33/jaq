@@ -59,6 +59,7 @@ void switch_to_next(bool reschedule_current) {
         next_process->state = RUNNING;
         process_t *tmp = current_process;
         current_process = next_process;
+        logf(LOG_LEVEL_DEBUG, "Switching to task %s\n", next_process->name);
         arch_switch_task(tmp->cpu_state, current_process->cpu_state);
     }
 }
@@ -84,7 +85,7 @@ void cleaner() {
             process_free(proc);
             kfree(proc);
         }
-        multitasking_sleep(100);
+        multitasking_yield();
     }
 }
 
