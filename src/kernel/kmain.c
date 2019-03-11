@@ -54,8 +54,10 @@ void kmain(multiboot_info_t* mb_info, uint32_t mb_magic) {
     log_info("Done\n");
 
     uint32_t fake_total_ram = total_mem - (total_mem % 1024) + 1024;
-    printf("JaqOS on " ARCH ", %d MB available\n> ", fake_total_ram / 1024);
+//    printf("JaqOS on " ARCH ", %d MB available\n> ", fake_total_ram / 1024);
 
     // Runs forever to make sure interrupts are handled
-    while (true);
+    while (true) {
+        multitasking_yield();
+    }
 }
