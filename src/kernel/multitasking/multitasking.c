@@ -126,7 +126,6 @@ void multitasking_yield() {
     ARCH_SAVE_RET_ADDR(current_process->cpu_state);
     arch_save_cpu_state(current_process->cpu_state);
     log_debug("yielding\n");
-    multitasking_schedule(current_process);
     current_process->state = READY;
     switch_to_next(true);
 }

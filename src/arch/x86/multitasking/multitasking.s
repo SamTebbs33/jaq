@@ -46,7 +46,7 @@ arch_switch_task:
     mov 28(%esi), %esp
     mov 24(%esi), %ebp
     # From now on we are using the next proc's stack
-    
+
     # Overwrite return address with current proc's saved eip
     mov 56(%esi), %eax
     mov %eax, (%esp)
