@@ -16,6 +16,27 @@ void arch_copy_cpu_state(arch_cpu_state_t* dest, arch_cpu_state_t* src) {
     dest->eip = src->eip;
 }
 
+void arch_restore_cpu_state(arch_cpu_state_t* state) {
+    asm("mov %0, %%eax":: "r"(state));
+    asm("mov 16(%eax), %edi");
+    asm("mov 20(%eax), %esi");
+    asm("mov 32(%eax), %ebx");
+    asm("mov 36(%eax), %edx");
+    asm("mov 40(%eax), %ecx");
+    asm("mov 44(%eax), %eax");
+}
+
+void arch_save_cpu_state(arch_cpu_state_t* state) {
+    asm("push %eax");
+    asm("mov %0, %%eax":: "r"(state));
+    asm("mov %edi, 16(%eax)");
+    asm("mov %esi, 20(%eax)");
+    asm("mov %ebx, 32(%eax)");
+    asm("mov %edx, 36(%eax)");
+    asm("mov %ecx, 40(%eax)");
+    asm("pop 44(%eax)");
+}
+
 void arch_init_process_state(process_t* process, void (*entry_function)(void), void (*exit_function)(void)) {
     arch_cpu_state_t* kernel_state = process->kernel_state;
     arch_cpu_state_t* user_state = process->user_state;
