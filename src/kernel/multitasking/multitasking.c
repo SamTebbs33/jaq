@@ -72,7 +72,6 @@ void switch_to_next(bool reschedule_current) {
 }
 
 void on_exit_syscall(arch_cpu_state_t* state) {
-    if(current_process->level == USER) arch_copy_cpu_state(current_process->user_state, state);
     multitasking_exit_process();
 }
 
@@ -82,8 +81,6 @@ void on_tick(arch_cpu_state_t* state) {
     milliseconds_counter += MULTITASKING_TICK_TIME;
     if(tick_counter >= MULTITASKING_TICKS_PER_SLICE) {
         // Copy the interrupted state into the appropriate process state
-        if (current_process->level == USER) arch_copy_cpu_state(current_process->user_state, state);
-        else arch_copy_cpu_state(current_process->kernel_state, state);
         tick_counter = 0;
         switch_to_next(true);
     }
@@ -97,14 +94,16 @@ void cleaner() {
     while (true) {
         if(queue_size(terminated_queue) > 0) {
             process_t* proc = queue_dequeue(terminated_queue);
+            logf(LOG_LEVEL_DEBUG, "Cleaning %s\n", proc->name);
             process_free(proc);
             kfree(proc);
-            multitasking_sleep(100);
         }
+        multitasking_yield();
     }
 }
 
 void multitasking_exit_process() {
+    logf(LOG_LEVEL_DEBUG, "Exiting %s\n", current_process->name);
     current_process->process_state = TERMINATED;
     queue_enqueue(terminated_queue, current_process);
     switch_to_next(false);
@@ -122,12 +121,12 @@ void multitasking_init(void* kernel_stack, uint32_t kernel_stack_size) {
     multitasking_init_process_state(current_process, 0);
 
     // Create the cleaner process
-    cleaner_process = process_create("cleaner", kmalloc(sizeof(arch_cpu_state_t)), kmalloc(sizeof(arch_cpu_state_t)), kmalloc(1024), 1024, kmalloc(1024), 1024, USER);
+    cleaner_process = process_create("cleaner", kmalloc(sizeof(arch_cpu_state_t)), kmalloc(sizeof(arch_cpu_state_t)), kmalloc(1024), 1024, kmalloc(1024), 1024, KERNEL);
     multitasking_init_process_state(cleaner_process, cleaner);
     multitasking_schedule(cleaner_process);
 
-    arch_register_interrupt_handler(ARCH_INTERRUPT_TIMER, on_tick);
-    arch_register_syscall(SYSCALL_PROC_EXIT, on_exit_syscall);
+//    arch_register_interrupt_handler(ARCH_INTERRUPT_TIMER, on_tick);
+//    arch_register_syscall(SYSCALL_PROC_EXIT, on_exit_syscall);
 }
 
 void multitasking_init_process_state(process_t *process, void (*entry_function)(void)) {
@@ -139,7 +138,6 @@ void multitasking_schedule(process_t *process) {
 }
 
 void multitasking_yield() {
-    if (current_process->level == KERNEL) arch_save_cpu_state(current_process->kernel_state);
     switch_to_next(true);
 }
 
