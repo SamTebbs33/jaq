@@ -114,6 +114,9 @@ irq_common:
 	mov %esp, %eax
 	push %eax # This points to the cpu_state saved on the stack, which C pops off as an arch_cpu_state_t*
 	call irq_handler
+
+.global irq_return
+irq_return:
 	pop %eax
 	pop %gs
 	pop %fs
