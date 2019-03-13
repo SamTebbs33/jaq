@@ -5,6 +5,7 @@
 #include <multitasking/multitasking.h>
 #include <lib/linkedlist.h>
 #include <lib/queue.h>
+#include <lib/util.h>
 #include <arch.h>
 #include <multitasking/process.h>
 #include <arch_defs.h>
@@ -98,7 +99,6 @@ void cleaner() {
             process_free(proc);
             kfree(proc);
         }
-        multitasking_yield();
     }
 }
 
@@ -125,8 +125,8 @@ void multitasking_init(void* kernel_stack, uint32_t kernel_stack_size) {
     multitasking_init_process_state(cleaner_process, cleaner);
     multitasking_schedule(cleaner_process);
 
-//    arch_register_interrupt_handler(ARCH_INTERRUPT_TIMER, on_tick);
-//    arch_register_syscall(SYSCALL_PROC_EXIT, on_exit_syscall);
+    arch_register_interrupt_handler(ARCH_INTERRUPT_TIMER, on_tick);
+    arch_register_syscall(SYSCALL_PROC_EXIT, on_exit_syscall);
 }
 
 void multitasking_init_process_state(process_t *process, void (*entry_function)(void)) {
