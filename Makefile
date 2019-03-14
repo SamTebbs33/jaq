@@ -95,7 +95,7 @@ $(MKRD_OUTPUT): $(MKRD_SRC)
 check-multiboot:
 
 ifeq ($(CHECK_MULTIBOOT),1)
-check-multiboot:
+check-multiboot: $(KERNEL_OUTPUT)
 	$(info > $(GRUBFILE))
 	$(GRUBFILE) $(GRUBFILE_FLAGS) $(KERNEL_OUTPUT)
 endif
