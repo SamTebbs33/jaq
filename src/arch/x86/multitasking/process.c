@@ -39,7 +39,7 @@ void arch_init_process_state(process_t* process, void (*entry_function)(void), v
         user_state->eip = (uint32_t)entry_function;
 
         user_state->esp = user_state->useresp;
-        user_state->ebp = user_state->esp - 4;
+        user_state->ebp = 0;
         user_stack[process->user_stack_size/4] = (uint32_t)exit_function;
         // Exit return address
         kernel_stack[kernel_stack_size / 4] = (uint32_t) exit_function;
@@ -57,5 +57,5 @@ void arch_init_process_state(process_t* process, void (*entry_function)(void), v
         kernel_stack[kernel_stack_size/4 - 1] = (uint32_t)entry_function;
         kernel_stack[kernel_stack_size/4] = (uint32_t)exit_function;
     }
-    kernel_state->ebp = kernel_state->esp - 4;
+    kernel_state->ebp = 0;
 }
