@@ -47,9 +47,9 @@ struct key_mapping mapping[] = {
  * mode 2 with alt
  */
 char keymap[256][3];
-int modifier = 0;
-char key_buff[KEYBOARD_BUFF_SIZE];
-uint32_t key_buff_pos = 0;
+volatile int modifier = 0;
+volatile char key_buff[KEYBOARD_BUFF_SIZE];
+volatile uint32_t key_buff_pos = 0;
 
 void on_key(arch_cpu_state_t* registers) {
     uint8_t scan_code = arch_inb(KEYBOARD_PORT);
@@ -154,8 +154,8 @@ void keyboard_init() {
 
 size_t keyboard_read_buffer(char *buff, size_t len, size_t offset) {
     len = min_size(len, key_buff_pos);
-    memcpy(buff + offset, key_buff, len);
-    memcpy(key_buff, key_buff + key_buff_pos, key_buff_pos);
+    memcpy(buff + offset, (void*)key_buff, len);
+    memcpy((void*)key_buff, (void*)key_buff + key_buff_pos, key_buff_pos);
     key_buff_pos = 0;
     return len;
 }
