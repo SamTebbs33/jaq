@@ -37,15 +37,4 @@ typedef arch_interrupt_handler_t arch_syscall_handler_t;
     asm("int $128");\
 }
 
-#define ARCH_SAVE_RET_ADDR(state) {\
-    asm("mov 4(%%ebp), %0": "=r"((state)->eip));\
-}
-
-#define ARCH_SAVE_STACK_POINTER(state) {\
-    asm("mov %ebp, %edx");\
-    asm("add -4, %%edx");\
-    asm("mov %%edx, %0": "=r"((state)->esp));\
-    asm("mov (%%esp), %0": "=r"((state)->ebp));\
-}
-
 #endif //JAQ_ARCH_TYPES_H

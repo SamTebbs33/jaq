@@ -8,18 +8,6 @@
 
 extern void irq_return(void);
 
-void arch_copy_cpu_state(arch_cpu_state_t* dest, arch_cpu_state_t* src) {
-    dest->edi = src->edi;
-    dest->esi = src->esi;
-    dest->ebx = src->ebx;
-    dest->edx = src->edx;
-    dest->ecx = src->ecx;
-    dest->eax = src->eax;
-    dest->eip = src->eip;
-    dest->esp = src->esp;
-    dest->ebp = src->ebp;
-}
-
 void arch_init_process_state(process_t* process, void (*entry_function)(void), void (*exit_function)(void)) {
     arch_cpu_state_t* kernel_state = process->kernel_state;
     arch_cpu_state_t* user_state = process->user_state;

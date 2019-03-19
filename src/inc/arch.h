@@ -61,8 +61,4 @@ void arch_init_process_state(process_t* process, void (*entry_function)(void), v
 
 void arch_register_syscall(uint32_t syscall, arch_syscall_handler_t handler);
 
-void arch_copy_cpu_state(arch_cpu_state_t* dest, arch_cpu_state_t* src);
-
-void arch_save_cpu_state(arch_cpu_state_t* dest);
-
 #endif //JAQ_ARCH_H
