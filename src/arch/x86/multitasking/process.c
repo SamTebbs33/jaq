@@ -60,7 +60,6 @@ void arch_init_process_state(process_t* process, void (*entry_function)(void), v
         kernel_stack[kernel_stack_size / 4] = (uint32_t) exit_function;
         // Put user state on stack
         memcpy((uint32_t*)((uint32_t)kernel_stack + kernel_stack_size - 4 - sizeof(arch_cpu_state_t)), user_state, sizeof(arch_cpu_state_t));
-        logf(LOG_LEVEL_DEBUG, "copying to %d\n", (uint32_t)kernel_stack + kernel_stack_size - 4 - sizeof(arch_cpu_state_t));
         // Dummy eax value
         kernel_stack[kernel_stack_size / 4 - sizeof(arch_cpu_state_t) / 4 - 2] = 0;
         // Put address of routine that pops off the user state and enters user mode
