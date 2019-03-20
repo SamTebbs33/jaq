@@ -1,8 +1,4 @@
 .extern tss
-useresp:
-    .long 0
-usereip:
-    .long 0
 
 # void arch_switch_to_kernel_task(arch_cpu_state_t* current, arch_cpu_state_t* next)
 .global arch_switch_to_kernel_task
@@ -16,8 +12,10 @@ arch_switch_to_kernel_task:
     # Get the next proc's state
     mov 16(%esp), %eax
 
-    # Save current state
+    # Save current kernel state
+    # Save pushed eax into state
     pop 44(%edi)
+    # Save pushed edi into state
     pop 16(%edi)
     mov %esi, 20(%edi)
     mov %ebp, 24(%edi)
@@ -35,6 +33,7 @@ arch_switch_to_kernel_task:
     mov 36(%eax), %edx
     mov 40(%eax), %ecx
     mov 44(%eax), %eax
+    # Use next proc's kernel esp when an interrupt occurs
     mov %esp, (tss + 4)
 
     # Re-enable interrupts
@@ -53,8 +52,10 @@ arch_switch_to_user_task:
     # Next proc's state
     mov 16(%esp), %eax
 
-    # Save current state
+    # Save current kernel state
+    # Save pushed eax into state
     pop 44(%edi)
+    # Save pushed edi into state
     pop 16(%edi)
     mov %esi, 20(%edi)
     mov %ebp, 24(%edi)
@@ -63,7 +64,7 @@ arch_switch_to_user_task:
     mov %edx, 36(%edi)
     mov %ecx, 40(%edi)
 
-    # Restore next state
+    # Restore next kernel state
     mov 16(%eax), %edi
     mov 20(%eax), %esi
     mov 24(%eax), %ebp
@@ -72,8 +73,9 @@ arch_switch_to_user_task:
     mov 36(%eax), %edx
     mov 40(%eax), %ecx
     mov 44(%eax), %eax
+    # Use next proc's kernel esp when an interrupt occurs
     mov %esp, (tss + 4)
 
     # Interrupts are re-enabled by the interrupt handler
-    # Return
+    # Return to interrupt handler
     ret

@@ -87,10 +87,32 @@ int strrchr(char* str, char ch) {
     return -1;
 }
 
+int strstr(char* str, char* substr) {
+    int next = 1, start = 0;
+    char* substr_start = substr;
+    while(*str) {
+        if(*substr == '\0') return start;
+        else if(*substr != *str) {
+            start = next;
+            substr = substr_start;
+        } else substr++;
+        next++;
+        str++;
+    }
+    return *substr == '\0' ? start : -1;
+}
+
 char *strdup(char *str) {
-    size_t len = strlen(str) + 1;
+    return strndup(str, strlen(str));
+}
+
+char* strndup(char* str, size_t n) {
+    size_t len = n + 1;
     char* dup = kmalloc(len * sizeof(char));
-    if(dup) memcpy(dup, str, len);
+    if(dup) {
+        memcpy(dup, str, n);
+        dup[n] = '\0';
+    }
     return dup;
 }
 
