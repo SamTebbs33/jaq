@@ -154,8 +154,6 @@ void paging_init(uint32_t mem_kilobytes, uint32_t virtual_start, uint32_t virtua
     pile_ptr = pile_start;
     pile_end = pile_virt_end;
 
-    idt_register_isr_handler(14, page_fault_handler);
-
     // Create and map the directory
     kernel_directory = kmalloc_a(sizeof(page_directory_t));
     paging_map_4mb_dir(kernel_directory, map_phys_start, map_phys_end, map_virt_start, map_virt_end);
