@@ -1,8 +1,4 @@
 .extern tss
-useresp:
-    .long 0
-usereip:
-    .long 0
 
 # void arch_switch_to_kernel_task(arch_cpu_state_t* current, arch_cpu_state_t* next)
 .global arch_switch_to_kernel_task
