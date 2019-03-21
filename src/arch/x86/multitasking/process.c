@@ -36,12 +36,12 @@ extern void irq_return(void);
 
 void arch_init_process_state(process_t* process, void (*entry_function)(void), void (*exit_function)(void)) {
     arch_cpu_state_t* kernel_state = process->kernel_state;
-    arch_cpu_state_t* user_state = process->user_state;
     uint32_t* kernel_stack = (uint32_t*)process->kernel_stack;
     uint32_t kernel_stack_size = process->kernel_stack_size;
     memset(kernel_state, 0, sizeof(arch_cpu_state_t));
 
     if (process->level == USER) {
+        arch_cpu_state_t* user_state = process->user_state;
         uint32_t* user_stack = (uint32_t*)process->user_stack;
         uint32_t user_stack_size = process->user_stack_size;
         memset(user_state, 0, sizeof(arch_cpu_state_t));
@@ -49,27 +49,45 @@ void arch_init_process_state(process_t* process, void (*entry_function)(void), v
         // This state is popped off by the irq return code, which then does an iret into userland
         user_state->ss = user_state->gs = user_state->fs = user_state->es = user_state->ds = GDT_DATA_SEGMENT_USER;
         user_state->cs = GDT_CODE_SEGMENT_USER;
-        user_state->useresp = (uint32_t)process->user_stack + process->user_stack_size;
         user_state->eflags = 0x200;
         user_state->eip = (uint32_t)entry_function;
 
+        user_stack[255] = (uint32_t)exit_function;
+
+        user_state->useresp = (uint32_t)process->user_stack + 255 * 4;
         user_state->esp = user_state->useresp;
         user_state->ebp = 0;
-        user_stack[process->user_stack_size/4] = (uint32_t)exit_function;
-        // Exit return address
-        kernel_stack[kernel_stack_size / 4] = (uint32_t) exit_function;
-        // Put user state on stack
-        memcpy((uint32_t*)((uint32_t)kernel_stack + kernel_stack_size - 4 - sizeof(arch_cpu_state_t)), user_state, sizeof(arch_cpu_state_t));
-        // Dummy eax value
-        kernel_stack[kernel_stack_size / 4 - sizeof(arch_cpu_state_t) / 4 - 2] = 0;
-        // Put address of routine that pops off the user state and enters user mode
-        kernel_stack[kernel_stack_size / 4 - sizeof(arch_cpu_state_t) / 4 - 3] = (uint32_t) irq_return;
-        // Point kernel esp to below exit function address, user state and dummy eax value
-        kernel_state->esp = (uint32_t)kernel_stack + kernel_stack_size - sizeof(arch_cpu_state_t) - 3 * 4;
+
+        kernel_stack[255] = (uint32_t)exit_function;
+        kernel_stack[254] = user_state->ss;
+        kernel_stack[253] = user_state->useresp;
+        kernel_stack[252] = user_state->eflags;
+        kernel_stack[251] = user_state->cs;
+        kernel_stack[250] = user_state->eip;
+        kernel_stack[249] = user_state->err_code;
+        kernel_stack[248] = user_state->int_no;
+        kernel_stack[247] = user_state->eax;
+        kernel_stack[246] = user_state->ecx;
+        kernel_stack[245] = user_state->edx;
+        kernel_stack[244] = user_state->ebx;
+        kernel_stack[243] = user_state->esp;
+        kernel_stack[242] = user_state->ebp;
+        kernel_stack[241] = user_state->esi;
+        kernel_stack[240] = user_state->edi;
+        kernel_stack[239] = user_state->ds;
+        kernel_stack[238] = user_state->es;
+        kernel_stack[237] = user_state->fs;
+        kernel_stack[236] = user_state->gs;
+        kernel_stack[235] = 0;
+        kernel_stack[234] = (uint32_t)irq_return;
+
+        kernel_state->esp = (uint32_t)kernel_stack + 234 * 4;
+
     } else {
-        kernel_state->esp = (uint32_t)kernel_stack + kernel_stack_size - 4;
-        kernel_stack[kernel_stack_size/4 - 1] = (uint32_t)entry_function;
-        kernel_stack[kernel_stack_size/4] = (uint32_t)exit_function;
+        kernel_stack[255] = (uint32_t)exit_function;
+        kernel_stack[254] = (uint32_t)entry_function;
+
+        kernel_state->esp = (uint32_t)kernel_stack + 254 * 4;
     }
     kernel_state->ebp = 0;
 }
