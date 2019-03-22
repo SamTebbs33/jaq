@@ -52,42 +52,42 @@ void arch_init_process_state(process_t* process, void (*entry_function)(void), v
         user_state->eflags = 0x200;
         user_state->eip = (uint32_t)entry_function;
 
-        user_stack[255] = (uint32_t)exit_function;
+        user_stack[user_stack_size_int - 1] = (uint32_t)exit_function;
 
-        user_state->useresp = (uint32_t)process->user_stack + 255 * 4;
+        user_state->useresp = (uint32_t)process->user_stack + (kernel_stack_size_int - 1) * 4;
         user_state->esp = user_state->useresp;
         user_state->ebp = 0;
 
-        kernel_stack[255] = (uint32_t)exit_function;
-        kernel_stack[254] = user_state->ss;
-        kernel_stack[253] = user_state->useresp;
-        kernel_stack[252] = user_state->eflags;
-        kernel_stack[251] = user_state->cs;
-        kernel_stack[250] = user_state->eip;
-        kernel_stack[249] = user_state->err_code;
-        kernel_stack[248] = user_state->int_no;
-        kernel_stack[247] = user_state->eax;
-        kernel_stack[246] = user_state->ecx;
-        kernel_stack[245] = user_state->edx;
-        kernel_stack[244] = user_state->ebx;
-        kernel_stack[243] = user_state->esp;
-        kernel_stack[242] = user_state->ebp;
-        kernel_stack[241] = user_state->esi;
-        kernel_stack[240] = user_state->edi;
-        kernel_stack[239] = user_state->ds;
-        kernel_stack[238] = user_state->es;
-        kernel_stack[237] = user_state->fs;
-        kernel_stack[236] = user_state->gs;
-        kernel_stack[235] = 0;
-        kernel_stack[234] = (uint32_t)irq_return;
+        kernel_stack[kernel_stack_size_int - 2] = (uint32_t)exit_function;
+        kernel_stack[kernel_stack_size_int - 3] = user_state->ss;
+        kernel_stack[kernel_stack_size_int - 4] = user_state->useresp;
+        kernel_stack[kernel_stack_size_int - 5] = user_state->eflags;
+        kernel_stack[kernel_stack_size_int - 6] = user_state->cs;
+        kernel_stack[kernel_stack_size_int - 7] = user_state->eip;
+        kernel_stack[kernel_stack_size_int - 8] = user_state->err_code;
+        kernel_stack[kernel_stack_size_int - 9] = user_state->int_no;
+        kernel_stack[kernel_stack_size_int - 10] = user_state->eax;
+        kernel_stack[kernel_stack_size_int - 11] = user_state->ecx;
+        kernel_stack[kernel_stack_size_int - 12] = user_state->edx;
+        kernel_stack[kernel_stack_size_int - 13] = user_state->ebx;
+        kernel_stack[kernel_stack_size_int - 14] = user_state->esp;
+        kernel_stack[kernel_stack_size_int - 15] = user_state->ebp;
+        kernel_stack[kernel_stack_size_int - 16] = user_state->esi;
+        kernel_stack[kernel_stack_size_int - 17] = user_state->edi;
+        kernel_stack[kernel_stack_size_int - 18] = user_state->ds;
+        kernel_stack[kernel_stack_size_int - 19] = user_state->es;
+        kernel_stack[kernel_stack_size_int - 20] = user_state->fs;
+        kernel_stack[kernel_stack_size_int - 21] = user_state->gs;
+        kernel_stack[kernel_stack_size_int - 22] = 0;
+        kernel_stack[kernel_stack_size_int - 23] = (uint32_t)irq_return;
 
-        kernel_state->esp = (uint32_t)kernel_stack + 234 * 4;
+        kernel_state->esp = (uint32_t)kernel_stack + (user_stack_size_int - 23) * 4;
 
     } else {
-        kernel_stack[255] = (uint32_t)exit_function;
-        kernel_stack[254] = (uint32_t)entry_function;
+        kernel_stack[kernel_stack_size_int - 1] = (uint32_t)exit_function;
+        kernel_stack[kernel_stack_size_int - 2] = (uint32_t)entry_function;
 
-        kernel_state->esp = (uint32_t)kernel_stack + 254 * 4;
+        kernel_state->esp = (uint32_t)kernel_stack + (kernel_stack_size_int - 2) * 4;
     }
     kernel_state->ebp = 0;
 }
