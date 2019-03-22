@@ -37,13 +37,13 @@ extern void irq_return(void);
 void arch_init_process_state(process_t* process, void (*entry_function)(void), void (*exit_function)(void)) {
     arch_cpu_state_t* kernel_state = process->kernel_state;
     uint32_t* kernel_stack = (uint32_t*)process->kernel_stack;
-    uint32_t kernel_stack_size = process->kernel_stack_size;
+    uint32_t kernel_stack_size = process->kernel_stack_size, kernel_stack_size_int = kernel_stack_size / 4;
     memset(kernel_state, 0, sizeof(arch_cpu_state_t));
 
     if (process->level == USER) {
         arch_cpu_state_t* user_state = process->user_state;
         uint32_t* user_stack = (uint32_t*)process->user_stack;
-        uint32_t user_stack_size = process->user_stack_size;
+        uint32_t user_stack_size = process->user_stack_size, user_stack_size_int = user_stack_size / 4;
         memset(user_state, 0, sizeof(arch_cpu_state_t));
 
         // This state is popped off by the irq return code, which then does an iret into userland
