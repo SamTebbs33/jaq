@@ -6,7 +6,22 @@
 #include <gdt.h>
 #include <lib/util.h>
 
+extern void switch_to_user_task(arch_cpu_state_t* current, arch_cpu_state_t* next, uint32_t k_stack_base);
+extern void switch_to_kernel_task(arch_cpu_state_t* current, arch_cpu_state_t* next);
 extern void irq_return(void);
+
+void arch_switch_task(process_t* current, process_t* next) {
+    uint32_t kernel_stack_base = (uint32_t)next->kernel_stack + next->kernel_stack_size - 4;
+    if(next->level == USER) {
+        logf(LOG_LEVEL_DEBUG, "Switching to user task %s\n", next->name);
+        switch_to_user_task(current->kernel_state, next->kernel_state, kernel_stack_base);
+    }
+    if(next->level == KERNEL) {
+        logf(LOG_LEVEL_DEBUG, "Switching to kernel task %s\n", next->name);
+        switch_to_kernel_task(current->kernel_state, next->kernel_state);
+    }
+}
+
 
 /*
  * Process stackmap

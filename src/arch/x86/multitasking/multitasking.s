@@ -1,8 +1,8 @@
 .extern tss
 
 # void arch_switch_to_kernel_task(arch_cpu_state_t* current, arch_cpu_state_t* next)
-.global arch_switch_to_kernel_task
-arch_switch_to_kernel_task:
+.global switch_to_kernel_task
+switch_to_kernel_task:
     # Disable interrupts to avoid being interrupted mid-switch
     cli
     push %edi
@@ -41,9 +41,9 @@ arch_switch_to_kernel_task:
     # Return to return address stored at start of next proc's stack
     ret
 
-# void arch_switch_to_user_task(arch_cpu_state_t* current, arch_cpu_state_t* next, arch_cpu_state_t* next_user)
-.global arch_switch_to_user_task
-arch_switch_to_user_task:
+# void arch_switch_to_user_task(arch_cpu_state_t* current, arch_cpu_state_t* next, uint32_t kernel_stack_base)
+.global switch_to_user_task
+switch_to_user_task:
     cli
     push %edi
     push %eax
@@ -63,6 +63,9 @@ arch_switch_to_user_task:
     mov %ebx, 32(%edi)
     mov %edx, 36(%edi)
     mov %ecx, 40(%edi)
+    # Use base of next proc's kernel stack as esp for interrupts
+    mov 12(%esp), %ebx
+    mov %ebx, (tss + 4)
 
     # Restore next kernel state
     mov 16(%eax), %edi
@@ -73,8 +76,6 @@ arch_switch_to_user_task:
     mov 36(%eax), %edx
     mov 40(%eax), %ecx
     mov 44(%eax), %eax
-    # Use next proc's kernel esp when an interrupt occurs
-    mov %esp, (tss + 4)
 
     # Interrupts are re-enabled by the interrupt handler
     # Return to interrupt handler
