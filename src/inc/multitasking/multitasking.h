@@ -48,6 +48,11 @@ void multitasking_yield();
 void multitasking_exit_process();
 
 /**
+ * Exit the current user process. Calls the PROC_EXIT syscall
+ */
+void multitasking_exit_process_user();
+
+/**
  * Sleep the current process for at least the given number of milliseconds
  * @param milliseconds The smallest number of milliseconds the process will sleep for
  */

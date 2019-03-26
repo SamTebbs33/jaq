@@ -96,8 +96,12 @@ void cleaner() {
     }
 }
 
+void multitasking_exit_process_user() {
+    ASSERT_EQ_INT("user mode check", current_process->level, USER);
+    ARCH_SYSCALL(SYSCALL_PROC_EXIT);
+}
+
 void multitasking_exit_process() {
-    logf(LOG_LEVEL_DEBUG, "Exiting %s\n", current_process->name);
     current_process->process_state = TERMINATED;
     queue_enqueue(terminated_queue, current_process);
     switch_to_next(false);
@@ -122,7 +126,7 @@ void multitasking_init(void* kernel_stack, uint32_t kernel_stack_size) {
 }
 
 void multitasking_init_process_state(process_t *process, void (*entry_function)(void)) {
-    arch_init_process_state(process, entry_function, multitasking_exit_process);
+    arch_init_process_state(process, entry_function, process->level == USER ? multitasking_exit_process_user : multitasking_exit_process);
 }
 
 void multitasking_schedule(process_t *process) {
