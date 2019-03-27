@@ -29,21 +29,21 @@ void arch_switch_task(process_t* current, process_t* next) {
  * Kernel process:
  *
  *      Kernel stack
- *      top: Exit function
- *      top - 4: Entry function  <- esp
+ *      top - 4: Exit function
+ *      top - 8: Entry function  <- esp
  *
  *      No user stack
  *
  * User process:
  *
  *      Kernel stack
- *      top: Exit function
- *      top - 4: Initial user state
- *      top - 4 - sizeof(arch_cpu_state_t): Unused eax value
- *      top - 8 - sizeof(arch_cpu_state_t): Return address  <- kernel_state.esp
+ *      top - 4: Exit function
+ *      top - 8: Initial user state
+ *      top - 8 - sizeof(arch_cpu_state_t): Unused eax value
+ *      top - 12 - sizeof(arch_cpu_state_t): Return address  <- kernel_state.esp
  *
  *      User stack
- *      top: Exit function  <- user_state.useresp
+ *      top - 4: Exit function  <- user_state.useresp
  *
  * The return address on the bottom of the kernel stack is set up to point to irq_return, which pops off the user state and does an iret into userland. Doing a ret from arch_switch_to_user_task will jump to irq_return.
  *
@@ -74,29 +74,12 @@ void arch_init_process_state(process_t* process, void (*entry_function)(void), v
         user_state->ebp = 0;
 
         kernel_stack[kernel_stack_size_int - 2] = (uint32_t)exit_function;
-        kernel_stack[kernel_stack_size_int - 3] = user_state->ss;
-        kernel_stack[kernel_stack_size_int - 4] = user_state->useresp;
-        kernel_stack[kernel_stack_size_int - 5] = user_state->eflags;
-        kernel_stack[kernel_stack_size_int - 6] = user_state->cs;
-        kernel_stack[kernel_stack_size_int - 7] = user_state->eip;
-        kernel_stack[kernel_stack_size_int - 8] = user_state->err_code;
-        kernel_stack[kernel_stack_size_int - 9] = user_state->int_no;
-        kernel_stack[kernel_stack_size_int - 10] = user_state->eax;
-        kernel_stack[kernel_stack_size_int - 11] = user_state->ecx;
-        kernel_stack[kernel_stack_size_int - 12] = user_state->edx;
-        kernel_stack[kernel_stack_size_int - 13] = user_state->ebx;
-        kernel_stack[kernel_stack_size_int - 14] = user_state->esp;
-        kernel_stack[kernel_stack_size_int - 15] = user_state->ebp;
-        kernel_stack[kernel_stack_size_int - 16] = user_state->esi;
-        kernel_stack[kernel_stack_size_int - 17] = user_state->edi;
-        kernel_stack[kernel_stack_size_int - 18] = user_state->ds;
-        kernel_stack[kernel_stack_size_int - 19] = user_state->es;
-        kernel_stack[kernel_stack_size_int - 20] = user_state->fs;
-        kernel_stack[kernel_stack_size_int - 21] = user_state->gs;
-        kernel_stack[kernel_stack_size_int - 22] = 0;
-        kernel_stack[kernel_stack_size_int - 23] = (uint32_t)irq_return;
+        memcpy((void*)((uint32_t)kernel_stack + kernel_stack_size - sizeof(arch_cpu_state_t) - 8), user_state, sizeof(arch_cpu_state_t));
 
-        kernel_state->esp = (uint32_t)kernel_stack + (user_stack_size_int - 23) * 4;
+        kernel_stack[kernel_stack_size_int - 2 - sizeof(arch_cpu_state_t) / 4 - 1] = 0;
+        kernel_stack[kernel_stack_size_int - 2 - sizeof(arch_cpu_state_t) / 4 - 2] = (uint32_t)irq_return;
+
+        kernel_state->esp = (uint32_t)kernel_stack + kernel_stack_size - 8 - sizeof(arch_cpu_state_t) - 8;
 
     } else {
         kernel_stack[kernel_stack_size_int - 1] = (uint32_t)exit_function;
