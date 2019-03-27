@@ -89,7 +89,6 @@ void cleaner() {
     while (true) {
         if(queue_size(terminated_queue) > 0) {
             process_t* proc = queue_dequeue(terminated_queue);
-            logf(LOG_LEVEL_DEBUG, "Cleaning %s\n", proc->name);
             process_free(proc);
             kfree(proc);
         }
