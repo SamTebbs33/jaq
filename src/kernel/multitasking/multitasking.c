@@ -113,10 +113,13 @@ void multitasking_init(void* kernel_stack, uint32_t kernel_stack_size) {
     terminated_queue = queue_create();
 
     // Create the init process
-    init_process = current_process = process_create("init", kmalloc(sizeof(arch_cpu_state_t)), NULL, kernel_stack, kernel_stack_size, NULL, 0, KERNEL);
+    process_stack_t* init_stack = kmalloc(sizeof(process_stack_t));
+    init_stack->ptr = kernel_stack;
+    init_stack->size = kernel_stack_size;
+    init_process = current_process = process_create("init", kmalloc(sizeof(arch_cpu_state_t)), NULL, init_stack, NULL, KERNEL);
 
     // Create the cleaner process
-    cleaner_process = process_create("cleaner", kmalloc(sizeof(arch_cpu_state_t)), kmalloc(sizeof(arch_cpu_state_t)), kmalloc(1024), 1024, kmalloc(1024), 1024, USER);
+    cleaner_process = process_create("cleaner", kmalloc(sizeof(arch_cpu_state_t)), kmalloc(sizeof(arch_cpu_state_t)), process_stack_create(1024), process_stack_create(1024), USER);
     multitasking_init_process_state(cleaner_process, cleaner);
     multitasking_schedule(cleaner_process);
 
