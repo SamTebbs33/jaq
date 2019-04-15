@@ -23,6 +23,7 @@
 fs_node_t *fs_root;
 extern void* KERNEL_VADDR_END, * KERNEL_VADDR_START, * KERNEL_PHYSADDR_END, * KERNEL_PHYSADDR_START;
 extern void* kernel_stack, * kernel_stack_end;
+void (*user_test_prog)(void);
 
 void kmain(multiboot_info_t* mb_info, uint32_t mb_magic) {
     ASSERT_EQ_INT("multiboot magic number", mb_magic, MULTIBOOT_BOOTLOADER_MAGIC);
@@ -42,6 +43,7 @@ void kmain(multiboot_info_t* mb_info, uint32_t mb_magic) {
     fs_init();
     if(mb_info->mods_count == 1) {
         initrd_init(initrd_virtual_start);
+        // TODO: Load user_test_bin from initrd and map it in init_process_state
     }
 
     log_info("Initialising devices\n");

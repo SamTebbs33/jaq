@@ -2,6 +2,7 @@
 // Created by Samuel Tebbs on 16/04/2018.
 //
 
+#include <arch_defs.h>
 #include <mem/heap.h>
 #include <mem/mem.h>
 #include <lib/util.h>
@@ -52,29 +53,35 @@ heap_t *heap_create(uint32_t start_addr, uint32_t end_addr, bool is_kernel, bool
     return heap;
 }
 
-heap_header_t* find_hole(size_t size, heap_t* heap) {
+heap_header_t* find_hole(size_t size, heap_t* heap, uint32_t alignment) {
     heap_index_t* index = heap->hole_index;
     size_t best_size = SIZE_MAX;
     heap_header_t* best_header = NULL;
     for (uint32_t i = 0; i < index->size; ++i) {
         heap_header_t* header = index->entries[i];
-        if(header->is_hole && header->size >= size) {
-            if(header->size == size) {
-                best_header = header;
-                best_size = size;
-                break;
-            } else if(header->size < best_size) {
-                best_header = header;
-                best_size = header->size;
+        if(header->is_hole) {
+            // Add the size lost due to alignment
+            uint32_t alignment_offset = alignment == 0 ? 0 : ((uint32_t) header + sizeof(heap_header_t)) % alignment;
+            size_t size_needed = size + alignment_offset;
+            if(header->size >= size_needed) {
+                if(header->size == size_needed) {
+                    best_header = header;
+                    best_size = size_needed;
+                    break;
+                } else if(header->size < best_size) {
+                    best_header = header;
+                    best_size = header->size;
+                }
             }
         }
     }
     return best_header;
 }
 
-void *heap_alloc(size_t size, heap_t *heap) {
+void *heap_alloc(size_t size, heap_t *heap, uint32_t alignment) {
     if(heap->capacity - heap->occupied >= size) {
-        heap_header_t* hole = find_hole(size, heap);
+        heap_header_t* hole = find_hole(size, heap, alignment);
+        uint32_t data_addr = (uint32_t) hole + sizeof(heap_header_t);
         if(hole) {
             size_t overhead = sizeof(heap_header_t) + sizeof(heap_footer_t);
             // Memory in the hole that exceeds what was requested
@@ -85,10 +92,9 @@ void *heap_alloc(size_t size, heap_t *heap) {
                 split_right(hole, surplus - overhead, heap);
             }
             hole->is_hole = false;
-            uint32_t data_addr = (uint32_t) hole + sizeof(heap_header_t);
             // The memory taken up by the block is now occupied
             heap->occupied += hole->size + sizeof(heap_header_t) + sizeof(heap_footer_t);
-            return (void *) data_addr;
+            return (void *) (alignment == 0 ? data_addr : ARCH_ALIGN_UP(data_addr, alignment));
         }
     }
     return NULL;

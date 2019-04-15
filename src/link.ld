@@ -18,24 +18,24 @@ SECTIONS
         *(.multiboot.text)
     }
 
-	/* The kernel will be loaded at 1MB, but will be mapped to 3GB + 1MB  */
+    /* The kernel will be loaded at 1MB, but will be mapped to 3GB + 1MB  */
     . += KERNEL_ADDR_OFFSET;
 
-	.text ALIGN(4K) : AT (ADDR (.text) - KERNEL_ADDR_OFFSET) {
-		*(.text)
-	}
+    .text ALIGN(4K) : AT (ADDR (.text) - KERNEL_ADDR_OFFSET) {
+        *(.text)
+    }
 
-	.rodata ALIGN(4K) : AT (ADDR (.rodata) - KERNEL_ADDR_OFFSET) {
-		*(.rodata)
-	}
+    .rodata ALIGN(4K) : AT (ADDR (.rodata) - KERNEL_ADDR_OFFSET) {
+        *(.rodata)
+    }
 
-	.data ALIGN(4K) : AT (ADDR (.data) - KERNEL_ADDR_OFFSET) {
-		*(.data)
-	}
+    .data ALIGN(4K) : AT (ADDR (.data) - KERNEL_ADDR_OFFSET) {
+        *(.data)
+    }
 
 	.bss ALIGN(4K) : AT (ADDR (.bss) - KERNEL_ADDR_OFFSET) {
-		*(COMMON)
-		*(.bss)
+        *(COMMON)
+        *(.bss)
 	}
 
     /DISCARD/ : {

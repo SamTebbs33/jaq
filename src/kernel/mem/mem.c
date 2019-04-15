@@ -3,18 +3,18 @@
 //
 
 #include <mem/mem.h>
-#include <paging.h>
+#include <arch_defs.h>
 #include <mem/heap.h>
 
 uint32_t pile_start, pile_end, pile_ptr;
 extern heap_t* kernel_heap;
 
 void* _kmalloc(size_t size, bool align) {
-    if(kernel_heap != NULL) return heap_alloc(size, kernel_heap);
+    if(kernel_heap != NULL) return heap_alloc(size, kernel_heap, align ? ARCH_PAGE_SIZE : 0);
     // If the address is not already page-aligned
-    if (align && !IS_PAGE_ALIGNED(pile_ptr)) {
+    if (align && !ARCH_IS_PAGE_ALIGNED(pile_ptr)) {
         // Align it
-        pile_ptr = ALIGN_UP(pile_ptr);
+        pile_ptr = ARCH_ALIGN_UP(pile_ptr, ARCH_PAGE_SIZE);
     }
     if(pile_ptr >= pile_end || pile_ptr + size >= pile_end) return NULL;
     uint32_t tmp = pile_ptr;

@@ -21,7 +21,7 @@ uint32_t tick_counter = 0;
 uint32_t milliseconds_counter = 0;
 
 process_t* init_process = NULL, * cleaner_process = NULL;
-extern void (*arch_user_test)(void);
+extern void (*user_test_prog)(void);
 
 bool process_can_run(process_t* proc) {
     return proc->process_state != SLEEPING && proc->process_state != BLOCKED && proc->process_state != TERMINATED;
@@ -119,9 +119,13 @@ void multitasking_init(void* kernel_stack, uint32_t kernel_stack_size) {
     init_process = current_process = process_create("init", kmalloc(sizeof(arch_cpu_state_t)), NULL, init_stack, NULL, KERNEL);
 
     // Create the cleaner process
-    cleaner_process = process_create("cleaner", kmalloc(sizeof(arch_cpu_state_t)), kmalloc(sizeof(arch_cpu_state_t)), process_stack_create(1024), process_stack_create(1024), USER);
+    cleaner_process = process_create("cleaner", kmalloc(sizeof(arch_cpu_state_t)), NULL, process_stack_create(1024), NULL, KERNEL);
     multitasking_init_process_state(cleaner_process, cleaner);
     multitasking_schedule(cleaner_process);
+
+    process_t* user_test = process_create("user test", kmalloc(sizeof(arch_cpu_state_t)), kmalloc(sizeof(arch_cpu_state_t)), process_stack_create(1024), process_stack_create(1024), USER);
+    multitasking_init_process_state(user_test, user_test_prog);
+    multitasking_schedule(user_test);
 
     arch_register_interrupt_handler(ARCH_INTERRUPT_TIMER, on_tick);
     arch_register_syscall(SYSCALL_PROC_EXIT, on_exit_syscall);

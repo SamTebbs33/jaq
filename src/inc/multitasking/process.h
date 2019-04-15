@@ -24,7 +24,6 @@ typedef struct process {
     char* name;
     arch_cpu_state_t* kernel_state;
     arch_cpu_state_t* user_state;
-    page_directory_t* page_directory;
     process_stack_t* kernel_stack;
     process_stack_t* user_stack;
     process_level_t level;

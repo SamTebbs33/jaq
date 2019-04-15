@@ -54,29 +54,33 @@ switch_to_user_task:
 
     # Save current kernel state
     # Save pushed eax into state
-    pop 44(%edi)
+    pop 48(%edi)
     # Save pushed edi into state
-    pop 16(%edi)
-    mov %esi, 20(%edi)
-    mov %ebp, 24(%edi)
-    mov %esp, 28(%edi)
-    mov %ebx, 32(%edi)
-    mov %edx, 36(%edi)
-    mov %ecx, 40(%edi)
+    pop 20(%edi)
+    mov %esi, 24(%edi)
+    mov %ebp, 28(%edi)
+    mov %esp, 32(%edi)
+    mov %ebx, 36(%edi)
+    mov %edx, 40(%edi)
+    mov %ecx, 44(%edi)
+    mov %cr3, %ebx
+    mov %ebx, (%edi)
     # Use base of next proc's kernel stack as esp for interrupts
     mov 12(%esp), %ebx
     mov %ebx, (tss + 4)
-
     # Restore next kernel state
-    mov 16(%eax), %edi
-    mov 20(%eax), %esi
-    mov 24(%eax), %ebp
-    mov 28(%eax), %esp
-    mov 32(%eax), %ebx
-    mov 36(%eax), %edx
-    mov 40(%eax), %ecx
-    mov 44(%eax), %eax
+    mov (%eax), %ebx
+    mov %ebx, %cr3
+    mov 20(%eax), %edi
+    mov 24(%eax), %esi
+    mov 28(%eax), %ebp
+    mov 32(%eax), %esp
+    mov 36(%eax), %ebx
+    mov 40(%eax), %edx
+    mov 44(%eax), %ecx
+    mov 48(%eax), %eax
 
     # Interrupts are re-enabled by the interrupt handler
     # Return to interrupt handler
     ret
+

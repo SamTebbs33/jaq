@@ -87,10 +87,14 @@ isr_common:
 	mov %ax, %es
 	mov %ax, %fs
 	mov %ax, %gs
+	mov %cr3, %eax
+	push %eax
 	mov %esp, %eax
 	push %eax # This points to the cpu_state saved on the stack, which C pops off as an arch_cpu_state_t*
 	call isr_handler
+	add $0x4, %esp
 	pop %eax
+	mov %eax, %cr3
 	pop %gs
 	pop %fs
 	pop %es
@@ -111,13 +115,17 @@ irq_common:
 	mov %ax, %es
 	mov %ax, %fs
 	mov %ax, %gs
+	mov %cr3, %eax
+	push %eax
 	mov %esp, %eax
 	push %eax # This points to the cpu_state saved on the stack, which C pops off as an arch_cpu_state_t*
 	call irq_handler
 
 .global irq_return
 irq_return:
+	add $0x4, %esp
 	pop %eax
+	mov %eax, %cr3
 	pop %gs
 	pop %fs
 	pop %es

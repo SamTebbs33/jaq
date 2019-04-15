@@ -62,9 +62,10 @@ heap_t* heap_create(uint32_t start_addr, uint32_t end_addr, bool is_kernel, bool
  * Allocate some memory on the heap
  * @param size The size of the memory
  * @param heap The heap in which to allocate
+ * @param alignment The desired alignment of the returned pointer. 0 for no alignment
  * @return A pointer to the allocated memory or NULL if allocation failed
  */
-void* heap_alloc(size_t size, heap_t* heap);
+void* heap_alloc(size_t size, heap_t* heap, uint32_t alignment);
 
 /**
  * Free some memory in the heap so that it can be reallocated

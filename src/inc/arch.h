@@ -45,12 +45,6 @@ uint8_t arch_inb(uint16_t port);
  */
 void arch_register_interrupt_handler(int interrupt, arch_interrupt_handler_t handler);
 
-/**
- * Sets the current page directory
- * @param page_dir The page directory to change to
- */
-void arch_set_page_directory(page_directory_t* page_dir);
-
 void arch_switch_task(process_t* current, process_t* next);
 
 void arch_acknowledge_irq(int32_t irq);

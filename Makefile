@@ -1,6 +1,6 @@
 CC = i686-elf-gcc
 AS = i686-elf-as
-LD = i686-elf-gcc
+LD = i686-elf-ld
 MKISO = grub-mkrescue
 GRUBFILE = grub-file
 EMU = qemu-system-i386
@@ -8,7 +8,7 @@ DEBUGGER = gdb
 
 CC_FLAGS ?= -std=gnu99 -Isrc/inc -ffreestanding -Wall -Wextra -Werror -Wno-unused-parameter -Wno-unused-variable -lgcc -O0 $(EXTRA_CC_FLAGS)
 AS_FLAGS ?= $(EXTRA_AS_FLAGS)
-LD_FLAGS ?= -ffreestanding -O2 -nostdlib -lgcc $(EXTRA_LD_FLAGS)
+LD_FLAGS ?= $(EXTRA_LD_FLAGS)
 EMU_FLAGS ?= -cdrom $(ISO_OUTPUT) -boot d -serial stdio $(EXTRA_EMU_FLAGS)
 GRUBFILE_FLAGS ?= --is-x86-multiboot $(EXTRA_GRUBFILE_FLAGS)
 DEBUGGER_FLAGS ?= -ex "symbol-file $(KERNEL_OUTPUT)" -ex "target remote localhost:1234" $(EXTRA_DEBUGGER_FLAGS)
@@ -77,9 +77,11 @@ $(KERNEL_OUTPUT): $(OBJECTS) $(LINK_SCRIPT)
 	mkdir -p $(shell dirname $(KERNEL_OUTPUT))
 	$(LD) -T $(LINK_SCRIPT) $(LD_FLAGS) $(OBJECTS) -o $(KERNEL_OUTPUT)
 
-$(INITRD_OUTPUT): $(INITRD_FILES) $(MKRD_OUTPUT)
+$(INITRD_OUTPUT): $(INITRD_FILES) $(MKRD_OUTPUT) user_test.s
 	$(info > $(MKRD_OUTPUT) $(INITRD_FILES) -> $@)
 	mkdir -p $(MODULES_OUTPUT)
+	$(AS) user_test.s -o user_test.o
+	$(LD) -Ttext 0x0 --oformat binary -o $(MODULES_OUTPUT)/user_test.bin user_test.o
 	./$(MKRD_OUTPUT) $(INITRD_OUTPUT) $(INITRD_FILES)
 
 $(ISO_OUTPUT): $(KERNEL_OUTPUT) check-multiboot $(INITRD_OUTPUT) $(GRUB_FILES)

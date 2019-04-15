@@ -7,6 +7,7 @@
 
 #include <stdinc.h>
 #include <boot_defs.h>
+#include <multitasking/process.h>
 
 #define PAGE_SIZE_4MB 0x400000
 #define PAGE_SIZE_4KB 0x1000
@@ -19,10 +20,6 @@
 #define PAGE_FAULT_USER (1 << 2)
 #define PAGE_FAULT_RESERVED (1 << 3)
 #define PAGE_FAULT_EXEC (1 << 4)
-
-#define ALIGN_DOWN(addr) ((addr) - ((addr) % PAGE_SIZE))
-#define ALIGN_UP(addr) (ALIGN_DOWN(addr) + PAGE_SIZE)
-#define IS_PAGE_ALIGNED(addr) ((addr % PAGE_SIZE) == 0)
 
 typedef uint32_t physaddr_t;
 
@@ -45,8 +42,6 @@ typedef struct {
 
 typedef struct {
     page_dir_entry_t entries[PAGE_TABLE_ENTRIES_PER_DIRECTORY];
-    // At the end of struct so should be ignored by MMU
-    //page_table_t* tables[PAGE_TABLE_ENTRIES_PER_DIRECTORY];
 } __attribute__((packed)) page_directory_t;
 
 /**
@@ -61,22 +56,31 @@ typedef struct {
 void paging_init(uint32_t mem_kilobytes, uint32_t virtual_start, uint32_t virtual_end, uint32_t phys_start, uint32_t phys_end, uint32_t initrd_end);
 
 /**
+ * Create a page directory.
+ * @param base The base directory whose mappings are copied. NULL for no base
+ * @return The new directory with the base's mappings applied
+ */
+page_directory_t* paging_create_page_dir(page_directory_t* base);
+
+/**
  * Map a page directory with 4MiB entries from phys_start, phys_end to virtual_start and virtual_end
  * @param dir The directory to map
  * @param phys_start The initial physical address to map to
  * @param phys_end The physical address to map up to
  * @param virtual_start The initial virtual address to map from
  * @param virtual_end The virtual address to map up to
+ * @param level The privilege level the directory applies to
  */
-void paging_map_4mb_dir(page_directory_t* dir, uint32_t phys_start, uint32_t phys_end, uint32_t virtual_start, uint32_t virtual_end);
+void paging_map_4mb_dir(page_directory_t* dir, uint32_t phys_start, uint32_t phys_end, uint32_t virtual_start, uint32_t virtual_end, process_level_t level);
 
 /**
  * Map a page to a 4MiB aligned physical address
  * @param dir The directory containing the page to map
  * @param page The page within the directory to map
  * @param phys_addr The 4MiB aligned physical address
+ * @param level The privilege level the page applies to
  */
-void paging_map_4mb_page(page_directory_t* dir, uint32_t page, uint32_t phys_addr);
+void paging_map_4mb_page(page_directory_t* dir, uint32_t page, uint32_t phys_addr, process_level_t level);
 
 /**
  * Allocate a page frame
