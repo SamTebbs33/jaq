@@ -87,21 +87,6 @@ int strrchr(char* str, char ch) {
     return -1;
 }
 
-int strstr(char* str, char* substr) {
-    int next = 1, start = 0;
-    char* substr_start = substr;
-    while(*str) {
-        if(*substr == '\0') return start;
-        else if(*substr != *str) {
-            start = next;
-            substr = substr_start;
-        } else substr++;
-        next++;
-        str++;
-    }
-    return *substr == '\0' ? start : -1;
-}
-
 char *strdup(char *str) {
     return strndup(str, strlen(str));
 }
