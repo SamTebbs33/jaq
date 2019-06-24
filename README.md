@@ -1,6 +1,8 @@
 # Jaq
 A kernel (and eventually OS) for the x86 platform.
 
+### Superseded by https://github.com/SamTebbs33/pluto
+
 ## Plans
 Check out the [GitHub project page](https://github.com/SamTebbs33/jaq/projects/1) for a more detailed and possibly more up-to-date list of plans.
 
